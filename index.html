@@ -4,208 +4,283 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>노무법인 두웰 · 실무 포털</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
     :root{
         --navy-1:#0a1730;
         --navy-2:#12335e;
-        --navy-3:#1c4a86;
         --gold:#d9b26a;
         --gold-bright:#ecca82;
-        --ink:#0b1626;
         --line:rgba(255,255,255,0.18);
         --glass:rgba(255,255,255,0.06);
         --glass-hover:rgba(255,255,255,0.13);
+        --font:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
-    html{scroll-behavior:smooth;}
-    body{font-family:'Noto Sans KR',sans-serif;color:#fff;background:var(--navy-1);-webkit-font-smoothing:antialiased;}
+    body{font-family:var(--font);color:#fff;background:var(--navy-1);-webkit-font-smoothing:antialiased;overflow:hidden;}
     a{text-decoration:none;color:inherit;}
-    .serif{font-family:'Cormorant Garamond','Noto Serif KR',serif;}
 
-    /* ===== 상단 네비게이션 ===== */
+    /* ===== 네비게이션 ===== */
     .nav{position:fixed;top:0;left:0;width:100%;z-index:50;display:flex;align-items:center;justify-content:space-between;
-        padding:22px 48px;transition:background .35s,padding .35s,box-shadow .35s;}
-    .nav.scrolled{background:rgba(8,18,38,0.92);padding:14px 48px;box-shadow:0 2px 20px rgba(0,0,0,0.35);backdrop-filter:blur(6px);}
+        padding:20px 48px;transition:background .35s,padding .35s,box-shadow .35s;}
+    .nav.solid{background:rgba(8,18,38,0.94);padding:12px 48px;box-shadow:0 2px 20px rgba(0,0,0,0.35);backdrop-filter:blur(6px);}
     .brand{display:flex;align-items:center;}
-    .brand .logo-img{height:34px;width:auto;display:block;}
-    .nav.scrolled .brand .logo-img{height:30px;}
-    .nav-links{display:flex;gap:38px;font-size:15px;font-weight:700;letter-spacing:-0.3px;}
-    .nav-links a{position:relative;padding:4px 0;color:#eef3fb;transition:color .2s;}
+    .brand .logo-img{height:34px;width:auto;display:block;transition:height .3s;}
+    .nav.solid .brand .logo-img{height:30px;}
+    .nav-links{display:flex;gap:36px;font-size:15px;font-weight:600;}
+    .nav-links a{position:relative;padding:4px 0;color:#eef3fb;cursor:pointer;transition:color .2s;}
     .nav-links a::after{content:"";position:absolute;left:0;bottom:-4px;width:0;height:2px;background:var(--gold);transition:width .25s;}
-    .nav-links a:hover{color:var(--gold-bright);}
-    .nav-links a:hover::after{width:100%;}
+    .nav-links a:hover,.nav-links a.active{color:var(--gold-bright);}
+    .nav-links a.active::after,.nav-links a:hover::after{width:100%;}
     .nav-toggle{display:none;font-size:26px;color:#fff;background:none;border:none;cursor:pointer;}
 
+    /* ===== 풀페이지 구조 ===== */
+    #fp{height:100vh;overflow:hidden;}
+    #fp-track{will-change:transform;transition:transform .9s cubic-bezier(.22,1,.36,1);}
+    .section{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:0 48px;text-align:center;}
+    .s-calc{background:radial-gradient(900px 500px at 50% 0%,rgba(40,90,160,.35),transparent 60%),linear-gradient(180deg,#0c1f3d,#0a1730);}
+    .s-template{background:radial-gradient(900px 500px at 50% 100%,rgba(40,90,160,.35),transparent 60%),linear-gradient(180deg,#0a1730,#0c2140);}
+    .s-form{background:radial-gradient(900px 500px at 50% 0%,rgba(40,90,160,.32),transparent 60%),linear-gradient(180deg,#0c1f3d,#0a1730);}
+    .s-flow{background:radial-gradient(900px 500px at 50% 100%,rgba(40,90,160,.35),transparent 60%),linear-gradient(180deg,#0a1730,#0c2140);}
+
     /* ===== 히어로 ===== */
-    .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;
-        /* ▼ 실제 빌딩 사진을 쓰려면 아래 background에 url('hero.jpg') 추가 */
-        background:
-            radial-gradient(1200px 600px at 70% 20%, rgba(40,90,160,0.55), transparent 60%),
-            linear-gradient(180deg,#0a1730 0%,#123058 45%,#0c1f3d 100%);
-    }
-    .hero .city{position:absolute;left:0;bottom:0;width:100%;height:46%;object-fit:cover;opacity:.5;pointer-events:none;}
+    .hero{overflow:hidden;background:radial-gradient(1200px 600px at 70% 20%,rgba(40,90,160,0.55),transparent 60%),linear-gradient(180deg,#0a1730 0%,#123058 45%,#0c1f3d 100%);}
+    .hero .city{position:absolute;left:0;bottom:0;width:100%;height:46%;pointer-events:none;}
     .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,18,38,.35),rgba(8,18,38,.55));}
-    .hero-inner{position:relative;z-index:2;padding:0 24px;max-width:900px;}
-    .hero .eng{font-size:clamp(34px,6vw,64px);font-weight:600;letter-spacing:2px;color:#fff;margin-bottom:26px;text-shadow:0 2px 30px rgba(0,0,0,.4);}
-    .hero .lead{font-size:clamp(17px,2.4vw,24px);font-weight:500;color:#dbe6f5;letter-spacing:-0.5px;margin-bottom:10px;}
+    .hero-inner{position:relative;z-index:2;max-width:900px;}
+    .hero .eng{font-size:clamp(30px,5.4vw,58px);font-weight:300;letter-spacing:3px;margin-bottom:26px;text-shadow:0 2px 30px rgba(0,0,0,.4);}
+    .hero .lead{font-size:clamp(16px,2.3vw,23px);font-weight:500;color:#dbe6f5;margin-bottom:12px;}
     .hero .lead .g{color:var(--gold-bright);}
-    .hero .title{font-size:clamp(26px,4.2vw,42px);font-weight:900;letter-spacing:-1px;line-height:1.35;}
-    .hero .title .hl{background:linear-gradient(transparent 55%,rgba(217,178,106,.85) 55%);padding:0 6px;color:#fff;}
-    .scroll-cue{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:2;color:#cdd9ec;font-size:12px;letter-spacing:2px;text-align:center;}
+    .hero .title{font-size:clamp(25px,4vw,40px);font-weight:800;letter-spacing:-1px;line-height:1.35;}
+    .hero .title .hl{background:linear-gradient(transparent 55%,rgba(217,178,106,.85) 55%);padding:0 6px;}
+    .scroll-cue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:2;color:#cdd9ec;font-size:12px;letter-spacing:2px;cursor:pointer;}
     .scroll-cue .chev{display:block;margin:8px auto 0;width:14px;height:14px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);animation:bob 1.6s infinite;}
     @keyframes bob{0%,100%{transform:rotate(45deg) translateY(0);}50%{transform:rotate(45deg) translateY(6px);}}
 
-    /* ===== 도구 섹션 ===== */
-    .tools{position:relative;padding:96px 48px 60px;background:
-        radial-gradient(900px 500px at 50% -5%, rgba(40,90,160,0.35), transparent 60%),
-        linear-gradient(180deg,#0c1f3d 0%,#0a1730 100%);}
-    .section-head{text-align:center;margin-bottom:14px;}
-    .section-head .ko{font-family:'Noto Serif KR',serif;font-size:clamp(24px,3.4vw,34px);font-weight:700;letter-spacing:14px;text-indent:14px;color:#fff;}
-    .section-head .en{display:block;margin-top:10px;font-family:'Cormorant Garamond',serif;font-size:16px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;}
-    .section-head .desc{margin-top:14px;font-size:14px;color:#aebbd0;font-weight:400;}
+    /* ===== 섹션 헤더 ===== */
+    .section-head{margin-bottom:44px;}
+    .section-head .ko{font-size:clamp(24px,3.4vw,36px);font-weight:800;letter-spacing:10px;text-indent:10px;}
+    .section-head .en{display:block;margin-top:12px;font-size:14px;font-weight:600;letter-spacing:5px;color:var(--gold);text-transform:uppercase;}
+    .section-head .desc{margin-top:16px;font-size:15px;color:#aebbd0;font-weight:400;}
 
-    .group{max-width:1180px;margin:56px auto 0;}
-    .group-label{display:flex;align-items:center;gap:14px;margin-bottom:22px;}
-    .group-label .bar{width:4px;height:20px;background:var(--gold);}
-    .group-label h3{font-size:18px;font-weight:700;letter-spacing:-0.3px;color:#fff;}
-    .group-label .en{font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:2px;color:#8ea3c2;}
-
-    .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
-    .card{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:158px;padding:22px;
-        background:var(--glass);border:1px solid var(--line);border-radius:2px;overflow:hidden;
+    /* ===== 카드 그리드 ===== */
+    .card-grid{display:grid;gap:20px;width:100%;max-width:1080px;}
+    .card-grid.cols-3{grid-template-columns:repeat(3,1fr);}
+    .card-grid.cols-2{grid-template-columns:repeat(2,1fr);}
+    .card-grid.single{max-width:520px;grid-template-columns:1fr;}
+    .card{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:170px;padding:24px;text-align:left;
+        background:var(--glass);border:1px solid var(--line);border-radius:3px;overflow:hidden;
         transition:transform .25s,border-color .25s,background .25s,box-shadow .25s;}
-    .card::before{content:"+";position:absolute;top:16px;right:18px;font-size:22px;font-weight:300;color:var(--gold);opacity:.9;transition:transform .25s;}
-    .card:hover{transform:translateY(-6px);background:var(--glass-hover);border-color:var(--gold);box-shadow:0 14px 30px rgba(0,0,0,.35);}
+    .card::before{content:"+";position:absolute;top:16px;right:18px;font-size:22px;font-weight:300;color:var(--gold);transition:transform .25s;}
+    .card:hover{transform:translateY(-6px);background:var(--glass-hover);border-color:var(--gold);box-shadow:0 16px 34px rgba(0,0,0,.4);}
     .card:hover::before{transform:rotate(90deg);}
-    .card .en{font-size:12.5px;letter-spacing:1px;color:#9fb2d0;margin-bottom:8px;min-height:16px;}
-    .card .ko{font-size:20px;font-weight:700;letter-spacing:-0.5px;color:#fff;line-height:1.3;}
-    .card .sub{margin-top:9px;font-size:12.5px;color:#aebbd0;font-weight:400;line-height:1.5;}
+    .card .en{font-size:12.5px;letter-spacing:1px;color:#9fb2d0;margin-bottom:9px;}
+    .card .ko{font-size:21px;font-weight:700;letter-spacing:-0.5px;line-height:1.3;}
+    .card .sub{margin-top:10px;font-size:13px;color:#aebbd0;font-weight:400;line-height:1.55;}
+    .card-grid.single .card{min-height:210px;}
+    .card-grid.single .card .ko{font-size:26px;}
 
-    /* ===== 푸터 ===== */
-    footer{background:#081226;text-align:center;padding:34px 20px;border-top:1px solid rgba(255,255,255,0.07);}
-    footer .fbrand{font-family:'Cormorant Garamond',serif;letter-spacing:2px;color:#dfe7f3;font-size:17px;margin-bottom:6px;}
-    footer .fnote{font-size:12px;color:#7f8ea8;}
+    /* ===== 우측 도트 네비 ===== */
+    .dots{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:15px;}
+    .dots button{width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(255,255,255,.55);background:transparent;cursor:pointer;padding:0;transition:all .25s;position:relative;}
+    .dots button.active{background:var(--gold);border-color:var(--gold);transform:scale(1.3);}
+    .dots button span{position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:12px;color:#cdd9ec;
+        background:rgba(8,18,38,.8);padding:3px 9px;border-radius:3px;opacity:0;pointer-events:none;transition:opacity .2s;}
+    .dots button:hover span{opacity:1;}
 
+    /* 페이지 표시(우하단) */
+    .pageno{position:fixed;right:30px;bottom:26px;z-index:40;font-size:13px;letter-spacing:1px;color:#9fb2d0;}
+    .pageno b{color:#fff;font-weight:700;}
+
+    .credit{position:absolute;bottom:22px;left:0;width:100%;text-align:center;font-size:12px;color:#7f8ea8;}
+
+    /* ===== 모바일: 풀페이지 해제, 일반 스크롤 ===== */
     @media (max-width:900px){
-        .nav{padding:16px 20px;}
-        .nav.scrolled{padding:12px 20px;}
-        .nav-links{position:fixed;inset:0 0 0 auto;width:70%;max-width:300px;flex-direction:column;gap:0;background:rgba(8,18,38,0.98);
+        body{overflow:auto;}
+        #fp{height:auto;overflow:visible;}
+        #fp-track{transform:none!important;transition:none;}
+        .section{height:auto;min-height:100vh;padding:110px 20px 70px;}
+        .nav{padding:14px 20px;}
+        .nav.solid{padding:12px 20px;}
+        .nav-links{position:fixed;inset:0 0 0 auto;width:72%;max-width:300px;flex-direction:column;gap:0;background:rgba(8,18,38,0.98);
             padding:90px 28px;transform:translateX(100%);transition:transform .3s;box-shadow:-10px 0 40px rgba(0,0,0,.4);}
         .nav-links.open{transform:translateX(0);}
         .nav-links a{padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.08);}
         .nav-toggle{display:block;z-index:60;}
-        .tools{padding:70px 20px 50px;}
-        .card-grid{grid-template-columns:1fr 1fr;gap:14px;}
+        .dots,.pageno{display:none;}
+        .card-grid.cols-3,.card-grid.cols-2{grid-template-columns:1fr;max-width:460px;}
+        .card{min-height:auto;}
     }
-    @media (max-width:560px){ .card-grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
 
 <nav class="nav" id="nav">
-    <a href="#home" class="brand">
-        <img src="logo_dowell_white.png" alt="Labor law Firm DOWELL" class="logo-img">
-    </a>
+    <a class="brand" data-goto="0"><img src="logo_dowell_white.png" alt="Labor law Firm DOWELL" class="logo-img"></a>
     <button class="nav-toggle" id="navToggle" aria-label="menu">☰</button>
     <div class="nav-links" id="navLinks">
-        <a href="#calc" onclick="closeNav()">계산기</a>
-        <a href="#template" onclick="closeNav()">메일 템플릿</a>
-        <a href="#form" onclick="closeNav()">행정 양식</a>
-        <a href="#flow" onclick="closeNav()">연간 플로우</a>
+        <a data-goto="0">홈</a>
+        <a data-goto="1">계산기</a>
+        <a data-goto="2">메일 템플릿</a>
+        <a data-goto="3">행정 양식</a>
+        <a data-goto="4">연간 플로우</a>
     </div>
 </nav>
 
-<!-- ===== 히어로 ===== -->
-<header class="hero" id="home">
-    <svg class="city" viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <g fill="#0a1a34">
-            <rect x="40" y="150" width="70" height="150"/><rect x="130" y="90" width="55" height="210"/>
-            <rect x="205" y="180" width="80" height="120"/><rect x="300" y="60" width="48" height="240"/>
-            <rect x="370" y="130" width="90" height="170"/><rect x="480" y="170" width="60" height="130"/>
-            <rect x="560" y="40" width="52" height="260"/><rect x="630" y="120" width="85" height="180"/>
-            <rect x="735" y="185" width="70" height="115"/><rect x="820" y="80" width="50" height="220"/>
-            <rect x="885" y="150" width="95" height="150"/><rect x="1000" y="110" width="58" height="190"/>
-            <rect x="1075" y="175" width="80" height="125"/><rect x="1170" y="70" width="50" height="230"/>
-            <rect x="1235" y="140" width="90" height="160"/><rect x="1345" y="185" width="70" height="115"/>
-        </g>
-        <g fill="#d9b26a" opacity="0.5">
-            <rect x="150" y="110" width="6" height="8"/><rect x="164" y="130" width="6" height="8"/><rect x="150" y="150" width="6" height="8"/>
-            <rect x="315" y="80" width="6" height="8"/><rect x="315" y="110" width="6" height="8"/><rect x="315" y="150" width="6" height="8"/>
-            <rect x="575" y="70" width="6" height="8"/><rect x="575" y="110" width="6" height="8"/><rect x="575" y="150" width="6" height="8"/>
-            <rect x="835" y="110" width="6" height="8"/><rect x="835" y="140" width="6" height="8"/>
-            <rect x="1185" y="100" width="6" height="8"/><rect x="1185" y="140" width="6" height="8"/><rect x="1185" y="180" width="6" height="8"/>
-        </g>
-    </svg>
-    <div class="veil"></div>
-    <div class="hero-inner">
-        <div class="eng serif">Labor Law Firm DOWELL</div>
-        <p class="lead">고객을 위한 <span class="g">최상의 솔루션</span>을 제공하는</p>
-        <h1 class="title">인사·노무 파트너, <span class="hl">노무법인 두웰</span></h1>
-    </div>
-    <div class="scroll-cue">SCROLL<span class="chev"></span></div>
-</header>
+<div id="fp">
+    <div id="fp-track">
 
-<!-- ===== 실무 도구 ===== -->
-<section class="tools">
-    <div class="section-head">
-        <div class="ko serif">실무 도구</div>
-        <span class="en">Practical Tools</span>
-        <p class="desc">계산기 · 메일 템플릿 · 행정 양식을 한 곳에서. 원하는 도구를 선택하시면 바로 연결됩니다.</p>
-    </div>
+        <!-- 0. 홈 -->
+        <section class="section hero" id="home">
+            <svg class="city" viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <g fill="#0a1a34">
+                    <rect x="40" y="150" width="70" height="150"/><rect x="130" y="90" width="55" height="210"/><rect x="205" y="180" width="80" height="120"/><rect x="300" y="60" width="48" height="240"/><rect x="370" y="130" width="90" height="170"/><rect x="480" y="170" width="60" height="130"/><rect x="560" y="40" width="52" height="260"/><rect x="630" y="120" width="85" height="180"/><rect x="735" y="185" width="70" height="115"/><rect x="820" y="80" width="50" height="220"/><rect x="885" y="150" width="95" height="150"/><rect x="1000" y="110" width="58" height="190"/><rect x="1075" y="175" width="80" height="125"/><rect x="1170" y="70" width="50" height="230"/><rect x="1235" y="140" width="90" height="160"/><rect x="1345" y="185" width="70" height="115"/>
+                </g>
+                <g fill="#d9b26a" opacity="0.5">
+                    <rect x="150" y="110" width="6" height="8"/><rect x="164" y="130" width="6" height="8"/><rect x="150" y="150" width="6" height="8"/><rect x="315" y="80" width="6" height="8"/><rect x="315" y="110" width="6" height="8"/><rect x="315" y="150" width="6" height="8"/><rect x="575" y="70" width="6" height="8"/><rect x="575" y="110" width="6" height="8"/><rect x="575" y="150" width="6" height="8"/><rect x="835" y="110" width="6" height="8"/><rect x="835" y="140" width="6" height="8"/><rect x="1185" y="100" width="6" height="8"/><rect x="1185" y="140" width="6" height="8"/><rect x="1185" y="180" width="6" height="8"/>
+                </g>
+            </svg>
+            <div class="veil"></div>
+            <div class="hero-inner">
+                <div class="eng">Labor Law Firm DOWELL</div>
+                <p class="lead">고객을 위한 <span class="g">최상의 솔루션</span>을 제공하는</p>
+                <h1 class="title">인사·노무 파트너, <span class="hl">노무법인 두웰</span></h1>
+            </div>
+            <div class="scroll-cue" data-goto="1">SCROLL<span class="chev"></span></div>
+        </section>
 
-    <!-- 계산기 -->
-    <div class="group" id="calc">
-        <div class="group-label"><span class="bar"></span><h3>실무 연산 계산기</h3><span class="en">Calculators</span></div>
-        <div class="card-grid">
-            <a class="card" href="퇴직금계산.html"><span class="en">Severance Pay</span><span class="ko">퇴직금 계산기</span><span class="sub">평균임금 산정·재직일수 기반 법정 퇴직금 자동 추산</span></a>
-            <a class="card" href="퇴직금적립내역서.html"><span class="en">Severance Reserve</span><span class="ko">퇴직금 적립 내역서</span><span class="sub">연도별·임직원별 퇴직급여 충당금 및 누적 적립 관리</span></a>
-            <a class="card" href="상시근로자수판단.html"><span class="en">Employee Count</span><span class="ko">상시근로자 수 계산</span><span class="sub">가동일수 분할 및 5인 이상 여부 법리 판단</span></a>
-            <a class="card" href="퇴사자4대보험정산.html"><span class="en">Insurance Settlement</span><span class="ko">퇴사자 4대보험 정산</span><span class="sub">중도퇴사자 건강보험·국민연금 등 중도 정산</span></a>
-            <a class="card" href="임신기근로시간단축_대상기간계산.html"><span class="en">Reduced Work Hours</span><span class="ko">임신기 근로시간단축</span><span class="sub">출산예정일 기준 12주 이내·32주 이후 대상기간 계산</span></a>
-        </div>
-    </div>
+        <!-- 1. 계산기 -->
+        <section class="section s-calc" id="calc">
+            <div class="section-head">
+                <div class="ko">실무 연산 계산기</div>
+                <span class="en">Calculators</span>
+                <p class="desc">평균임금·재직일수·보험 정산 등 실무 연산을 자동으로.</p>
+            </div>
+            <div class="card-grid cols-3">
+                <a class="card" href="퇴직금계산.html"><span class="en">Severance Pay</span><span class="ko">퇴직금 계산기</span><span class="sub">평균임금 산정·재직일수 기반 법정 퇴직금 자동 추산</span></a>
+                <a class="card" href="퇴직금적립내역서.html"><span class="en">Severance Reserve</span><span class="ko">퇴직금 적립 내역서</span><span class="sub">연도별·임직원별 퇴직급여 충당금 및 누적 적립 관리</span></a>
+                <a class="card" href="상시근로자수판단.html"><span class="en">Employee Count</span><span class="ko">상시근로자 수 계산</span><span class="sub">가동일수 분할 및 5인 이상 여부 법리 판단</span></a>
+                <a class="card" href="퇴사자4대보험정산.html"><span class="en">Insurance Settlement</span><span class="ko">퇴사자 4대보험 정산</span><span class="sub">중도퇴사자 건강보험·국민연금 등 중도 정산</span></a>
+                <a class="card" href="임신기근로시간단축_대상기간계산.html"><span class="en">Reduced Work Hours</span><span class="ko">임신기 근로시간단축</span><span class="sub">출산예정일 기준 12주 이내·32주 이후 대상기간 계산</span></a>
+            </div>
+        </section>
 
-    <!-- 메일 템플릿 -->
-    <div class="group" id="template">
-        <div class="group-label"><span class="bar"></span><h3>실무 안내 메일 템플릿</h3><span class="en">Mail Templates</span></div>
-        <div class="card-grid">
-            <a class="card" href="신규업체 기초요청자료_템플릿.html"><span class="en">New Client</span><span class="ko">신규업체 기초요청자료</span><span class="sub">약정서·EDI·통장사본 등 신규 사업장 정보 취합</span></a>
-            <a class="card" href="소득총액신고 세무요청_탬플릿.html"><span class="en">Income Report</span><span class="ko">소득총액신고 세무요청</span><span class="sub">근로자·개인사업자대표 소득총액신고 서류 요청</span></a>
-            <a class="card" href="건강보험연말정산 분할납부안내.html"><span class="en">Health Insurance</span><span class="ko">건강보험 분할납부 안내</span><span class="sub">건강보험 연말정산 정산보험료 분할납부 안내</span></a>
-            <a class="card" href="담당자 휴가안내_템플릿.html"><span class="en">Vacation Notice</span><span class="ko">담당자 휴가 안내</span><span class="sub">담당자 부재기간·업무 복귀일 자동 안내</span></a>
-        </div>
-    </div>
+        <!-- 2. 메일 템플릿 -->
+        <section class="section s-template" id="template">
+            <div class="section-head">
+                <div class="ko">메일 템플릿</div>
+                <span class="en">Mail Templates</span>
+                <p class="desc">실무 안내 메일을 항목만 채우면 제목·본문까지 완성.</p>
+            </div>
+            <div class="card-grid cols-2">
+                <a class="card" href="신규업체 기초요청자료_템플릿.html"><span class="en">New Client</span><span class="ko">신규업체 기초요청자료</span><span class="sub">약정서·EDI·통장사본 등 신규 사업장 정보 취합</span></a>
+                <a class="card" href="소득총액신고 세무요청_탬플릿.html"><span class="en">Income Report</span><span class="ko">소득총액신고 세무요청</span><span class="sub">근로자·개인사업자대표 소득총액신고 서류 요청</span></a>
+                <a class="card" href="건강보험연말정산 분할납부안내.html"><span class="en">Health Insurance</span><span class="ko">건강보험 분할납부 안내</span><span class="sub">건강보험 연말정산 정산보험료 분할납부 안내</span></a>
+                <a class="card" href="담당자 휴가안내_템플릿.html"><span class="en">Vacation Notice</span><span class="ko">담당자 휴가 안내</span><span class="sub">담당자 부재기간·업무 복귀일 자동 안내</span></a>
+            </div>
+        </section>
 
-    <!-- 행정 양식 -->
-    <div class="group" id="form">
-        <div class="group-label"><span class="bar"></span><h3>사내 실무 행정 양식</h3><span class="en">Forms</span></div>
-        <div class="card-grid">
-            <a class="card" href="상담일지.html"><span class="en">Consultation Log</span><span class="ko">상담일지 작성 양식</span><span class="sub">고객사 인바운드 상담 내역 기록·공유용</span></a>
-        </div>
-    </div>
+        <!-- 3. 행정 양식 -->
+        <section class="section s-form" id="form">
+            <div class="section-head">
+                <div class="ko">행정 양식</div>
+                <span class="en">Forms</span>
+                <p class="desc">사내 실무 행정 양식.</p>
+            </div>
+            <div class="card-grid single">
+                <a class="card" href="상담일지.html"><span class="en">Consultation Log</span><span class="ko">상담일지 작성 양식</span><span class="sub">고객사 인바운드 상담 내역을 기록하고 캡처·공유용으로 활용</span></a>
+            </div>
+        </section>
 
-    <!-- 연간 플로우 -->
-    <div class="group" id="flow">
-        <div class="group-label"><span class="bar"></span><h3>연간 업무 플로우</h3><span class="en">Annual Flow</span></div>
-        <div class="card-grid">
-            <a class="card" href="아웃소싱 연간업무플로우.html"><span class="en">Annual Schedule</span><span class="ko">아웃소싱 연간 업무 플로우</span><span class="sub">월별 급여대행·4대보험 정기신고·연간 노무행정 일정</span></a>
-        </div>
-    </div>
-</section>
+        <!-- 4. 연간 플로우 -->
+        <section class="section s-flow" id="flow">
+            <div class="section-head">
+                <div class="ko">연간 업무 플로우</div>
+                <span class="en">Annual Flow</span>
+                <p class="desc">월별 급여대행·4대보험 정기신고·연간 노무행정 일정을 한눈에.</p>
+            </div>
+            <div class="card-grid single">
+                <a class="card" href="아웃소싱 연간업무플로우.html"><span class="en">Annual Schedule</span><span class="ko">아웃소싱 연간 업무 플로우</span><span class="sub">당월·지난달·다음달 자동 강조, 월별 주요 일정과 급여·소싱 업무 정리</span></a>
+            </div>
+            <div class="credit">노무법인 두웰 · 실무 통합 포털 &nbsp;|&nbsp; made by 전형섭</div>
+        </section>
 
-<footer>
-    <div class="fbrand serif">Labor Law Firm DOWELL</div>
-    <div class="fnote">노무법인 두웰 · 실무 통합 포털 &nbsp;|&nbsp; made by 전형섭</div>
-</footer>
+    </div>
+</div>
+
+<!-- 우측 도트 네비 -->
+<div class="dots" id="dots"></div>
+<div class="pageno" id="pageno"><b>01</b> / 05</div>
 
 <script>
-    const nav=document.getElementById('nav'), links=document.getElementById('navLinks');
-    window.addEventListener('scroll',()=>{ nav.classList.toggle('scrolled', window.scrollY>40); });
-    document.getElementById('navToggle').addEventListener('click',()=>links.classList.toggle('open'));
-    function closeNav(){ links.classList.remove('open'); }
+    const track=document.getElementById('fp-track');
+    const nav=document.getElementById('nav');
+    const links=Array.from(document.querySelectorAll('.nav-links a'));
+    const sections=Array.from(document.querySelectorAll('.section'));
+    const labels=['홈','계산기','메일 템플릿','행정 양식','연간 플로우'];
+    let idx=0, locking=false;
+    const isDesktop=()=>window.matchMedia('(min-width:901px)').matches;
+
+    // 도트 생성
+    const dotsWrap=document.getElementById('dots');
+    sections.forEach((_,i)=>{
+        const b=document.createElement('button');
+        b.innerHTML='<span>'+labels[i]+'</span>';
+        b.addEventListener('click',()=>goTo(i));
+        dotsWrap.appendChild(b);
+    });
+    const dots=Array.from(dotsWrap.children);
+
+    function render(){
+        if(isDesktop()) track.style.transform='translateY(-'+(idx*100)+'vh)';
+        else track.style.transform='none';
+        dots.forEach((d,i)=>d.classList.toggle('active',i===idx));
+        links.forEach(a=>a.classList.toggle('active', +a.dataset.goto===idx));
+        document.getElementById('pageno').innerHTML='<b>'+String(idx+1).padStart(2,'0')+'</b> / 05';
+        nav.classList.toggle('solid', idx>0);
+    }
+    function goTo(i){
+        i=Math.max(0,Math.min(sections.length-1,i));
+        if(!isDesktop()){ sections[i].scrollIntoView({behavior:'smooth'}); idx=i; render(); return; }
+        if(i===idx||locking) return;
+        idx=i; render();
+        locking=true; setTimeout(()=>locking=false,950);
+    }
+
+    // 휠
+    window.addEventListener('wheel',(e)=>{
+        if(!isDesktop()) return;
+        e.preventDefault();
+        if(locking) return;
+        if(e.deltaY>30) goTo(idx+1);
+        else if(e.deltaY<-30) goTo(idx-1);
+    },{passive:false});
+
+    // 키보드
+    window.addEventListener('keydown',(e)=>{
+        if(!isDesktop()) return;
+        if(['ArrowDown','PageDown'].includes(e.key)){ e.preventDefault(); goTo(idx+1); }
+        else if(['ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); goTo(idx-1); }
+    });
+
+    // 터치(태블릿 가로 등)
+    let ty=null;
+    window.addEventListener('touchstart',(e)=>{ if(isDesktop()) ty=e.touches[0].clientY; },{passive:true});
+    window.addEventListener('touchend',(e)=>{
+        if(!isDesktop()||ty===null) return;
+        const dy=ty-e.changedTouches[0].clientY;
+        if(Math.abs(dy)>50){ dy>0?goTo(idx+1):goTo(idx-1); }
+        ty=null;
+    },{passive:true});
+
+    // 네비/스크롤큐 클릭
+    document.querySelectorAll('[data-goto]').forEach(el=>{
+        el.addEventListener('click',()=>{ goTo(+el.dataset.goto); document.getElementById('navLinks').classList.remove('open'); });
+    });
+    document.getElementById('navToggle').addEventListener('click',()=>document.getElementById('navLinks').classList.toggle('open'));
+
+    window.addEventListener('resize',render);
+    render();
 </script>
 </body>
 </html>
