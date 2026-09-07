@@ -29,12 +29,9 @@
     .nav{position:fixed;top:0;left:0;width:100%;z-index:50;display:flex;align-items:center;justify-content:space-between;
         padding:22px 48px;transition:background .35s,padding .35s,box-shadow .35s;}
     .nav.scrolled{background:rgba(8,18,38,0.92);padding:14px 48px;box-shadow:0 2px 20px rgba(0,0,0,0.35);backdrop-filter:blur(6px);}
-    .brand{display:flex;align-items:center;gap:12px;}
-    .brand .emblem{width:40px;height:40px;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;
-        font-family:'Cormorant Garamond',serif;font-weight:600;font-size:18px;color:var(--gold);letter-spacing:1px;}
-    .brand .btext{line-height:1.15;}
-    .brand .btext small{display:block;font-size:10px;letter-spacing:2px;color:#b9c6da;font-weight:400;}
-    .brand .btext strong{font-family:'Cormorant Garamond',serif;font-size:19px;letter-spacing:1.5px;color:#fff;font-weight:600;}
+    .brand{display:flex;align-items:center;}
+    .brand .logo-img{height:34px;width:auto;display:block;}
+    .nav.scrolled .brand .logo-img{height:30px;}
     .nav-links{display:flex;gap:38px;font-size:15px;font-weight:700;letter-spacing:-0.3px;}
     .nav-links a{position:relative;padding:4px 0;color:#eef3fb;transition:color .2s;}
     .nav-links a::after{content:"";position:absolute;left:0;bottom:-4px;width:0;height:2px;background:var(--gold);transition:width .25s;}
@@ -110,8 +107,7 @@
 
 <nav class="nav" id="nav">
     <a href="#home" class="brand">
-        <span class="emblem">DW</span>
-        <span class="btext"><small>LABOR LAW FIRM</small><strong>DOWELL</strong></span>
+        <img src="logo_dowell_white.png" alt="Labor law Firm DOWELL" class="logo-img">
     </a>
     <button class="nav-toggle" id="navToggle" aria-label="menu">☰</button>
     <div class="nav-links" id="navLinks">
