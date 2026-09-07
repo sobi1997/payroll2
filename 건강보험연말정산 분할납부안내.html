@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!--
+    ===== 변경 이력 (커밋 로그) =====
+    커밋 1 (2026-07-23)
+    - 탭 구성 변경: 1차(최초 안내)/2차(재안내)/3차(미신청 통보) → 근로자(5/10마감) / 일반사업장(7/10마감) / 성실사업장(8/10마감)
+    - 각 탭 전환 시 회신기한 입력란에 해당 그룹의 기본 마감일(월/일)을 귀속연도+1년 기준으로 자동 채움 (수동 수정 가능)
+    - "1. 안내사항 목록 설정" 섹션(드래그 정렬 리스트) 및 관련 로직/스타일 전체 제거
+    - 귀속연도 자동 설정 로직(파일을 여는 연도 - 1)은 기존 그대로 유지
+
+    커밋 2 (2026-07-23)
+    - 일반사업장/성실사업장 탭은 "근로자"가 아니라 "개인사업자 대표자" 건에 대한 안내임을 명확히 표기
+      · 탭 라벨: 일반사업장 → 일반사업장 대표자 / 성실사업장 → 성실사업장 대표자
+      · 메일 제목 태그 및 본문 문구도 "대표자(개인사업자, 일반신고)의" / "대표자(개인사업자, 성실신고)의" 형태로 수정
+
+    커밋 3 (2026-07-23)
+    - 마감일이 눈에 잘 띄지 않는다는 피드백 반영, 두웰 브랜드 컬러(남색)를 활용해 마감 강조 디자인 적용
+      · 탭: "근로자" / "5/10 마감" 2줄 구성 + 마감 뱃지(선택 시 남색 필 배지로 강조)
+      · 메일 본문: 회신기한을 남색 배경 카드(큰 흰 글씨)로 분리해 한눈에 들어오도록 변경
+
+    커밋 4 (2026-07-23)
+    - 탭 디자인 다듬기: 마감 뱃지가 라벨에 너무 붙어 보인다는 피드백 반영, 간격을 넓히고 비활성 탭은 아웃라인(테두리만) 뱃지로 더 가볍게, 활성 탭만 남색 채움으로 강조
+    - 메일 본문 회신기한 영역은 커밋 3의 남색 카드 디자인을 되돌려 커밋 2 방식(문장형 텍스트)으로 복원
+    - 회신기한 입력란 자동 채움(탭 전환/연도 변경 시 5/10·7/10·8/10 자동 입력) 로직 전체 제거 — 이제 항상 직접 입력해야 함
+
+    커밋 5 (2026-07-23)
+    - 탭이 커졌다는 피드백 반영, 탭 자체는 원래(커밋2 이전)의 심플한 한 줄 버튼으로 완전히 되돌림 (마감 뱃지 제거)
+    - 마감일 표시는 탭이 아니라, 탭 아래 폼 영역 맨 위에 별도의 "마감일 안내 배너"로 완전히 새로운 방식으로 분리
+      · 연한 남색 배경 + 진한 남색 좌측 라인 + 캘린더 아이콘으로 구성, 선택된 탭에 맞춰 문구가 바뀜(참고용 표시일 뿐 회신기한 입력값과는 무관)
+
+    커밋 6 (2026-07-23)
+    - 마감일 배너(커밋5) 제거, 커밋3의 둥근 뱃지 디자인으로 복귀하되 라벨 아래가 아니라 같은 줄 옆에 배치(탭 높이 유지)
+    - 탭 라벨 변경: 일반사업장 대표자 → 개인사업자대표_일반 / 성실사업장 대표자 → 개인사업자대표_성실 (메일 제목 태그도 동일하게 변경)
+
+    커밋 7 (2026-07-23)
+    - 메일 제목 형식 변경: "...귀속 건강보험 ... (그룹명)" → "...귀속 [그룹명] 건강보험 ..." (귀속과 건강보험 사이에 그룹명 삽입)
+      · 근로자 탭: "근로자" 그대로 삽입 / 일반·성실 탭: "_일반","_성실" 접미사 없이 "개인사업자대표"로 통일해서 삽입
+    - 메일 본문 전면 재작성: "1. 건강보험 연말정산이란 / 2. 납부방법 / 3. 분할납부 대상인원" 안내 + 분할납부 신청 방법 문단으로 구성 (3개 탭 공통 문구, 추후 탭별 차등 요청 가능)
+      · 본문 상단 연도는 귀속연도(reportYear) 값을 사용
+      · 회신기한은 여전히 사용자가 직접 입력한 값(dueDateNormal)을 그대로 반영하며 기본값은 비워둠
+
+    커밋 8 (2026-07-23)
+    - 본문 첫 안내 문단 수정: "{연도} 건강보험 연말정산 보험료가..." → "{연도} 귀속 {그룹명} 연말정산 보험료가..." (제목과 동일하게 근로자/개인사업자대표 삽입, _일반·_성실 접미사는 미반영)
+
+    커밋 9 (2026-07-23)
+    - "3. 분할납부 대상인원" 문구의 당월 기준을 탭별로 다르게 반영: 근로자 4월 / 개인사업자대표_일반 6월 / 개인사업자대표_성실 7월
+    - 설정 패널의 회신기한 입력란 바로 아래에 첨부파일(분할납부신청서) 확인용 리마인더 문구 추가 — 메일 본문에는 포함되지 않는 발송 담당자용 체크 표시
+
+    커밋 10 (2026-07-23)
+    - 사업장명 / 담당자 직통번호 / 회신기한 중 하나라도 비어 있으면 "제목 복사"·"본문 복사" 버튼이 복사를 실행하지 않도록 막음 (버튼이 빨갛게 "필수 항목 확인!"으로 잠깐 바뀌고, 미입력 경고 문구도 함께 표시)
+
+    커밋 11 (2026-07-23)
+    - 복사 차단 방식을 버튼 색 변경에서 실제 경고창(모달 팝업)으로 변경 — 어떤 항목이 비어 있는지 목록으로 보여주고 "확인"을 눌러야 닫힘
+
+    커밋 12 (2026-07-23)
+    - 경고창 레이아웃 수정: 미입력 목록이 짧을 때 "확인" 버튼이 목록 옆으로 붙던 문제 → 목록을 항상 전체 폭으로 채워 버튼이 목록 아래쪽에 오도록 수정
+    -->
+    <meta charset="UTF-8">
+    <title>노무법인 두웰 - 건강보험 연말정산 분할납부 신청여부 확인 메일 매니저 V1.12</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-color: #334155;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body, input, button, select, textarea {
+            font-family: 'Noto Sans KR', 'Pretendard', -apple-system, sans-serif;
+            letter-spacing: -0.5px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body { margin: 0; padding: 20px; background: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; }
+
+        .container { display: flex; width: 100%; max-width: 1400px; gap: 24px; height: calc(100vh - 40px); }
+        .panel { flex: 1; background: white; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .panel-header { padding: 18px 24px; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 16px; background: #fafafa; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; }
+        .panel-body { padding: 24px; overflow-y: auto; flex: 1; }
+        /* 3단 탭 스타일 */
+        .tab-container { display: flex; gap: 4px; padding: 12px 24px 0 24px; background: #fafafa; }
+        .tab-btn { flex: 1; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; padding: 12px 8px; border: 1px solid var(--border-color); border-bottom: none; background: #e2e8f0; color: #64748b; border-radius: 8px 8px 0 0; cursor: pointer; transition: 0.15s; text-align: center; }
+        .tab-btn.active { background: white; border-color: var(--border-color); position: relative; z-index: 2; box-shadow: 0 -2px 4px rgba(0,0,0,0.02); }
+        .tab-label { font-weight: 700; font-size: 12.5px; color: #475569; white-space: nowrap; }
+        .tab-btn.active .tab-label { color: var(--primary-color); }
+        .tab-deadline { display: inline-flex; align-items: center; font-weight: 700; font-size: 10.5px; padding: 2px 9px; border-radius: 999px; background: transparent; border: 1px solid #cbd5e1; color: #94a3b8; white-space: nowrap; }
+        .tab-btn.active .tab-deadline { border-color: var(--primary-color); background: var(--primary-color); color: #ffffff; }
+        /* 컨트롤러 스타일 */
+        .input-group { margin-bottom: 16px; position: relative; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        .input-text, .input-select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; color: #334155; background-color: white; font-family: 'Noto Sans KR', sans-serif; }
+        .input-text:focus, .input-select:focus { outline: 2px solid var(--primary-color); border-color: transparent; }
+        .input-text[type="date"] { cursor: pointer; }
+        .input-warn-msg { color: #ef4444; font-size: 12px; margin-top: 4px; display: none; font-weight: 500; }
+        /* 첨부파일 체크 리마인더 - 발송 담당자용 UI 안내(메일 본문에는 포함되지 않음) */
+        .attach-reminder { display: flex; align-items: flex-start; gap: 8px; margin-top: 4px; padding: 10px 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; font-size: 12.5px; color: #92400e; line-height: 1.5; }
+        .attach-reminder-icon { font-size: 14px; line-height: 1.4; }
+
+        .section-box { border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 20px; background: #fdfdfd; }
+        .section-title { font-weight: 600; font-size: 15px; margin-bottom: 12px; color: var(--primary-color); }
+        /* 프리뷰 스타일 */
+        .preview-zone { display: flex; flex-direction: column; gap: 20px; }
+        .card-box { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .card-header-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; }
+        .card-tag { font-weight: bold; color: var(--primary-color); font-size: 13px; }
+
+        .subject-text { font-weight: 600; color: #1e293b; font-size: 14px !important; padding: 4px 0; word-break: break-all; font-family: 'Noto Sans KR', sans-serif !important; letter-spacing: -0.5px !important; }
+        .mail-wrapper { font-size: 14px !important; line-height: 1.6 !important; font-family: 'Noto Sans KR', sans-serif !important; }
+        .mail-wrapper * { font-family: 'Noto Sans KR', sans-serif !important; font-size: 14px !important; letter-spacing: -0.5px !important; }
+
+        .mini-copy-btn { background: #f1f5f9; color: #334155; border: 1px solid var(--border-color); padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.15s; min-width: 80px; text-align: center; }
+        .mini-copy-btn:hover { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .mini-copy-btn.copied { background: #10b981 !important; color: white !important; border-color: #10b981 !important; }
+
+        /* 필수 항목 미입력 시 뜨는 복사 차단 경고창 */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal-card { background: #ffffff; border-radius: 14px; padding: 28px 28px 24px; width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
+        .modal-icon { font-size: 32px; margin-bottom: 8px; line-height: 1; }
+        .modal-title { font-weight: 700; font-size: 16px; color: #1e293b; margin-bottom: 6px; }
+        .modal-desc { font-size: 13px; color: #64748b; margin-bottom: 14px; line-height: 1.5; }
+        .modal-list { list-style: none; padding: 0; margin: 0 0 20px; text-align: left; display: block; }
+        .modal-list li { font-size: 13.5px; color: #ef4444; font-weight: 700; padding: 3px 0; }
+        .modal-list li::before { content: "• "; }
+        .modal-close-btn { background: var(--primary-color); color: #ffffff; border: none; padding: 10px 26px; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; }
+        .modal-close-btn:hover { background: var(--primary-hover); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="panel">
+        <div class="panel-header" style="border-bottom: none; padding-bottom: 6px;">건강보험 연말정산 분할납부 신청여부 확인 양식</div>
+
+        <div class="tab-container">
+            <div id="tabWorker" class="tab-btn active" onclick="switchTab('worker')">
+                <span class="tab-label">근로자</span>
+                <span class="tab-deadline">5/10 마감</span>
+            </div>
+            <div id="tabNormal" class="tab-btn" onclick="switchTab('normal')">
+                <span class="tab-label">개인사업자대표_일반</span>
+                <span class="tab-deadline">7/10 마감</span>
+            </div>
+            <div id="tabDiligent" class="tab-btn" onclick="switchTab('diligent')">
+                <span class="tab-label">개인사업자대표_성실</span>
+                <span class="tab-deadline">8/10 마감</span>
+            </div>
+        </div>
+        <div class="panel-body" style="border-top: 1px solid var(--border-color);">
+
+            <div class="input-group">
+                <label>사업장명</label>
+                <input type="text" id="companyName" class="input-text" placeholder="노무법인 두웰" oninput="renderMail()">
+                <div id="companyWarn" class="input-warn-msg">⚠️ 사업장명을 기입해주세요.</div>
+            </div>
+
+            <div class="input-group">
+                <label>담당자 직통번호</label>
+                <input type="text" id="contactInfo" class="input-text" placeholder="053-0000-0000" oninput="handleContactInput(this)">
+                <div id="contactWarn" class="input-warn-msg">⚠️ 연락처를 기입해주세요.</div>
+            </div>
+            <div class="input-group">
+                <label>귀속연도</label>
+                <select id="reportYear" class="input-select" onchange="renderMail()">
+                    <option value="2024년도">2024년도</option>
+                    <option value="2025년도">2025년도</option>
+                    <option value="2026년도">2026년도</option>
+                    <option value="2027년도">2027년도</option>
+                    <option value="2028년도">2028년도</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label id="labelDateNormal">회신기한</label>
+                <input type="date" id="dueDateNormal" class="input-text" onchange="renderMail()">
+                <div id="normalWarn" class="input-warn-msg">⚠️ 회신기한을 선택해주세요.</div>
+            </div>
+
+            <div class="attach-reminder">
+                <span class="attach-reminder-icon">📎</span>
+                <span>발송 전 <strong>분할납부신청서</strong> 파일이 첨부되었는지 담당자가 꼭 확인해주세요.</span>
+            </div>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-header">메일 미리보기</div>
+        <div class="panel-body" style="background: #f1f5f9; display: flex; flex-direction: column; gap: 16px;">
+
+            <div class="preview-zone">
+                <div class="card-box">
+                    <div class="card-header-area">
+                        <span class="card-tag">메일 제목</span>
+                        <button class="mini-copy-btn" onclick="copyText('mailSubject', this, '제목 복사')">제목 복사</button>
+                    </div>
+                    <div id="mailSubject" class="subject-text"></div>
+                </div>
+
+                <div class="card-box">
+                    <div class="card-header-area">
+                        <span class="card-tag">메일 본문</span>
+                        <button class="mini-copy-btn" onclick="copyText('mailPreview', this, '본문 복사')">본문 복사</button>
+                    </div>
+                    <div id="mailPreview" class="mail-wrapper"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="copyGuardOverlay" class="modal-overlay" onclick="if (event.target === this) closeCopyGuardModal()">
+    <div class="modal-card">
+        <div class="modal-icon">⚠️</div>
+        <div class="modal-title">복사하기 전에 확인해주세요</div>
+        <div class="modal-desc">아래 항목을 먼저 입력해야 제목/본문을 복사할 수 있습니다.</div>
+        <ul id="copyGuardList" class="modal-list"></ul>
+        <button class="modal-close-btn" onclick="closeCopyGuardModal()">확인</button>
+    </div>
+</div>
+<script>
+    const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+    let currentMode = 'worker';
+
+    // 그룹별 메일 제목용 명칭(제목에서 "귀속"과 "건강보험" 사이에 삽입, 일반/성실 구분 없이 통일)과
+    // "3. 분할납부 대상인원" 문구에 들어가는 당월 기준 월(그룹별로 상이)
+    const groupInfo = {
+        worker:   { subjectGroupName: '근로자',       targetMonth: '4월' },
+        normal:   { subjectGroupName: '개인사업자대표', targetMonth: '6월' },
+        diligent: { subjectGroupName: '개인사업자대표', targetMonth: '7월' }
+    };
+
+    function switchTab(mode) {
+        currentMode = mode;
+        document.getElementById('tabWorker').classList.remove('active');
+        document.getElementById('tabNormal').classList.remove('active');
+        document.getElementById('tabDiligent').classList.remove('active');
+
+        if (mode === 'worker') document.getElementById('tabWorker').classList.add('active');
+        else if (mode === 'normal') document.getElementById('tabNormal').classList.add('active');
+        else if (mode === 'diligent') document.getElementById('tabDiligent').classList.add('active');
+
+        renderMail();
+    }
+    function initReportYear() {
+        const lastYear = new Date().getFullYear() - 1;
+        const selectEl = document.getElementById('reportYear');
+        const targetValue = lastYear + "년도";
+
+        for (let i = 0; i < selectEl.options.length; i++) {
+            if (selectEl.options[i].value === targetValue) {
+                selectEl.selectedIndex = i;
+                break;
+            }
+        }
+    }
+    function formatDateWithDay(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '';
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dayName = weekDays[date.getDay()];
+
+        return `${year}년 ${month}월 ${day}일 (${dayName})`;
+    }
+    function handleContactInput(el) {
+        let val = el.value.replace(/[^0-9]/g, '');
+        let formatted = '';
+        if (val.startsWith('02')) {
+            if (val.length <= 2) { formatted = val; }
+            else if (val.length <= 5) { formatted = val.substring(0, 2) + '-' + val.substring(2); }
+            else if (val.length <= 9) { formatted = val.substring(0, 2) + '-' + val.substring(2, val.length - 4) + '-' + val.substring(val.length - 4); }
+            else { formatted = val.substring(0, 2) + '-' + val.substring(2, 6) + '-' + val.substring(6, 10); }
+        } else {
+            if (val.length <= 3) { formatted = val; }
+            else if (val.length <= 6) { formatted = val.substring(0, 3) + '-' + val.substring(3); }
+            else if (val.length <= 10) { formatted = val.substring(0, 3) + '-' + val.substring(3, val.length - 4) + '-' + val.substring(val.length - 4); }
+            else { formatted = val.substring(0, 3) + '-' + val.substring(3, 7) + '-' + val.substring(7, 11); }
+        }
+        el.value = formatted;
+        renderMail();
+    }
+    function renderMail() {
+        const companyRaw = document.getElementById('companyName').value.trim();
+        const contactRaw = document.getElementById('contactInfo').value.trim();
+        const yearAttr = document.getElementById('reportYear').value;
+        const rawNormal = document.getElementById('dueDateNormal').value;
+
+        document.getElementById('companyWarn').style.display = companyRaw ? 'none' : 'block';
+        document.getElementById('contactWarn').style.display = contactRaw ? 'none' : 'block';
+        document.getElementById('normalWarn').style.display = rawNormal ? 'none' : 'block';
+
+        const companyText = companyRaw || '';
+        const contactText = contactRaw || '';
+        const info = groupInfo[currentMode];
+
+        document.getElementById('mailSubject').innerText = `[노무법인 두웰] ${companyText ? companyText + ' ' : ''}${yearAttr} 귀속 ${info.subjectGroupName} 건강보험 연말정산분 분할납부 신청여부 확인 안내`;
+
+        const dueNormalFormatted = formatDateWithDay(rawNormal);
+
+        const emailTemplate = `
+            <div style="max-width: 600px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; line-height: 1.6; color: #333333;">
+                <p style="margin: 0 0 16px 0; font-family: 'Noto Sans KR', sans-serif; color: #333333;">안녕하십니까,<br>노무법인 두웰입니다.</p>
+
+                <p style="margin: 0 0 24px 0; font-family: 'Noto Sans KR', sans-serif; color: #333333;">${yearAttr} 귀속 ${info.subjectGroupName} 연말정산 보험료가 확정됨에 따라, 정산 보험료 납부 방법과 관련해 안내드립니다.</p>
+
+                <div style="margin-bottom: 20px; font-family: 'Noto Sans KR', sans-serif;">
+                    <div style="font-weight: bold; color: #1e3a8a; margin-bottom: 8px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif;">1. 건강보험 연말정산이란</div>
+                    <div style="padding-left: 10px; color: #333333; font-family: 'Noto Sans KR', sans-serif;">- 실제 소득에 따른 '확정 보험료'와 이미 납부한 '고지 보험료'의 차액을 정산하는 과정</div>
+                </div>
+
+                <div style="margin-bottom: 20px; font-family: 'Noto Sans KR', sans-serif;">
+                    <div style="font-weight: bold; color: #1e3a8a; margin-bottom: 8px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif;">2. 납부방법</div>
+                    <div style="padding-left: 10px; color: #333333; margin-bottom: 4px; font-family: 'Noto Sans KR', sans-serif;">- 분할납부 (별도 신청 필요, 최대 12개월까지 가능)</div>
+                    <div style="padding-left: 10px; color: #333333; font-family: 'Noto Sans KR', sans-serif;">- 일시납부</div>
+                </div>
+
+                <div style="margin-bottom: 24px; font-family: 'Noto Sans KR', sans-serif;">
+                    <div style="font-weight: bold; color: #1e3a8a; margin-bottom: 8px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif;">3. 분할납부 대상인원</div>
+                    <div style="padding-left: 10px; color: #333333; font-family: 'Noto Sans KR', sans-serif;">- 연말정산 보험료가 당월(${info.targetMonth}) 보험료 이상 발생한 인원</div>
+                </div>
+
+                <p style="margin: 0 0 20px 0; font-family: 'Noto Sans KR', sans-serif; color: #333333;">위 두 가지 납부 방법 중 분할납부를 신청 희망하시는 경우,<br><span style="font-weight: bold; color: #1e3a8a;">${dueNormalFormatted || ''}</span>까지 분할납부신청서 파일 내 인원별 분할납부횟수(N → N개월)를 작성하여 회신 부탁드립니다.</p>
+
+                <p style="margin: 0 0 24px 0; font-size: 13px; color: #666666; font-family: 'Noto Sans KR', sans-serif;">(분할납부를 별도로 신청하지 않을 경우 자동으로 일시납부되는 점 안내드립니다)</p>
+
+                <div style="background-color: #f8fafc; border-left: 4px solid #1e3a8a; padding: 12px 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0; font-family: 'Noto Sans KR', sans-serif; color: #333333;">
+                    <span style="font-weight: bold; color: #1e3a8a; font-family: 'Noto Sans KR', sans-serif;">담당자 직통번호 : ${contactText}</span>
+                </div>
+
+                <p style="margin: 0; font-family: 'Noto Sans KR', sans-serif; color: #333333;">감사합니다.</p>
+            </div>
+        `;
+        document.getElementById('mailPreview').innerHTML = emailTemplate;
+    }
+    // 사업장명 / 담당자 직통번호 / 회신기한이 모두 입력되어야 복사를 허용
+    function getMissingRequiredFields() {
+        const missing = [];
+        if (!document.getElementById('companyName').value.trim()) missing.push('사업장명');
+        if (!document.getElementById('contactInfo').value.trim()) missing.push('담당자 직통번호');
+        if (!document.getElementById('dueDateNormal').value) missing.push('회신기한');
+        return missing;
+    }
+    function showCopyGuardModal(missingFields) {
+        document.getElementById('copyGuardList').innerHTML = missingFields.map(f => `<li>${f}</li>`).join('');
+        document.getElementById('copyGuardOverlay').classList.add('show');
+    }
+    function closeCopyGuardModal() {
+        document.getElementById('copyGuardOverlay').classList.remove('show');
+    }
+    function copyText(elementId, btnElement, originalText) {
+        const missing = getMissingRequiredFields();
+        if (missing.length > 0) {
+            renderMail(); // 경고 문구(사업장명/연락처/회신기한) 표시 갱신
+            showCopyGuardModal(missing);
+            return;
+        }
+
+        const container = document.getElementById(elementId);
+
+        let targetNode = container;
+        if (elementId === 'mailSubject') {
+            const tempDiv = document.createElement('div');
+            tempDiv.style.fontFamily = "'Noto Sans KR', sans-serif";
+            tempDiv.style.fontSize = "14px";
+            tempDiv.style.fontWeight = "600";
+            tempDiv.innerText = container.innerText;
+            document.body.appendChild(tempDiv);
+            targetNode = tempDiv;
+        }
+        const range = document.createRange();
+        range.selectNode(targetNode);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+
+        try {
+            document.execCommand('copy');
+            btnElement.classList.add('copied');
+            btnElement.innerText = '복사 완료!';
+
+            setTimeout(() => {
+                btnElement.classList.remove('copied');
+                btnElement.innerText = originalText;
+            }, 1000);
+
+        } catch (err) {
+            console.error('복사 실패', err);
+        }
+
+        window.getSelection().removeAllRanges();
+        if (elementId === 'mailSubject') {
+            targetNode.remove();
+        }
+    }
+    initReportYear();
+    renderMail();
+</script>
+</body>
+</html>

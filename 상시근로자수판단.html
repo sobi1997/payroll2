@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상시근로자 수 산정 계산기</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Malgun Gothic', sans-serif; }
+        body { background-color: #f4f6f9; padding: 30px; color: #333; }
+
+        .wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #cfd8dc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            background-color: #0d47a1;
+            color: #fff;
+            padding: 18px 24px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .content-body { padding: 30px; }
+
+        .group-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+
+        .group-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #0d47a1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .group-title span {
+            background: #0d47a1;
+            color: #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .type-select-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: 10px;
+            background: #e0f2fe;
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 1px solid #bae6fd;
+        }
+        .type-select-group label {
+            font-size: 13px;
+            color: #0369a1;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .type-select-group input[type="radio"] { cursor: pointer; }
+
+        .company-display-right {
+            font-size: 14px;
+            font-weight: bold;
+            color: #374151;
+            text-align: right;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 25px;
+            background: #fafafa;
+            padding: 22px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .info-item { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+        .info-item label { width: 120px; font-weight: bold; color: #455a64; white-space: nowrap; }
+        .info-item select, .info-item input {
+            flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 3px; background: #fffde7; color: #000; font-size: 14px;
+        }
+
+        #endDateInput { text-align: center; }
+
+        .worker-btn-group { display: inline-flex; gap: 6px; flex-shrink: 0; }
+        .btn-add-worker {
+            background-color: #10b981; color: white; border: none; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.1s;
+        }
+        .btn-add-worker:hover { background-color: #059669; }
+
+        .btn-remove-worker {
+            background-color: #ef4444; color: white; border: none; padding: 5px 12px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.1s;
+        }
+        .btn-remove-worker:hover { background-color: #dc2626; }
+
+        .table-container { overflow-x: auto; margin-bottom: 25px; border: 1px solid #cbd5e1; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
+        th { background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 4px; color: #1e293b; font-weight: bold; }
+        th.day-col { width: 110px; }
+        th.count-col { width: 140px; }
+
+        .th-worker-name-input {
+            width: 95%; border: 1px solid #cbd5e1; border-radius: 3px; padding: 3px 4px; text-align: center; font-size: 13px; font-weight: bold; color: #1e293b; background: #fff;
+        }
+        .btn-toggle-all {
+            display: block; margin: 5px auto 0 auto; padding: 2px 6px; font-size: 11px; background: #e2e8f0; border: 1px solid #cbd5e1; color: #475569; border-radius: 3px; cursor: pointer; font-weight: normal; transition: all 0.1s;
+        }
+        .btn-toggle-all:hover { background: #0d47a1; color: #fff; border-color: #0d47a1; }
+
+        td { border: 1px solid #cbd5e1; padding: 6px 4px; background: #fff; height: 35px; }
+
+        /* 요일별 색상 (평체 유지) */
+        .sat-color { color: #2563eb !important; font-weight: normal !important; }
+        .sun-color { color: #dc2626 !important; font-weight: normal !important; }
+
+        .cell-o {
+            cursor: pointer; font-weight: bold; color: #0d47a1; font-size: 16px; user-select: none; transition: background 0.1s;
+        }
+        .cell-o:hover { background: #f1f5f9; }
+        .cell-o.checked { background: #e0f2fe; }
+
+        /* 💡 TypeB 달력형 스타일 정의 */
+        .calendar-grid-wrap {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .calendar-month-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0d47a1;
+            margin: 15px 0 8px 0;
+            text-align: left;
+        }
+        .calendar-month-title:first-child { margin-top: 0; }
+
+        /* TypeB 용 달력 전용 인풋창 크기 및 여백 조정 */
+        .typeb-cell {
+            height: 75px;
+            vertical-align: top;
+            text-align: left;
+            padding: 6px;
+            position: relative;
+        }
+        /* 산정 기간 범위를 벗어나는 달력 칸 흐리게 처리 */
+        .typeb-cell.out-of-range {
+            background: #f8fafc;
+            color: #cbd5e1 !important;
+        }
+        .typeb-cell.out-of-range input {
+            display: none; /* 범위 밖은 입력창 숨김 */
+        }
+        .typeb-date-num {
+            font-size: 12px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .input-direct-count {
+            width: 100%;
+            padding: 4px;
+            border: 1px solid #cbd5e1;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: normal;
+            background: #fffde7;
+            color: #333;
+            outline: none;
+        }
+
+        .readonly-box-blue {
+            background: #f0f7ff !important; border: 1px solid #bfdbfe !important; border-radius: 4px; padding: 8px 12px; font-size: 15px; font-weight: bold; color: #1e40af; text-align: right; width: 140px; outline: none;
+        }
+
+        .summary-section { margin-top: 25px; background: #fff; border: 1px solid #cbd5e1; padding: 24px; border-radius: 6px; }
+        .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 14px; }
+        .summary-row label { font-weight: bold; color: #475569; }
+        .summary-value-wrap { display: flex; align-items: center; gap: 8px; font-weight: bold; color: #1e293b; }
+
+        .final-decision-badge-box {
+            margin-top: 20px; background: #f0f7ff; border: 2px solid #2563eb; padding: 16px 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .final-decision-badge-box .badge-label { font-size: 16px; color: #1e40af; font-weight: bold; }
+        .final-decision-badge-box .badge-value { font-size: 20px; color: #1e40af; font-weight: bold; text-align: right; }
+
+        .note-box {
+            font-size: 13px; color: #334155; line-height: 1.6; background: #f8fafc; padding: 14px 16px; border: 1px solid #e2e8f0; border-radius: 4px; margin-top: 15px; word-break: keep-all;
+        }
+
+        .print-only-header { display: none; }
+        .print-only-sub-info { display: none; }
+        .print-only-footer { display: none; }
+
+        .button-area { display: flex; justify-content: center; gap: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 24px; }
+        .btn { border: none; color: #fff; font-weight: bold; cursor: pointer; font-size: 15px; border-radius: 4px; padding: 13px 32px; }
+        .btn-print { background: #2563eb; }
+        .btn-reset { background: #64748b; }
+
+        @media print {
+            @page { size: A4 portrait; margin: 8mm 6mm 6mm 6mm; }
+            body { background: #fff !important; padding: 0 !important; color: #000 !important; font-size: 10px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .wrapper { box-shadow: none !important; border: none !important; max-width: 100% !important; width: 100% !important; }
+            .content-body { padding: 0 !important; }
+            .header, .button-area, .info-grid, .btn-toggle-all, .worker-btn-group, .company-display-right, .type-select-group { display: none !important; }
+            .print-only-header { display: block !important; color: #000 !important; text-align: center !important; font-size: 20px !important; font-weight: bold !important; padding: 0 0 12px 0 !important; margin-bottom: 5px !important; letter-spacing: 2px; }
+            .print-only-sub-info { display: block !important; width: 100% !important; margin-bottom: 12px !important; font-size: 11px !important; color: #000 !important; line-height: 1.6 !important; font-weight: bold !important; text-align: left !important; border-bottom: 1px solid #000; padding-bottom: 8px; }
+            .group-title-row { margin-bottom: 4px !important; }
+            .group-title { display: none !important; }
+            .table-container { margin-bottom: 8px !important; border: none !important; overflow: hidden !important; width: 100% !important; }
+            table { width: 100% !important; table-layout: fixed !important; font-size: 9px !important; }
+            th { border: 1px solid #000 !important; padding: 4px 1px !important; background: #f1f5f9 !important; }
+            td { border: 1px solid #000 !important; padding: 4px !important; }
+            .typeb-cell { height: 50px !important; padding: 2px !important; }
+            .input-direct-count { border: none !important; background: transparent !important; font-size: 10px !important; font-weight: normal !important; text-align: center !important; }
+            .summary-section { border: 1px solid #000 !important; padding: 12px !important; margin-top: 5px !important; border-radius: 0 !important; background: #fff !important; }
+            .readonly-box-blue { border: none !important; background: transparent !important; padding: 0 !important; font-size: 11px !important; width: auto !important; color: #000 !important; }
+            .final-decision-badge-box { margin-top: 10px !important; border: 1px solid #000 !important; padding: 10px !important; background: #fff !important; border-radius: 0 !important; }
+            .note-box { border: none !important; background: #fff !important; font-size: 10.5px !important; padding: 5px 0 0 0 !important; line-height: 1.4 !important; }
+            .print-only-footer { display: block !important; margin-top: 15px; font-size: 11px; text-align: right; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="header">상시 근로자 수 산정 계산기</div>
+        
+        <div class="print-only-header">상시 근로자 수 산정</div>
+        <div class="print-only-sub-info" id="printSubInfo">
+            <div>사업장명 : -</div>
+            <div style="margin-top: 4px;">사업장규모 확인일 : -</div>
+        </div>
+
+        <div class="content-body">
+            <div class="group-title-row" style="margin-bottom: 25px;">
+                <div class="group-title"><span>1</span> 기간 설정</div>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>사업장규모 확인일</label>
+                    <input type="date" id="endDateInput" min="2025-01-01" max="2029-12-31" onchange="initCalendar()">
+                </div>
+
+                <div class="info-item">
+                    <label>사업장명</label>
+                    <input type="text" id="companyName" placeholder="예: 노무법인 두웰" oninput="updateHeader()">
+                </div>
+            </div>
+
+            <div class="group-title-row">
+                <div class="group-title">
+                    <span>2</span> 
+                    근무 표 데이터 입력
+                    
+                    <div class="type-select-group">
+                        <label><input type="radio" name="calcType" value="A" checked onchange="switchType()"> TypeA (근로자 선택 리스트형)</label>
+                        <label><input type="radio" name="calcType" value="B" onchange="switchType()"> TypeB (달력형 인원수 입력)</label>
+                    </div>
+
+                    <div class="worker-btn-group" id="workerBtnGroup">
+                        <button class="btn-add-worker" onclick="addWorkerColumn()">+ 사원 추가</button>
+                        <button class="btn-remove-worker" onclick="removeWorkerColumn()">- 사원 삭제</button>
+                    </div>
+                </div>
+                <div class="company-display-right" id="companyDisplay">사업장명 : </div>
+            </div>
+
+            <div class="table-container" id="containerArea">
+                </div>
+
+            <div class="group-title-row" style="margin-bottom: 12px;">
+                <div class="group-title"><span>3</span> 산정 결과</div>
+            </div>
+            
+            <div class="summary-section">
+                <div class="summary-row">
+                    <label>상시 근로자 수</label>
+                    <div class="summary-value-wrap">
+                        <input type="text" id="resAverageCount" class="readonly-box-blue" value="0.00" readonly> 명
+                    </div>
+                </div>
+                <div class="summary-row">
+                    <label>근로자 5인 이상 업무가동일</label>
+                    <div class="summary-value-wrap">
+                        <input type="text" id="resOverFiveDays" class="readonly-box-blue" value="0" readonly> 일
+                    </div>
+                </div>
+
+                <div class="final-decision-badge-box">
+                    <div class="badge-label">상시근로자 수 산정 결과</div>
+                    <div class="badge-value" id="resDecisionBadge">-</div>
+                </div>
+
+                <div class="note-box" id="resLetFormulaText">
+                    근무표 데이터를 입력하시면 노동법 기준에 따른 상시근로자수 판단 비고가 자동 연산됩니다.
+                </div>
+            </div>
+
+            <div class="print-only-footer">
+                <div class="date-line">확인일자 : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;년 &nbsp;&nbsp;&nbsp;&nbsp;월 &nbsp;&nbsp;&nbsp;&nbsp;일 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (인)</div>
+            </div>
+
+            <div class="button-area">
+                <button class="btn btn-print" onclick="preparePrintAndShow()">출력하기</button>
+                <button class="btn btn-reset" onclick="resetTable()">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let checkedStates = {}; 
+        let directCounts = {}; 
+        let dateList = [];
+        let savedNames = {};
+        let currentWorkerCount = 5;
+
+        function getActiveType() {
+            const types = document.getElementsByName('calcType');
+            for(let i=0; i<types.length; i++) {
+                if(types[i].checked) return types[i].value;
+            }
+            return 'A';
+        }
+
+        function setTodayDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('endDateInput').value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        function saveCurrentNames() {
+            for(let w=1; w<=currentWorkerCount; w++) {
+                const el = document.getElementById('nameW' + w);
+                if(el && el.value !== '-') savedNames['w' + w] = el.value;
+            }
+        }
+
+        function restoreNames() {
+            for(let w=1; w<=currentWorkerCount; w++) {
+                if(savedNames['w' + w] !== undefined) {
+                    const el = document.getElementById('nameW' + w);
+                    if(el) el.value = savedNames['w' + w];
+                }
+            }
+        }
+
+        function updateHeader() {
+            const compName = document.getElementById('companyName').value || '-';
+            const endDateVal = document.getElementById('endDateInput').value || '-';
+            let formattedDate = endDateVal !== '-' ? endDateVal.replace(/-/g, '.') : '-';
+
+            document.getElementById('printSubInfo').innerHTML = `
+                <div>사업장명 : ${compName}</div>
+                <div style="margin-top: 4px;">사업장규모 확인일 : ${formattedDate}</div>
+            `;
+            document.getElementById('companyDisplay').innerText = `사업장명 : ${compName}`;
+        }
+
+        function switchType() {
+            initCalendar();
+        }
+
+        function addWorkerColumn() {
+            if (currentWorkerCount >= 10) return; 
+            saveCurrentNames();
+            currentWorkerCount++;
+            initCalendar();
+        }
+
+        function removeWorkerColumn() {
+            if (currentWorkerCount <= 5) return; 
+            if (confirm(`마지막 열의 사원 스케줄 데이터를 삭제하시겠습니까?`)) {
+                saveCurrentNames();
+                dateList.forEach(dateStr => {
+                    delete checkedStates[`${dateStr}-${currentWorkerCount}`];
+                });
+                delete savedNames['w' + currentWorkerCount];
+                currentWorkerCount--;
+                initCalendar();
+            }
+        }
+
+        function getDayColorClass(dateStrOrDayNum) {
+            let dayNum = typeof dateStrOrDayNum === 'string' ? new Date(dateStrOrDayNum).getDay() : dateStrOrDayNum;
+            if (dayNum === 6) return 'sat-color'; 
+            if (dayNum === 0) return 'sun-color'; 
+            return '';
+        }
+
+        function initCalendar() {
+            dateList = [];
+            const endDateVal = document.getElementById('endDateInput').value;
+            if (!endDateVal) return;
+
+            const endDate = new Date(endDateVal);
+            const startDate = new Date(endDate.getFullYear(), endDate.getMonth() - 1, endDate.getDate() + 1);
+
+            // 1차적으로 날짜 범위 배열 파싱 생성
+            let cursor = new Date(startDate);
+            while (cursor <= endDate) {
+                const y = cursor.getFullYear();
+                const m = String(cursor.getMonth() + 1).padStart(2, '0');
+                const d = String(cursor.getDate()).padStart(2, '0');
+                dateList.push(`${y}-${m}-${d}`);
+                cursor.setDate(cursor.getDate() + 1);
+            }
+
+            const type = getActiveType();
+            const containerArea = document.getElementById('containerArea');
+            const workerBtnGroup = document.getElementById('workerBtnGroup');
+            
+            containerArea.innerHTML = '';
+
+            if (type === 'A') {
+                workerBtnGroup.style.display = 'inline-flex';
+                
+                // TypeA 기존 일렬 리스트형 렌더링
+                const table = document.createElement('table');
+                table.id = 'calcTable';
+                
+                let headHtml = `
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="day-col">일자</th>
+                            <th colspan="${currentWorkerCount}">근로자별 근무일</th>
+                            <th rowspan="2" class="count-col">근무일별<br>근로자 수</th>
+                        </tr>
+                        <tr id="workerThNameRow">`;
+                for(let w=1; w<=currentWorkerCount; w++) {
+                    const letter = String.fromCharCode(64 + w);
+                    headHtml += `
+                        <th class="worker-col">
+                            <input type="text" class="th-worker-name-input" placeholder="사원${letter}" id="nameW${w}" tabindex="${w}">
+                            <button class="btn-toggle-all" onclick="toggleColumn(${w})">일괄 삽입/삭제</button>
+                        </th>`;
+                }
+                headHtml += `</tr></thead>`;
+                table.innerHTML = headHtml;
+
+                const tbody = document.createElement('tbody');
+                dateList.forEach((dateStr, index) => {
+                    const tr = document.createElement('tr');
+                    const tdDate = document.createElement('td');
+                    tdDate.innerText = dateStr;
+                    
+                    const colorClass = getDayColorClass(dateStr);
+                    if(colorClass) tdDate.className = colorClass;
+                    tr.appendChild(tdDate);
+
+                    for (let w = 1; w <= currentWorkerCount; w++) {
+                        const tdWorker = document.createElement('td');
+                        tdWorker.className = 'cell-o';
+                        tdWorker.id = `cell-${dateStr}-${w}`;
+                        
+                        const stateKey = `${dateStr}-${w}`;
+                        if (checkedStates[stateKey]) {
+                            tdWorker.innerText = 'O';
+                            tdWorker.classList.add('checked');
+                        }
+
+                        tdWorker.onclick = function() {
+                            if (this.innerText === 'O') {
+                                this.innerText = '';
+                                this.classList.remove('checked');
+                                checkedStates[stateKey] = false;
+                            } else {
+                                this.innerText = 'O';
+                                this.classList.add('checked');
+                                checkedStates[stateKey] = true;
+                            }
+                            calculateMetrics();
+                        };
+                        tr.appendChild(tdWorker);
+                    }
+
+                    const tdCount = document.createElement('td');
+                    tdCount.id = `dayCount-${index}`;
+                    if(colorClass) tdCount.className = colorClass;
+                    tr.appendChild(tdCount);
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                containerArea.appendChild(table);
+                restoreNames();
+
+            } else {
+                // 💡 TypeB 달력형(Grid 달력) 완전 신규 구조 렌더링
+                workerBtnGroup.style.display = 'none';
+
+                // 산정기간에 걸쳐있는 연도 및 월 그룹 추출
+                let monthsMap = {};
+                dateList.forEach(dStr => {
+                    const parts = dStr.split('-');
+                    const key = `${parts[0]}-${parts[1]}`; // YYYY-MM
+                    if(!monthsMap[key]) monthsMap[key] = [];
+                    monthsMap[key].push(dStr);
+                });
+
+                const wrapDiv = document.createElement('div');
+                wrapDiv.className = 'calendar-grid-wrap';
+
+                // 각 월별로 실제 달력 격자(Grid) 구조 작성
+                Object.keys(monthsMap).sort().forEach(monthKey => {
+                    const [year, month] = monthKey.split('-');
+                    
+                    const mTitle = document.createElement('div');
+                    mTitle.className = 'calendar-month-title';
+                    mTitle.innerText = `▶ ${year}년 ${parseInt(month, 10)}월`;
+                    wrapDiv.appendChild(mTitle);
+
+                    const calTable = document.createElement('table');
+                    calTable.style.marginBottom = '20px';
+                    calTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th class="sun-color">일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th class="sat-color">토</th>
+                            </tr>
+                        </thead>
+                    `;
+
+                    const calTbody = document.createElement('tbody');
+                    
+                    // 해당 월의 1일 요일과 총 일수 계산 구하기
+                    const firstDayIdx = new Date(parseInt(year,10), parseInt(month,10) - 1, 1).getDay();
+                    const lastDate = new Date(parseInt(year,10), parseInt(month,10), 0).getDate();
+
+                    let currentDay = 1;
+                    let rowTr = document.createElement('tr');
+
+                    // 첫 주 빈칸 채우기
+                    for(let i=0; i<7; i++) {
+                        if(i < firstDayIdx) {
+                            let tdEmpty = document.createElement('td');
+                            tdEmpty.className = 'typeb-cell out-of-range';
+                            rowTr.appendChild(tdEmpty);
+                        } else {
+                            rowTr.appendChild(createCalCell(year, month, currentDay));
+                            currentDay++;
+                        }
+                    }
+                    calTbody.appendChild(rowTr);
+
+                    // 둘째 주 이후 채우기
+                    while(currentDay <= lastDate) {
+                        rowTr = document.createElement('tr');
+                        for(let i=0; i<7; i++) {
+                            if(currentDay <= lastDate) {
+                                rowTr.appendChild(createCalCell(year, month, currentDay));
+                                currentDay++;
+                            } else {
+                                let tdEmpty = document.createElement('td');
+                                tdEmpty.className = 'typeb-cell out-of-range';
+                                rowTr.appendChild(tdEmpty);
+                            }
+                        }
+                        calTbody.appendChild(rowTr);
+                    }
+
+                    calTable.appendChild(calTbody);
+                    wrapDiv.appendChild(calTable);
+                });
+
+                containerArea.appendChild(wrapDiv);
+            }
+
+            updateHeader();
+            calculateMetrics();
+        }
+
+        // 달력 내 개별 셀 날짜 노출 및 직접 인풋 생성 보조함수
+        function createCalCell(year, month, day) {
+            const dayStr = String(day).padStart(2, '0');
+            const fullDateStr = `${year}-${month}-${dayStr}`;
+            
+            const td = document.createElement('td');
+            td.className = 'typeb-cell';
+            
+            // 요일별 일자 번호 색상 타겟팅
+            const colorClass = getDayColorClass(fullDateStr);
+            
+            // 현재 일자가 노동법 산정대상 1개월 범위내에 포함되는지 검사
+            if(dateList.includes(fullDateStr)) {
+                let dateSpan = document.createElement('span');
+                dateSpan.className = 'typeb-date-num ' + colorClass;
+                dateSpan.innerText = day;
+                td.appendChild(dateSpan);
+
+                const savedVal = directCounts[fullDateStr] !== undefined ? directCounts[fullDateStr] : '';
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.min = '0';
+                input.className = 'input-direct-count';
+                input.id = `direct-${fullDateStr}`;
+                input.value = savedVal;
+                input.placeholder = '0';
+                input.oninput = function() { saveDirectCount(fullDateStr); };
+                
+                td.appendChild(input);
+            } else {
+                // 범위 외 이전달/다음달 날짜는 흐리게 표기
+                td.classList.add('out-of-range');
+                td.innerHTML = `<span class="typeb-date-num">${day}</span>`;
+            }
+            return td;
+        }
+
+        function saveDirectCount(dateStr) {
+            const inputEl = document.getElementById(`direct-${dateStr}`);
+            if(inputEl) {
+                let val = parseInt(inputEl.value, 10);
+                if(isNaN(val) || val < 0) val = 0;
+                directCounts[dateStr] = val;
+            }
+            calculateMetrics();
+        }
+
+        function toggleColumn(workerIndex) {
+            let hasEmptyCell = false;
+            for (let i = 0; i < dateList.length; i++) {
+                const stateKey = `${dateList[i]}-${workerIndex}`;
+                if (!checkedStates[stateKey]) {
+                    hasEmptyCell = true;
+                    break;
+                }
+            }
+
+            dateList.forEach(dateStr => {
+                const stateKey = `${dateStr}-${workerIndex}`;
+                const cell = document.getElementById(`cell-${dateStr}-${workerIndex}`);
+                if (hasEmptyCell) {
+                    checkedStates[stateKey] = true;
+                    if (cell) { cell.innerText = 'O'; cell.classList.add('checked'); }
+                } else {
+                    checkedStates[stateKey] = false;
+                    if (cell) { cell.innerText = ''; cell.classList.remove('checked'); }
+                }
+            });
+            calculateMetrics();
+        }
+
+        function calculateMetrics() {
+            let totalActiveWorkersSum = 0;
+            let totalActiveDays = 0;      
+            let overFiveDaysCount = 0;    
+            let underFiveDaysCount = 0;   
+            const type = getActiveType();
+
+            dateList.forEach((dateStr, index) => {
+                let dayWorkerCount = 0;
+                
+                if(type === 'A') {
+                    for (let w = 1; w <= currentWorkerCount; w++) {
+                        if (checkedStates[`${dateStr}-${w}`]) dayWorkerCount++;
+                    }
+                    const countCell = document.getElementById(`dayCount-${index}`);
+                    if (countCell) {
+                        if (dayWorkerCount > 0) countCell.innerText = dayWorkerCount;
+                        else countCell.innerText = '';
+                    }
+                } else {
+                    dayWorkerCount = directCounts[dateStr] || 0;
+                }
+                
+                if (dayWorkerCount > 0) {
+                    totalActiveWorkersSum += dayWorkerCount;
+                    totalActiveDays++;
+                    if (dayWorkerCount >= 5) overFiveDaysCount++;
+                    else underFiveDaysCount++;
+                }
+            });
+
+            let averageCount = 0;
+            if (totalActiveDays > 0) {
+                averageCount = Math.ceil((totalActiveWorkersSum / totalActiveDays) * 100) / 100;
+            }
+
+            document.getElementById('resAverageCount').value = averageCount.toFixed(2);
+            document.getElementById('resOverFiveDays').value = overFiveDaysCount;
+
+            const badgeEl = document.getElementById('resDecisionBadge');
+            const noteBox = document.getElementById('resLetFormulaText');
+            
+            if (totalActiveDays === 0) {
+                badgeEl.innerText = "-";
+                noteBox.innerText = "근무표 데이터를 입력하시면 노동법 기준에 따른 상시근로자수 판단 비고가 자동 연산됩니다.";
+                return;
+            }
+
+            const ratio = overFiveDaysCount / totalActiveDays;
+            let resultMessage = "";
+
+            if (averageCount < 5) {
+                if (ratio >= 0.5) {
+                    badgeEl.innerText = "5인 이상 판단";
+                    resultMessage = `상시근로자 수는 ${averageCount.toFixed(2)}명이나, 근로자 5인 이상 업무가동일이 ${overFiveDaysCount}일로 산정기간 업무가동일 ${totalActiveDays}일 중 1/2 이상을 차지해 상시근로자 수 5인 이상으로 판단 됨.`;
+                } else {
+                    badgeEl.innerText = "5인 미만 판단";
+                    resultMessage = `상시근로자 수는 ${averageCount.toFixed(2)}명이며, 근로자 5인 미만 업무가동일이 ${underFiveDaysCount}일로 산정기간 업무가동일 ${totalActiveDays}일 중 1/2 이상을 차지해 상시근로자 수 5인 미만으로 판단 됨.`;
+                }
+            } else {
+                if (ratio >= 0.5) {
+                    badgeEl.innerText = "5인 이상 판단";
+                    resultMessage = `상시근로자 수는 ${averageCount.toFixed(2)}명이며, 근로자 5인 이상 업무가동일이 ${overFiveDaysCount}일로 산정기간 업무가동일 ${totalActiveDays}일 중 1/2 이상을 차지해 상시근로자 수 5인 이상으로 판단 됨.`;
+                } else {
+                    badgeEl.innerText = "5인 미만 판단";
+                    resultMessage = `상시근로자 수는 ${averageCount.toFixed(2)}명이며, 근로자 5인 미만 업무가동일이 ${underFiveDaysCount}일로 산정기간 업무가동일 ${totalActiveDays}일 중 1/2 이상을 차지해 상시근로자 수 5인 미만으로 판단 됨.`;
+                }
+            }
+            noteBox.innerText = resultMessage;
+        }
+
+        function preparePrintAndShow() {
+            if(getActiveType() === 'A') {
+                for (let w = 1; w <= currentWorkerCount; w++) {
+                    const el = document.getElementById('nameW' + w);
+                    if (el && el.value.trim() === '') el.value = '-';
+                }
+            }
+            window.print();
+            setTimeout(() => {
+                if(getActiveType() === 'A') {
+                    for (let w = 1; w <= currentWorkerCount; w++) {
+                        const el = document.getElementById('nameW' + w);
+                        if (el && el.value === '-') el.value = '';
+                    }
+                }
+            }, 1000);
+        }
+
+        function resetTable() {
+            if(confirm("입력된 근무표 데이터를 전체 초기화하시겠습니까?")) {
+                checkedStates = {};
+                directCounts = {};
+                savedNames = {};
+                document.getElementById('companyName').value = '';
+                currentWorkerCount = 5;
+                setTodayDate();
+                initCalendar();
+            }
+        }
+
+        window.onload = function() {
+            setTodayDate();
+            initCalendar();
+        };
+    </script>
+</body>
+</html>

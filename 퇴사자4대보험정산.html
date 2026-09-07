@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퇴사자 4대보험정산 (2026년)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; }
+        body { background-color: #f4f6f9; padding: 30px; color: #333; }
+
+        .wrapper {
+            max-width: 1050px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #cfd8dc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            background-color: #0d47a1;
+            color: #fff;
+            padding: 18px 24px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .content-body { padding: 30px; }
+
+        .group-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #0d47a1;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .group-title span {
+            background: #0d47a1;
+            color: #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 25px;
+            background: #fafafa;
+            padding: 22px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .info-item label {
+            width: 100px;
+            font-weight: bold;
+            color: #455a64;
+        }
+
+        .info-item input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fffde7;
+            color: #000;
+            font-size: 14px;
+        }
+
+        .date-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .date-row input { text-align: center; }
+        .date-row .year { width: 74px; flex: none; }
+        .date-row .month, .date-row .day { width: 52px; flex: none; }
+
+        .calc-layout {
+            display: grid;
+            grid-template-columns: 1fr 0.95fr 1.15fr;
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .card-title {
+            background: #f8fafc;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        .card-body { padding: 18px 16px; min-height: 176px; }
+
+        .result-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .result-row:last-child { margin-bottom: 0; }
+
+        .result-row label {
+            flex: 0 0 96px;
+            width: 96px;
+            font-weight: bold;
+            color: #475569;
+            white-space: nowrap;
+            word-break: keep-all;
+        }
+
+        .result-row input {
+            flex: 1 1 auto;
+            min-width: 0;
+            max-width: 160px;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 3px;
+            text-align: right;
+            font-size: 14px;
+        }
+        .editable { background: #fffde7; }
+
+        /* 자동 연산 수식 전용 잠금 하늘색 스타일 */
+        .readonly {
+            background: #e0f2fe !important;
+            border: 1px solid #bae6fd !important;
+            outline: none;
+            color: #1e40af !important;
+            font-weight: bold;
+        }
+
+        .paid-card .card-body { padding: 18px 16px; }
+
+        .paid-row {
+            display: grid;
+            grid-template-columns: 96px minmax(0, 1fr);
+            align-items: center;
+            column-gap: 10px;
+            row-gap: 6px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .paid-row:last-child { margin-bottom: 0; }
+        .paid-row > label:first-child { width: auto; font-weight: bold; color: #475569; white-space: nowrap; word-break: keep-all; }
+
+        .money-input-wrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 5px; }
+        .money-input-wrap input { width: 100% !important; padding: 8px; border: 1px solid #cbd5e1; border-radius: 3px; text-align: right; font-size: 14px; }
+
+        .care-paid-row .checkbox-label {
+            grid-column: 2;
+            width: auto !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: #475569;
+            font-weight: bold;
+            white-space: nowrap;
+            cursor: pointer;
+            margin-top: -2px;
+        }
+
+        .care-paid-row .checkbox-label input { width: auto !important; padding: 0 !important; margin: 0; cursor: pointer; }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13px; text-align: center; }
+        th { background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px; color: #1e293b; font-weight: bold; }
+        td { border: 1px solid #cbd5e1; padding: 10px; background: #fff; }
+        td.amount { text-align: right; padding-right: 14px; }
+        td.input-cell input { width: 100%; padding: 6px; text-align: right; }
+
+        .button-area { display: flex; justify-content: center; gap: 12px; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 24px; }
+        .btn { border: none; color: #fff; font-weight: bold; cursor: pointer; font-size: 15px; border-radius: 4px; padding: 13px 32px; }
+        .btn-print { background: #2563eb; }
+        .btn-reset { background: #64748b; }
+
+        .calc-layout .card:nth-child(2) .result-row input { max-width: 120px; }
+
+        @media (max-width: 900px) { .calc-layout { grid-template-columns: 1fr; } }
+
+        .print-sheet { display: none; }
+
+        @media print {
+            @page { size: A4 portrait; margin: 10mm; }
+            html, body { width: 210mm; height: 297mm; background: #fff !important; padding: 0 !important; margin: 0 !important; color: #000; }
+            .wrapper { display: none !important; }
+            .print-sheet { display: block !important; width: 190mm; margin: 0 auto; font-size: 11px; line-height: 1.35; color: #111; }
+            .print-title { text-align: center; font-size: 21px; font-weight: bold; letter-spacing: 1px; margin: 6mm 0 7mm 0; }
+            
+            .print-info-table, .print-base-table, .print-result-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 5mm; }
+            .print-info-table th, .print-info-table td,
+            .print-base-table th, .print-base-table td,
+            .print-result-table th, .print-result-table td { border: 1px solid #9ca3af; padding: 5px 6px; vertical-align: middle; word-break: keep-all; overflow-wrap: break-word; white-space: nowrap; }
+            
+            .print-info-table th, .print-base-table th, .print-result-table th { background: #f1f5f9 !important; font-weight: bold; text-align: center; color: #111; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .print-info-table th, .print-info-table td { height: 24px; padding: 4px 6px !important; font-size: 10.5px; }
+            .print-base-table th, .print-base-table td { height: 24px; padding: 4px 6px !important; font-size: 10.5px; }
+            .print-info-table #pCompanyName { text-align: left; white-space: normal !important; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.25; }
+            .print-top-table td, .print-top-table th { vertical-align: middle; }
+            .print-top-table #pCompanyName, .print-top-table #pWorkerName { text-align: left; white-space: normal !important; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.25; }
+            
+            .print-base-table th, .print-base-table td { height: 26px; }
+            .print-base-table td { background: #fff !important; color: #111; font-weight: normal; }
+            
+            .print-date-month-table, .print-money-table { margin-bottom: 4mm; }
+            .print-money-table { margin-top: -1mm; }
+            .print-date-month-table th, .print-date-month-table td, .print-money-table th, .print-money-table td { height: 25px; padding: 4px 6px !important; font-size: 10.5px; vertical-align: middle; }
+            
+            .print-result-table { margin-top: 22px; margin-bottom: 4mm; }
+            .print-result-table th { height: 28px; font-size: 11px; }
+            .print-result-table td { height: 30px; font-size: 11px; }
+            
+            .right { text-align: right; padding-right: 8px !important; }
+            .center { text-align: center; }
+            
+            /* [출력물 교정]: 지저분한 박스를 아예 파괴하고 오리지널 4대보험의 정갈한 연하늘 백그라운드 세팅 */
+            .blue-cell { background: #e0f2fe !important; color: #1e40af !important; font-weight: bold !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            
+            .print-note { font-size: 10px; color: #475569; margin-top: 2mm; }
+            .confirm-date-line { white-space: nowrap; }
+            .date-blank { display: inline-block; width: 18mm; vertical-align: baseline; margin: 0 1mm; }
+            .date-blank.short { width: 9mm; }
+            .worker-sign-line { margin-top: 3mm; }
+            .print-sign-area { width: 88mm; margin-left: auto; margin-top: 14mm; font-size: 12px; line-height: 2.1; font-weight: bold; }
+            .sign-line { display: flex; justify-content: space-between; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="printSheet" class="print-sheet">
+        <div class="print-title">퇴사자 4대보험정산 (2026년)</div>
+
+        <table class="print-info-table print-top-table">
+            <colgroup>
+                <col style="width: 13%;">
+                <col style="width: 37%;">
+                <col style="width: 13%;">
+                <col style="width: 37%;">
+            </colgroup>
+            <tr>
+                <th>사업장명</th>
+                <td id="pCompanyName"></td>
+                <th>근로자명</th>
+                <td id="pWorkerName"></td>
+            </tr>
+        </table>
+
+        <table class="print-base-table print-date-month-table">
+            <colgroup>
+                <col style="width: 13%;">
+                <col style="width: 37%;">
+                <col style="width: 13%;">
+                <col style="width: 37%;">
+            </colgroup>
+            <tr>
+                <th>입사일</th>
+                <td id="pJoinDate" class="center"></td>
+                <th>근무월수</th>
+                <td id="pCalcMonthCount" class="center"></td>
+            </tr>
+            <tr>
+                <th>퇴사일</th>
+                <td id="pLeaveDate" class="center"></td>
+                <th>납부의무월수</th>
+                <td id="pPayMonthCount" class="center"></td>
+            </tr>
+        </table>
+
+        <table class="print-base-table print-money-table">
+            <colgroup>
+                <col style="width: 13%;">
+                <col style="width: 20%;">
+                <col style="width: 13%;">
+                <col style="width: 20%;">
+                <col style="width: 13%;">
+                <col style="width: 21%;">
+            </colgroup>
+            <tr>
+                <th>지급총액</th>
+                <td id="pTotalPay" class="right"></td>
+                <th>비과세</th>
+                <td id="pNonTaxPay" class="right"></td>
+                <th>산정액</th>
+                <td id="pCalcPay" class="right"></td>
+            </tr>
+        </table>
+
+        <table class="print-result-table">
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>요율</th>
+                    <th>월 보험료</th>
+                    <th>결정보험료</th>
+                    <th>기납부액</th>
+                    <th>정산금액</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>건강보험료</td>
+                    <td>3.595%</td>
+                    <td id="pMonthlyHealthFee" class="right"></td>
+                    <td id="pDecisionHealthFee" class="right"></td>
+                    <td id="pPaidHealthFee" class="right"></td>
+                    <td id="pAdjustHealthFee" class="right" style="font-weight: bold;"></td>
+                </tr>
+                <tr>
+                    <td>장기요양보험료</td>
+                    <td>13.14%</td>
+                    <td id="pMonthlyCareFee" class="right"></td>
+                    <td id="pDecisionCareFee" class="right"></td>
+                    <td id="pPaidCareFee" class="right"></td>
+                    <td id="pAdjustCareFee" class="right" style="font-weight: bold;"></td>
+                </tr>
+                <tr>
+                    <td>고용보험료</td>
+                    <td>0.9%</td>
+                    <td id="pMonthlyEmploymentFee" class="right"></td>
+                    <td id="pDecisionEmploymentFee" class="right"></td>
+                    <td id="pPaidEmploymentFee" class="right"></td>
+                    <td id="pAdjustEmploymentFee" class="right" style="font-weight: bold;"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="print-note">
+            ※ 정산금액은 결정보험료에서 기납부액을 차감한 금액입니다.
+        </div>
+
+        <div class="print-sign-area">
+            <div class="confirm-date-line">확인일자 : <span class="date-blank"></span>년 <span class="date-blank short"></span>월 <span class="date-blank short"></span>일</div>
+            <div class="sign-line worker-sign-line">근로자 : <span id="pSignWorkerName"></span> &nbsp;&nbsp;&nbsp;&nbsp; (인)</div>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        <div class="header">퇴사자 4대보험정산 (2026년)</div>
+
+        <div class="content-body">
+            <div class="group-title"><span>1</span> 기본 정보</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>상호명</label>
+                    <input type="text" id="companyName" placeholder="예: 노무법인 두웰">
+                </div>
+                <div class="info-item">
+                    <label>근로자명</label>
+                    <input type="text" id="workerName" placeholder="전형섭">
+                </div>
+
+                <div class="info-item">
+                    <label>입사일</label>
+                    <div class="date-row">
+                        <input type="text" id="joinYear" class="year readonly" value="2026" tabindex="-1" readonly> 년
+                        <input type="text" id="joinMonth" class="month editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                        <input type="text" id="joinDay" class="day editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'day')"> 일
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <label>퇴사일</label>
+                    <div class="date-row">
+                        <input type="text" id="leaveYear" class="year readonly" value="2026" tabindex="-1" readonly> 년
+                        <input type="text" id="leaveMonth" class="month editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                        <input type="text" id="leaveDay" class="day editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'day')"> 일
+                    </div>
+                </div>
+            </div>
+
+            <div class="group-title"><span>2</span> 정산 기준 및 기납부액 입력</div>
+            <div class="calc-layout">
+                <div class="card">
+                    <div class="card-title">① 보수총액 입력</div>
+                    <div class="card-body">
+                        <div class="result-row">
+                            <label>지급총액</label>
+                            <input type="text" id="totalPay" class="editable" value="0" oninput="formatAndCalc(this)" onfocus="clearZero(this)" onblur="restoreZero(this)"> 원
+                        </div>
+                        <div class="result-row">
+                            <label>비과세금액</label>
+                            <input type="text" id="nonTaxPay" class="editable" value="0" oninput="formatAndCalc(this)" onfocus="clearZero(this)" onblur="restoreZero(this)"> 원
+                        </div>
+                        <div class="result-row">
+                            <label>산정액</label>
+                            <input type="text" id="calcPay" class="readonly" value="0" tabindex="-1" readonly> 원
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">② 정산 월수 확인</div>
+                    <div class="card-body">
+                        <div class="result-row">
+                            <label>근무월수</label>
+                            <input type="text" id="calcMonthCount" class="readonly" value="0" tabindex="-1" readonly> 개월
+                        </div>
+                        <div class="result-row">
+                            <label>납부의무월수</label>
+                            <input type="text" id="payMonthCount" class="readonly" value="0" tabindex="-1" readonly> 개월
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card paid-card">
+                    <div class="card-title">③ 기납부액 입력</div>
+                    <div class="card-body">
+                        <div class="paid-row">
+                            <label>건강보험료</label>
+                            <div class="money-input-wrap">
+                                <input type="text" id="paidHealthFee" class="editable" value="0" oninput="formatAndCalc(this)" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                                <span>원</span>
+                            </div>
+                        </div>
+
+                        <div class="paid-row care-paid-row">
+                            <label>장기요양보험료</label>
+                            <div class="money-input-wrap">
+                                <input type="text" id="paidCareFee" class="editable" value="0" oninput="formatAndCalc(this)" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                                <span>원</span>
+                            </div>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="careDiscountChk" onchange="calculateAll()">
+                                장기요양 30% 공제
+                            </label>
+                        </div>
+
+                        <div class="paid-row">
+                            <label>고용보험료</label>
+                            <div class="money-input-wrap">
+                                <input type="text" id="paidEmploymentFee" class="editable" value="0" oninput="formatAndCalc(this)" onfocus="clearZero(this)" onblur="restoreZero(this)">
+                                <span>원</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group-title"><span>3</span> 정산 결과</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 16%;">구분</th>
+                        <th style="width: 14%;">요율</th>
+                        <th style="width: 18%;">월 보험료</th>
+                        <th style="width: 18%;">결정보험료</th>
+                        <th style="width: 17%;">기납부액</th>
+                        <th style="width: 17%;">정산금액</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>건강보험료</td>
+                        <td>3.595%</td>
+                        <td class="amount" id="monthlyHealthFee">0 원</td>
+                        <td class="amount" id="decisionHealthFee">0 원</td>
+                        <td class="amount" id="paidHealthFeeResult">0 원</td>
+                        <td class="input-cell"><input type="text" id="adjustHealthFee" class="readonly" value="0" tabindex="-1" readonly></td>
+                    </tr>
+                    <tr>
+                        <td>장기요양보험료</td>
+                        <td>13.14%</td>
+                        <td class="amount" id="monthlyCareFee">0 원</td>
+                        <td class="amount" id="decisionCareFee">0 원</td>
+                        <td class="amount" id="paidCareFeeResult">0 원</td>
+                        <td class="input-cell"><input type="text" id="adjustCareFee" class="readonly" value="0" tabindex="-1" readonly></td>
+                    </tr>
+                    <tr>
+                        <td>고용보험료</td>
+                        <td>0.9%</td>
+                        <td class="amount" id="monthlyEmploymentFee">0 원</td>
+                        <td class="amount" id="decisionEmploymentFee">0 원</td>
+                        <td class="amount" id="paidEmploymentFeeResult">0 원</td>
+                        <td class="input-cell"><input type="text" id="adjustEmploymentFee" class="readonly" value="0" tabindex="-1" readonly></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="button-area">
+                <button type="button" class="btn btn-print" onclick="printSettlement()">출력하기</button>
+                <button type="button" class="btn btn-reset" onclick="confirmResetForm()">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const HEALTH_RATE = 0.03595;
+        const CARE_RATE = 0.1314;
+        const EMPLOYMENT_RATE = 0.009;
+
+        function onlyNumber(value) {
+            return String(value).replace(/[^0-9]/g, '');
+        }
+
+        function numberWithCommas(x) {
+            const sign = Number(x) < 0 ? '-' : '';
+            const absValue = Math.abs(Number(x) || 0);
+            return sign + String(Math.floor(absValue)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function parseMoney(value) {
+            return Number(String(value).replace(/,/g, '') || 0);
+        }
+
+        function formatMoney(value) {
+            return numberWithCommas(Math.floor(Number(value) || 0));
+        }
+
+        function roundDownToTen(value) {
+            return Math.floor((Number(value) || 0) / 10) * 10;
+        }
+
+        function clearZero(input) {
+            if (parseMoney(input.value) === 0) input.value = '';
+        }
+
+        function restoreZero(input) {
+            if (input.value.trim() === '') input.value = '0';
+            input.value = formatMoney(parseMoney(input.value));
+            calculateAll();
+        }
+
+        function formatAndCalc(input) {
+            const num = onlyNumber(input.value);
+            input.value = num === '' ? '' : numberWithCommas(num);
+            calculateAll();
+        }
+
+        function normalizeDateInput(input, type) {
+            let num = onlyNumber(input.value);
+            if (num === '') {
+                input.value = '';
+                calculateAll();
+                return;
+            }
+            if (type === 'year') {
+                input.value = num.length === 4 ? num : '';
+            }
+            if (type === 'month') {
+                const month = Number(num);
+                input.value = month >= 1 && month <= 12 ? String(month).padStart(2, '0') : '';
+            }
+            if (type === 'day') {
+                const day = Number(num);
+                input.value = day >= 1 && day <= 31 ? String(day).padStart(2, '0') : '';
+            }
+            calculateAll();
+        }
+
+        function dateInputChanged() {
+            calculateAll();
+        }
+
+        function getDateFromInputs(prefix) {
+            const y = document.getElementById(prefix + 'Year').value;
+            const m = document.getElementById(prefix + 'Month').value;
+            const d = document.getElementById(prefix + 'Day').value;
+            if (y.length !== 4 || m.length < 1 || d.length < 1) return null;
+
+            const year = Number(y);
+            const month = Number(m);
+            const day = Number(d);
+            if (!year || month < 1 || month > 12 || day < 1 || day > 31) return null;
+
+            const date = new Date(year, month - 1, day);
+            if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+            return date;
+        }
+
+        function getCalcMonthCount(joinDate, leaveDate) {
+            if (!joinDate || !leaveDate || leaveDate < joinDate) return 0;
+            return (leaveDate.getFullYear() - joinDate.getFullYear()) * 12 + (leaveDate.getMonth() - joinDate.getMonth()) + 1;
+        }
+
+        function getPayMonthCount(joinDate, leaveDate) {
+            if (!joinDate || !leaveDate || leaveDate < joinDate) return 0;
+            let count = 0;
+            let cursor = new Date(joinDate.getFullYear(), joinDate.getMonth(), 1);
+            if (cursor < joinDate) {
+                cursor = new Date(joinDate.getFullYear(), joinDate.getMonth() + 1, 1);
+            }
+            while (cursor <= leaveDate) {
+                count++;
+                cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+            }
+            return count;
+        }
+
+        function calculateAll() {
+            const totalPay = parseMoney(document.getElementById('totalPay').value);
+            const nonTaxPay = parseMoney(document.getElementById('nonTaxPay').value);
+            const paidHealthFee = parseMoney(document.getElementById('paidHealthFee').value);
+            const paidCareFee = parseMoney(document.getElementById('paidCareFee').value);
+            const paidEmploymentFee = parseMoney(document.getElementById('paidEmploymentFee').value);
+
+            const calcPay = Math.max(totalPay - nonTaxPay, 0);
+            const joinDate = getDateFromInputs('join');
+            const leaveDate = getDateFromInputs('leave');
+
+            const calcMonthCount = getCalcMonthCount(joinDate, leaveDate);
+            const payMonthCount = getPayMonthCount(joinDate, leaveDate);
+
+            const monthlyHealthFee = calcMonthCount > 0 ? roundDownToTen((calcPay / calcMonthCount) * HEALTH_RATE) : 0;
+            const isCareDiscount = document.getElementById('careDiscountChk').checked;
+            const monthlyCareFee = roundDownToTen(monthlyHealthFee * CARE_RATE * (isCareDiscount ? 0.7 : 1));
+            const monthlyEmploymentFee = calcMonthCount > 0 ? roundDownToTen((calcPay / calcMonthCount) * EMPLOYMENT_RATE) : 0;
+
+            const decisionHealthFee = monthlyHealthFee * payMonthCount;
+            const decisionCareFee = monthlyCareFee * payMonthCount;
+            const decisionEmploymentFee = monthlyEmploymentFee * calcMonthCount;
+
+            const adjustHealthFee = decisionHealthFee - paidHealthFee;
+            const adjustCareFee = decisionCareFee - paidCareFee;
+            const adjustEmploymentFee = decisionEmploymentFee - paidEmploymentFee;
+
+            document.getElementById('calcPay').value = formatMoney(calcPay);
+            document.getElementById('calcMonthCount').value = calcMonthCount;
+            document.getElementById('payMonthCount').value = payMonthCount;
+
+            document.getElementById('monthlyHealthFee').innerText = formatMoney(monthlyHealthFee) + ' 원';
+            document.getElementById('monthlyCareFee').innerText = formatMoney(monthlyCareFee) + ' 원';
+            document.getElementById('monthlyEmploymentFee').innerText = formatMoney(monthlyEmploymentFee) + ' 원';
+
+            document.getElementById('decisionHealthFee').innerText = formatMoney(decisionHealthFee) + ' 원';
+            document.getElementById('decisionCareFee').innerText = formatMoney(decisionCareFee) + ' 원';
+            document.getElementById('decisionEmploymentFee').innerText = formatMoney(decisionEmploymentFee) + ' 원';
+
+            document.getElementById('paidHealthFeeResult').innerText = formatMoney(paidHealthFee) + ' 원';
+            document.getElementById('paidCareFeeResult').innerText = formatMoney(paidCareFee) + ' 원';
+            document.getElementById('paidEmploymentFeeResult').innerText = formatMoney(paidEmploymentFee) + ' 원';
+
+            document.getElementById('adjustHealthFee').value = formatMoney(adjustHealthFee);
+            document.getElementById('adjustCareFee').value = formatMoney(adjustCareFee);
+            document.getElementById('adjustEmploymentFee').value = formatMoney(adjustEmploymentFee);
+        }
+
+        function confirmResetForm() {
+            if (confirm("입력 정보를 초기화하시겠습니까?")) {
+                resetForm();
+            }
+        }
+
+        function resetForm() {
+            document.querySelectorAll('input').forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                    return;
+                }
+                if (input.classList.contains('readonly')) return;
+                if (
+                    input.id === 'totalPay' ||
+                    input.id === 'nonTaxPay' ||
+                    input.id === 'paidHealthFee' ||
+                    input.id === 'paidCareFee' ||
+                    input.id === 'paidEmploymentFee'
+                ) {
+                    input.value = '0';
+                } else {
+                    input.value = '';
+                }
+            });
+            calculateAll();
+        }
+
+        function getDisplayDate(prefix) {
+            const y = document.getElementById(prefix + 'Year').value;
+            const m = document.getElementById(prefix + 'Month').value;
+            const d = document.getElementById(prefix + 'Day').value;
+            if (!y || !m || !d) return '';
+            return y + '-' + String(Number(m)).padStart(2, '0') + '-' + String(Number(d)).padStart(2, '0');
+        }
+
+        function textOf(id) {
+            const el = document.getElementById(id);
+            return el ? el.innerText : '';
+        }
+
+        function valueOf(id) {
+            const el = document.getElementById(id);
+            return el ? el.value : '';
+        }
+
+        function moneyTextFromValue(id) {
+            const val = valueOf(id);
+            return val ? val + ' 원' : '0 원';
+        }
+
+        function preparePrintSheet() {
+            calculateAll();
+
+            document.getElementById('pCompanyName').innerText = valueOf('companyName');
+            document.getElementById('pWorkerName').innerText = valueOf('workerName');
+            document.getElementById('pJoinDate').innerText = getDisplayDate('join');
+            document.getElementById('pLeaveDate').innerText = getDisplayDate('leave');
+
+            document.getElementById('pTotalPay').innerText = moneyTextFromValue('totalPay');
+            document.getElementById('pNonTaxPay').innerText = moneyTextFromValue('nonTaxPay');
+            document.getElementById('pCalcPay').innerText = moneyTextFromValue('calcPay');
+            document.getElementById('pCalcMonthCount').innerText = valueOf('calcMonthCount') ? valueOf('calcMonthCount') + '개월' : '';
+            document.getElementById('pPayMonthCount').innerText = valueOf('payMonthCount') ? valueOf('payMonthCount') + '개월' : '';
+
+            document.getElementById('pMonthlyHealthFee').innerText = textOf('monthlyHealthFee');
+            document.getElementById('pDecisionHealthFee').innerText = textOf('decisionHealthFee');
+            document.getElementById('pPaidHealthFee').innerText = textOf('paidHealthFeeResult');
+            document.getElementById('pAdjustHealthFee').innerText = valueOf('adjustHealthFee') ? valueOf('adjustHealthFee') + ' 원' : '0 원';
+
+            document.getElementById('pMonthlyCareFee').innerText = textOf('monthlyCareFee');
+            document.getElementById('pDecisionCareFee').innerText = textOf('decisionCareFee');
+            document.getElementById('pPaidCareFee').innerText = textOf('paidCareFeeResult');
+            document.getElementById('pAdjustCareFee').innerText = valueOf('adjustCareFee') ? valueOf('adjustCareFee') + ' 원' : '0 원';
+
+            document.getElementById('pMonthlyEmploymentFee').innerText = textOf('monthlyEmploymentFee');
+            document.getElementById('pDecisionEmploymentFee').innerText = textOf('decisionEmploymentFee');
+            document.getElementById('pPaidEmploymentFee').innerText = textOf('paidEmploymentFeeResult');
+            document.getElementById('pAdjustEmploymentFee').innerText = valueOf('adjustEmploymentFee') ? valueOf('adjustEmploymentFee') + ' 원' : '0 원';
+
+            document.getElementById('pSignWorkerName').innerText = valueOf('workerName');
+        }
+
+        function printSettlement() {
+            preparePrintSheet();
+            window.print();
+        }
+
+        window.onload = calculateAll;
+    </script>
+</body>
+</html>

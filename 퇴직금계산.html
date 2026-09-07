@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퇴직금 계산기</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; }
+        body { background-color: #f4f6f9; padding: 30px; color: #333; }
+        
+        .wrapper { max-width: 1100px; margin: 0 auto; background: white; border: 1px solid #cfd8dc; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .header { background-color: #0d47a1; color: white; padding: 18px 24px; font-size: 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .content-body { padding: 30px; }
+        
+        .group-title { font-size: 15px; font-weight: bold; color: #0d47a1; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .group-title span { background: #0d47a1; color: white; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+
+        /* 인적정보 선택 입력 바 */
+        .info-toggle-bar { background: #f8fafc; padding: 12px 20px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-weight: bold; color: #1e40af; }
+        
+        /* 인적정보 영역 */
+        #workerInfoArea { display: none; background: #fafafa; border: 1px solid #e0e0e0; padding: 25px; margin-bottom: 25px; border-radius: 4px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px 25px; }
+        .info-item { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+        
+        /* 사업장명 변경에 맞춰 가로폭 100px 수직 칼정렬 고정 */
+        .info-item label { width: 100px; font-weight: bold; color: #455a64; flex-shrink: 0; }
+        
+        /* 수기 입력 필수 노란색 공통 스타일 */
+        .editable { background: #fffde7 !important; border: 1px solid #ccc; border-radius: 3px; padding: 7px; color: #000; font-size: 14px; }
+        .info-item input { flex: 1; padding: 7px; border: 1px solid #ccc; border-radius: 3px; background: #fffde7; color: #000; width: 100%; }
+
+        /* 재직 설정 그리드 바 */
+        .input-row-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 25px; background: #fafafa; padding: 20px; border: 1px solid #e0e0e0; margin-bottom: 15px; }
+        
+        /* 순수 수기 입력형 날짜 로우 스타일 */
+        .date-row { display: flex; align-items: center; gap: 5px; flex: 1; font-size: 14px; }
+        .date-row label { width: 110px; font-weight: bold; color: #455a64; margin-right: 4px; }
+        .date-row input { text-align: center; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 3px; color: #333; font-size: 14px; }
+        .date-row input.year { width: 75px; }
+        .date-row input.month, .date-row input.day { width: 55px; }
+        
+        /* 자동 연산 수식 전용 잠금 하늘색 지정 */
+        .readonly { background-color: #e0f2fe !important; border: 1px solid #7dd3fc !important; color: #1e40af !important; font-weight: bold; outline: none; border-radius: 3px; }
+
+        .exclusion-bar { display: flex; align-items: center; background: #f1f5f9; padding: 14px 20px; font-size: 14px; margin-bottom: 25px; border: 1px solid #cbd5e1; border-radius: 4px; gap: 40px; }
+        .dashboard-item { display: flex; align-items: center; gap: 10px; }
+        .exclusion-title { font-weight: bold; color: #334155; }
+        .exclusion-summary { color: #dc2626; font-weight: bold; font-size: 15px; }
+        .calc-days-summary { color: #2563eb; font-weight: bold; font-size: 16px; background: #eff6ff; padding: 2px 10px; border: 1px solid #bfdbfe; border-radius: 4px; }
+
+        .table-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .mode-select-area { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: bold; color: #e65100; background: #fff3e0; padding: 6px 12px; border: 1px solid #ffe0b2; border-radius: 4px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13px; text-align: center; }
+        th { background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 12px; font-weight: bold; color: #1e293b; }
+        td { border: 1px solid #cbd5e1; padding: 10px; background: white; }
+        
+        .date-split-container { display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .date-split-container input[type="text"], td input.period-days-field { 
+            width: 110px; text-align: center; padding: 6px; border-radius: 3px; font-size: 13px; transition: background 0.2s, border 0.2s;
+        }
+        td input.period-days-field { width: 50px; }
+        
+        td input.base-wage, td input.etc-wage { width: 85%; padding: 6px; text-align: right; font-size: 13px; color: #333; }
+
+        .bottom-flex-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 15px; border-top: 2px solid #0d47a1; padding-top: 25px; }
+        .result-column { display: flex; flex-direction: column; gap: 12px; }
+        
+        .result-row { display: flex; align-items: center; height: 35px; }
+        .result-row label { width: 140px; font-weight: bold; font-size: 14px; color: #475569; }
+        .result-row input { padding: 8px; text-align: right; width: 180px; font-size: 14px; border-radius: 3px; }
+
+        .final-box { background: #eff6ff; border: 2px solid #2563eb; padding: 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-top: 5px; height: 35px; }
+        .final-box label { font-size: 16px; color: #1e40af; font-weight: bold; }
+        .final-box input { font-size: 20px; color: #1e40af; font-weight: bold; border: none !important; background: transparent !important; text-align: right; width: 220px; outline: none; box-shadow: none !important; }
+
+        .action-buttons { display: flex; gap: 15px; margin-top: 35px; justify-content: center; border-top: 1px solid #e2e8f0; padding-top: 25px; }
+        .btn-action { padding: 14px 40px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 16px; border-radius: 4px; }
+        .btn-calc { background-color: #2563eb; }
+        .btn-reset { background-color: #64748b; }
+
+        /* 모달창 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; justify-content: center; align-items: center; }
+        
+        /* [★버그 박멸]: 캘린더가 모달 테두리에 갇혀서 잘리던 현상을 완벽 해결하기 위해 overflow 수식을 visible로 긴급 치환 */
+        .modal-box { background: white; width: 560px; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; overflow: visible !important; }
+        .modal-header { background: #f8fafc; padding: 15px; font-size: 15px; font-weight: bold; text-align: center; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; }
+        .modal-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+        .btn-blue-sm { background-color: #1565c0; color: white; border: none; padding: 6px 14px; font-size: 12px; cursor: pointer; font-weight: bold; border-radius: 2px; }
+        .btn-row-del { background: none; border: none; color: #ef4444; font-size: 18px; font-weight: bold; cursor: pointer; padding: 2px 8px; }
+        .modal-footer { text-align: center; padding: 15px; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+        .btn-modal-confirm { background: #0d47a1; color: white; border: none; border-radius: 20px; padding: 10px 50px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        
+        .custom-flatpickr-input { width: 100%; padding: 6px; font-size: 13px; text-align: center; border: 1px solid #ccc; border-radius: 3px; font-weight: bold; background-color: #fffde7; cursor: pointer; color: #333; }
+
+        /* 고급 블루 캘린더 테마 오버라이딩 세팅락 */
+        .flatpickr-calendar { border: 1px solid #cfd8dc !important; box-shadow: 0 6px 16px rgba(0,0,0,0.12) !important; width: 315px !important; border-radius: 4px !important; overflow: hidden; z-index: 99999 !important; }
+        .flatpickr-months { background-color: #0d47a1 !important; height: 46px !important; display: flex; align-items: center; }
+        .flatpickr-months .flatpickr-month { color: white !important; fill: white !important; height: 46px !important; }
+        .flatpickr-current-month { padding: 0 !important; font-size: 14px !important; color: white !important; font-weight: bold !important; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .flatpickr-current-month .flatpickr-monthDropdown-months { font-size: 14px !important; font-weight: bold !important; color: white !important; background: transparent; padding: 2px 6px; border: none; }
+        .numInputWrapper span { display: none !important; }
+        input.numInput.cur-year { font-size: 14px !important; font-weight: bold !important; color: white !important; background: transparent !important; border: none !important; width: 55px !important; padding: 0 !important; text-align: center; }
+        .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month { color: white !important; fill: white !important; padding: 10px !important; top: 3px !important; }
+        .flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg { fill: #ffb74d !important; }
+        .flatpickr-weekdays { background-color: #f1f5f9 !important; border-bottom: 1px solid #cbd5e1 !important; height: 32px !important; }
+        span.flatpickr-weekday { color: #475569 !important; font-weight: bold !important; font-size: 12px !important; display: inline-flex !important; align-items: center; justify-content: center; }
+        .flatpickr-days { width: 315px !important; border-top: none !important; }
+        .dayContainer { width: 315px !important; min-width: 315px !important; max-width: 315px !important; box-sizing: border-box; }
+        .flatpickr-day { font-size: 13px !important; color: #333 !important; max-width: 45px !important; height: 38px !important; line-height: 36px !important; border: 1px solid #f1f5f9 !important; margin: 0 !important; border-radius: 0 !important; box-sizing: border-box; }
+        .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay { color: #bac3d1 !important; background: #fafafa; }
+        .flatpickr-day:hover { background: #e0f2fe !important; border-color: #bae6fd !important; color: #0d47a1 !important; }
+        .flatpickr-day.selected, .flatpickr-day.selected:hover { background-color: #0d47a1 !important; border-color: #0d47a1 !important; color: white !important; font-weight: bold; }
+        .flatpickr-day.today { border-color: #ffb74d !important; font-weight: bold; color: #e65100 !important; }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="header">퇴직금 계산 (퇴직금제도, 퇴직연금DB형)</div>
+
+        <div class="content-body">
+            <div class="info-toggle-bar">
+                <input type="checkbox" id="showInfoChk" onchange="toggleWorkerInfo()">
+                <label for="showInfoChk" style="cursor:pointer;">근로자 및 재직 정보 입력 (선택사항)</label>
+            </div>
+
+            <div id="workerInfoArea">
+                <div class="info-grid">
+                    <div class="info-item"><label>사업장명</label><input type="text" id="companyName" class="editable" placeholder="예: 노무법인 두웰"></div>
+                    <div class="info-item"><label>근로자명</label><input type="text" id="workerName" class="editable" placeholder="전형섭"></div>
+                    <div class="info-item"><label>사번</label><input type="text" id="employeeNo" class="editable" placeholder="1001"></div>
+                    <div class="info-item"><label>부서</label><input type="text" id="department" class="editable" placeholder="급여아웃소싱"></div>
+                    <div class="info-item"><label>직위</label><input type="text" id="position" class="editable" placeholder="주임"></div>
+                    <div class="info-item">
+                        <label>주민등록번호</label>
+                        <input type="text" id="rrnFront" class="editable" maxlength="6" style="width:90px; text-align:center; flex:none;" placeholder="앞 6자리">
+                        <span>-</span>
+                        <input type="text" id="rrnBack" class="editable" maxlength="7" style="width:100px; text-align:center; flex:none;" placeholder="뒤 7자리">
+                    </div>
+                    <div class="info-item" style="grid-column: span 3;"><label>주소</label><input type="text" id="address" class="editable" placeholder="서울특별시 강남구 ..."></div>
+                </div>
+            </div>
+
+            <div class="table-toolbar" style="margin-bottom: 5px;">
+                <div class="group-title" style="margin-bottom: 0;"><span>1</span> 재직기간 날짜 설정</div>
+                <div class="mode-select-area">
+                    <input type="checkbox" id="midCalcChk" onchange="toggleMidCalcMode()">
+                    <label for="midCalcChk" style="cursor:pointer;">퇴직금 중도정산 활성화</label>
+                </div>
+            </div>
+
+            <div class="input-row-container">
+                <div class="date-row">
+                    <label>입사일자</label>
+                    <input type="text" id="joinYear" class="year editable" maxlength="4" placeholder="0000" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'year')"> 년
+                    <input type="text" id="joinMonth" class="month editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                    <input type="text" id="joinDay" class="day editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'day')"> 일
+                </div>
+                <div class="date-row">
+                    <label>퇴직일자</label>
+                    <input type="text" id="leaveYear" class="year editable" maxlength="4" placeholder="0000" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'year')"> 년
+                    <input type="text" id="leaveMonth" class="month editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                    <input type="text" id="leaveDay" class="day editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'day')"> 일
+                </div>
+                
+                <div class="date-row">
+                    <label style="color:#1e40af;">퇴직금 기산일자</label>
+                    <input type="text" id="calcStartYear" class="year readonly" placeholder="0000" tabindex="-1" readonly oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'year')"> 년
+                    <input type="text" id="calcStartMonth" class="month readonly" placeholder="00" tabindex="-1" readonly oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                    <input type="text" id="calcStartDay" class="day readonly" placeholder="00" tabindex="-1" readonly oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'day')"> 일
+                </div>
+                <div class="date-row">
+                    <label style="color:#1e40af;">퇴직금 산정일자</label>
+                    <input type="text" id="calcEndYear" class="year readonly" placeholder="0000" tabindex="-1" readonly oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'year')"> 년
+                    <input type="text" id="calcEndMonth" class="month readonly" placeholder="00" tabindex="-1" readonly oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                    <input type="text" id="calcEndDay" class="day readonly" placeholder="00" tabindex="-1" readonly oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'day')"> 일
+                </div>
+            </div>
+
+            <div class="exclusion-bar">
+                <div class="dashboard-item">
+                    <span class="exclusion-title">• 평균임금 산정 제외기간 (제외일자) :</span>
+                    <span id="unincludedSummary" class="exclusion-summary">0 일 제외됨</span>
+                    <button class="btn-blue-sm" style="margin-left: 10px;" onclick="openModal()">제외일자 등록/수정</button>
+                </div>
+                <div class="dashboard-item" style="margin-left: auto;">
+                    <span class="exclusion-title" style="color: #1e293b;">• 퇴직금 산정일수 :</span>
+                    <span id="finalWorkDaysSummary" class="calc-days-summary">0 일</span>
+                </div>
+            </div>
+
+            <div class="table-toolbar">
+                <div class="group-title" style="margin-bottom: 0;"><span>2</span> 퇴직 전 3개월간 임금 총액 계산 (세전금액)</div>
+                <div class="mode-select-area">
+                    <input type="checkbox" id="manualModeChk" onchange="toggleManualMode()">
+                    <label style="cursor:pointer;" for="manualModeChk">산정기간 직접입력</label>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">산정 기간</th>
+                        <th style="width: 15%;">기간별 일수</th>
+                        <th style="width: 22%;">기본급</th>
+                        <th style="width: 22%;">기타수당</th>
+                    </tr>
+                </thead>
+                <tbody id="wageTableBody"></tbody>
+            </table>
+
+            <div class="group-title"><span>3</span> 수당 가산액 입력 및 최종 결과</div>
+            <div class="bottom-flex-layout">
+                <div class="result-column">
+                    <div class="result-row">
+                        <label>연간 상여금 총액</label>
+                        <input type="text" id="annualBonus" class="editable" value="0" oninput="formatAndCalcWages(this)" onfocus="clearZero(this)" onblur="restoreZero(this)"> 원
+                    </div>
+                    <div class="result-row">
+                        <label>연차수당</label>
+                        <input type="text" id="annualLeaveWage" class="editable" value="0" oninput="formatAndCalcWages(this)" onfocus="clearZero(this)" onblur="restoreZero(this)"> 원
+                    </div>
+                    <div class="result-row">
+                        <label>임금총액</label>
+                        <input type="text" id="totalWageSum" class="readonly" value="0" tabindex="-1" readonly> 원
+                    </div>
+                </div>
+                <div class="result-column">
+                    <div class="result-row"><label>1일 평균임금</label><input type="text" id="avgWagePerDay" class="readonly" value="0" tabindex="-1" readonly> 원</div>
+                    <div class="result-row"><label>1일 통상임금</label><input type="text" id="normalWagePerDay" class="editable" value="0" oninput="formatAndCalcSeverance(this)" onfocus="clearZero(this)" onblur="restoreZero(this)"> 원</div>
+                    <div class="result-row"><label>퇴직위로금 등</label><input type="text" id="severanceConsolationPay" class="editable" value="0" oninput="formatAndCalcSeverance(this)" onfocus="clearZero(this)" onblur="restoreZero(this)"> 원</div>
+                    <div class="final-box">
+                        <label>최종 계산 퇴직금</label>
+                        <div><input type="text" id="finalSeverance" value="0" tabindex="-1" readonly> 원</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-action btn-calc" onclick="printSeveranceStatement()">출력하기</button>
+                <button class="btn-action btn-reset" onclick="confirmResetInputs()">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="unincluded-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div style="font-weight: bold; color:#0d47a1;">제외일자(미산입기간) 설정</div>
+                <div style="cursor:pointer; font-size: 18px;" onclick="closeModal()">✕</div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-toolbar"><button class="btn-blue-sm" onclick="addModalRow()">＋ 행추가</button></div>
+                <table>
+                    <thead><tr><th>시작일자</th><th>종료일자</th><th style="width:60px;">삭제</th></tr></thead>
+                    <tbody id="modalTableBody">
+                        <tr>
+                            <td><input type="text" class="custom-flatpickr-input start-date" placeholder="날짜 선택"></td>
+                            <td><input type="text" class="custom-flatpickr-input end-date" placeholder="날짜 선택"></td>
+                            <td><button class="btn-row-del" onclick="deleteThisRow(this)">✕</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer"><button class="btn-modal-confirm" onclick="applyUnincludedDays()">설정 완료 및 반영</button></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+    <script>
+        let savedUnincludedDays = 0;
+        let total3MonthDays = 0;
+        let isManualMode = false;
+        let isMidCalcMode = false;
+
+        window.onload = function() {
+            syncDateToInputs();
+            initCalendarPickers();
+        }
+
+        function initCalendarPickers() {
+            flatpickr(".custom-flatpickr-input", {
+                locale: "ko",
+                dateFormat: "Y.m.d",
+                allowInput: true,
+                monthSelectorType: "dropdown",
+                yearSelectorType: "dropdown"
+            });
+        }
+
+        function liveDateMask(input) {
+            let num = input.value.replace(/[^0-9]/g, '');
+            if (num.length > 8) num = num.substring(0, 8);
+            let formatted = "";
+            if (num.length <= 4) formatted = num;
+            else if (num.length <= 6) formatted = num.substring(0, 4) + "." + num.substring(4);
+            else formatted = num.substring(0, 4) + "." + num.substring(4, 6) + "." + num.substring(6);
+            input.value = formatted;
+            if (input.classList.contains('p-start') || input.classList.contains('p-end')) recalcManualTotalDays();
+        }
+
+        function onlyNumber(value) {
+            return String(value).replace(/[^0-9]/g, '');
+        }
+
+        function normalizeDateInput(input, type) {
+            let num = onlyNumber(input.value);
+            if (num === '') {
+                input.value = '';
+                syncDateToInputs();
+                return;
+            }
+            if (type === 'year') {
+                input.value = num.length === 4 ? num : '';
+            }
+            if (type === 'month') {
+                const month = Number(num);
+                input.value = month >= 1 && month <= 12 ? String(month).padStart(2, '0') : '';
+            }
+            if (type === 'day') {
+                const day = Number(num);
+                input.value = day >= 1 && day <= 31 ? String(day).padStart(2, '0') : '';
+            }
+            syncDateToInputs();
+        }
+
+        function dateInputChanged() {
+            syncDateToInputs();
+        }
+
+        function toggleWorkerInfo() {
+            const area = document.getElementById('workerInfoArea');
+            area.style.display = document.getElementById('showInfoChk').checked ? 'block' : 'none';
+        }
+
+        function numberWithCommas(x) { return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+        function formatAndCalcWages(input) {
+            let num = input.value.replace(/[^0-9]/g, '');
+            input.value = num === '' ? '' : numberWithCommas(num);
+            calcAverageWage();
+        }
+
+        function formatAndCalcSeverance(input) {
+            let num = input.value.replace(/[^0-9]/g, '');
+            input.value = num === '' ? '' : numberWithCommas(num);
+            calcFinalSeverance();
+        }
+
+        function clearZero(input) {
+            let cleanVal = input.value.replace(/,/g, '');
+            if(Number(cleanVal) === 0) input.value = '';
+        }
+
+        function restoreZero(input) {
+            if(input.value.trim() === '') { input.value = '0'; calcAverageWage(); }
+        }
+
+        function openModal() { document.getElementById('unincluded-modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('unincluded-modal').style.display = 'none'; }
+        
+        // 행추가
+        function addModalRow() {
+            const tbody = document.getElementById('modalTableBody'); const newRow = document.createElement('tr');
+            newRow.innerHTML = `<td><input type="text" class="custom-flatpickr-input start-date" placeholder="날짜 선택"></td><td><input type="text" class="custom-flatpickr-input end-date" placeholder="날짜 선택"></td><td><button class="btn-row-del" onclick="deleteThisRow(this)">✕</button></td>`;
+            tbody.appendChild(newRow);
+            initCalendarPickers();
+        }
+        function deleteThisRow(btn) { btn.closest('tr').remove(); }
+
+        /* [★수리 완료]: 중도정산 토글 클래스 덮어쓰기 완전 파괴 및 유산 보존 처리 */
+        function toggleMidCalcMode() {
+            isMidCalcMode = document.getElementById('midCalcChk').checked;
+            const startInputs = document.querySelectorAll('#calcStartYear, #calcStartMonth, #calcStartDay');
+            const endInputs = document.querySelectorAll('#calcEndYear, #calcEndMonth, #calcEndDay');
+            
+            if (isMidCalcMode) {
+                startInputs.forEach(el => { el.removeAttribute('readonly'); el.removeAttribute('tabindex'); el.classList.remove('readonly'); el.classList.add('editable'); });
+                endInputs.forEach(el => { el.removeAttribute('readonly'); el.removeAttribute('tabindex'); el.classList.remove('readonly'); el.classList.add('editable'); });
+            } else {
+                startInputs.forEach(el => { el.setAttribute('readonly', 'true'); el.setAttribute('tabindex', '-1'); el.classList.remove('editable'); el.classList.add('readonly'); });
+                endInputs.forEach(el => { el.setAttribute('readonly', 'true'); el.setAttribute('tabindex', '-1'); el.classList.remove('editable'); el.classList.add('readonly'); });
+                syncDateToInputs();
+            }
+        }
+
+        function syncDateToInputs() {
+            if (!isMidCalcMode) {
+                document.getElementById('calcStartYear').value = document.getElementById('joinYear').value;
+                document.getElementById('calcStartMonth').value = document.getElementById('joinMonth').value;
+                document.getElementById('calcStartDay').value = document.getElementById('joinDay').value;
+                document.getElementById('calcEndYear').value = document.getElementById('leaveYear').value;
+                document.getElementById('calcEndMonth').value = document.getElementById('leaveMonth').value;
+                document.getElementById('calcEndDay').value = document.getElementById('leaveDay').value;
+            }
+            updateAllCalculations();
+        }
+
+        function toggleManualMode() {
+            isManualMode = document.getElementById('manualModeChk').checked;
+            if(!isManualMode) {
+                updateAllCalculations();
+            } else {
+                document.querySelectorAll('.p-start, .p-end').forEach(el => {
+                    el.removeAttribute('readonly');
+                    el.removeAttribute('tabindex');
+                    el.classList.remove('readonly');
+                    el.classList.add('editable');
+                });
+                recalcManualTotalDays();
+            }
+        }
+
+        function updateAllCalculations() {
+            const startDate = getCompositeDate('calcStart'); const endDate = getCompositeDate('calcEnd');
+            const tbody = document.getElementById('wageTableBody');
+
+            if (!startDate || !endDate) {
+                document.getElementById('finalWorkDaysSummary').innerText = "0 일";
+                if (tbody) tbody.innerHTML = '';
+                total3MonthDays = 0;
+                calcAverageWage();
+                return;
+            }
+
+            if (endDate >= startDate) {
+                const baseDiff = getExactDaysBetween(startDate, endDate);
+                const finalWorkDays = baseDiff - savedUnincludedDays;
+                document.getElementById('finalWorkDaysSummary').innerText = (finalWorkDays > 0 ? finalWorkDays : 0) + " 일";
+                generate3MonthTable(endDate);
+            } else {
+                document.getElementById('finalWorkDaysSummary').innerText = "0 일 (날짜 오류)";
+                if (tbody) tbody.innerHTML = '';
+                total3MonthDays = 0;
+                calcAverageWage();
+            }
+        }
+
+        function getCompositeDate(prefix) {
+            const y = document.getElementById(prefix + 'Year').value;
+            const m = document.getElementById(prefix + 'Month').value;
+            const d = document.getElementById(prefix + 'Day').value;
+            if (y.length !== 4 || m.length < 1 || d.length < 1) return null;
+            return new Date(y, parseInt(m) - 1, parseInt(d));
+        }
+
+        function getExactDaysBetween(d1, d2) {
+            const utc1 = Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate());
+            const utc2 = Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate());
+            return Math.floor((utc2 - utc1) / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        function generate3MonthTable(calcEndDate) {
+            const tbody = document.getElementById('wageTableBody');
+            if(isManualMode && tbody.children.length > 0) return;
+            tbody.innerHTML = ''; 
+
+            let targetPeriods = [];
+            let checkLastDay = new Date(calcEndDate.getFullYear(), calcEndDate.getMonth() + 1, 0).getDate();
+            let isMonthEnd = (calcEndDate.getDate() === checkLastDay);
+
+            if (isMonthEnd) {
+                let endY = calcEndDate.getFullYear(); let endM = calcEndDate.getMonth(); 
+                for (let i = 0; i < 3; i++) {
+                    let s = new Date(endY, endM - i, 1); let e = new Date(endY, endM - i + 1, 0);
+                    targetPeriods.unshift({ start: s, end: e });
+                }
+            } else {
+                let tempEnd = new Date(calcEndDate); let remainingDays = 90;
+                while (remainingDays > 0) {
+                    let tempStart = new Date(tempEnd.getFullYear(), tempEnd.getMonth(), 1);
+                    let naturalMonthDays = getExactDaysBetween(tempStart, tempEnd);
+                    if (naturalMonthDays <= remainingDays) {
+                        targetPeriods.unshift({ start: new Date(tempStart), end: new Date(tempEnd) });
+                        remainingDays -= naturalMonthDays;
+                    } else {
+                        let exactStart = new Date(tempEnd); exactStart.setDate(tempEnd.getDate() - remainingDays + 1);
+                        targetPeriods.unshift({ start: exactStart, end: new Date(tempEnd) }); remainingDays = 0;
+                    }
+                    if (remainingDays > 0) { tempEnd = new Date(tempStart); tempEnd.setDate(tempEnd.getDate() - 1); }
+                }
+            }
+
+            total3MonthDays = 0;
+            targetPeriods.forEach((period) => {
+                const days = getExactDaysBetween(period.start, period.end);
+                total3MonthDays += days;
+                const sStr = formatDateStr(period.start); const eStr = formatDateStr(period.end);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="date-split-container">
+                            <input type="text" class="p-start readonly" value="${sStr}" tabindex="-1" readonly oninput="liveDateMask(this)">
+                            <span>~</span>
+                            <input type="text" class="p-end readonly" value="${eStr}" tabindex="-1" readonly oninput="liveDateMask(this)">
+                        </div>
+                    </td>
+                    <td><input type="text" class="period-days-field readonly" value="${days}" tabindex="-1" readonly> 일</td>
+                    <td><input type="text" class="base-wage editable" value="0" oninput="formatAndCalcWages(this)" onfocus="clearZero(this)" onblur="restoreZero(this)"> 원</td>
+                    <td><input type="text" class="etc-wage editable" value="0" oninput="formatAndCalcWages(this)" onfocus="clearZero(this)" onblur="restoreZero(this)"> 원</td>
+                `;
+                tbody.appendChild(row);
+            });
+            appendTotalRow(total3MonthDays);
+            calcAverageWage();
+        }
+
+        function appendTotalRow(totalDays) {
+            const tbody = document.getElementById('wageTableBody');
+            const totalRow = document.createElement('tr');
+            totalRow.style.backgroundColor = '#f8fafc'; totalRow.style.borderTop = '2px solid #cbd5e1';
+            totalRow.innerHTML = `<td>급여 반영 합계 일수</td><td id="tableTotalDays">${totalDays} 일</td><td id="totalBaseWage">0 원</td><td id="totalEtcWage">0 원</td>`;
+            tbody.appendChild(totalRow);
+        }
+
+        function recalcManualTotalDays() {
+            let currentSum = 0;
+            document.querySelectorAll('.period-days-field').forEach((el, idx) => {
+                const sVal = document.querySelectorAll('.p-start')[idx].value.trim();
+                const eVal = document.querySelectorAll('.p-end')[idx].value.trim();
+                if(sVal.length < 10 || eVal.length < 10) { 
+                    el.value = ""; 
+                } else {
+                    const s = new Date(sVal.replace(/\./g, '-')); const e = new Date(eVal.replace(/\./g, '-'));
+                    if(e >= s) { el.value = getExactDaysBetween(s, e); } else { el.value = ""; }
+                }
+                currentSum += Number(el.value || 0);
+            });
+            total3MonthDays = currentSum;
+            document.getElementById('tableTotalDays').innerText = currentSum + " 일";
+            calcAverageWage();
+        }
+
+        function formatDateStr(date) {
+            const y = date.getFullYear(); const m = String(date.getMonth() + 1).padStart(2, '0'); const d = String(date.getDate()).padStart(2, '0');
+            return `${y}.${m}.${d}`;
+        }
+
+        function applyUnincludedDays() {
+            let totalDeduction = 0;
+            document.querySelectorAll('#modalTableBody tr').forEach(tr => {
+                const sVal = tr.querySelector('.start-date').value;
+                const eVal = tr.querySelector('.end-date').value;
+                if(sVal && eVal) {
+                    const s = new Date(sVal.replace(/\./g, '-')); const e = new Date(eVal.replace(/\./g, '-'));
+                    if(e >= s) totalDeduction += getExactDaysBetween(s, e);
+                }
+            });
+            savedUnincludedDays = totalDeduction;
+            document.getElementById('unincludedSummary').innerText = `${totalDeduction} 일 제외됨`;
+            closeModal();
+            updateAllCalculations();
+        }
+
+        function getAllowanceAdjustedAmount(originalAmount) {
+            const amount = Number(originalAmount || 0);
+            const periodDays = Number(total3MonthDays || 0);
+            if (isManualMode && periodDays > 0 && periodDays < 89) {
+                return Math.floor(amount / 365 * periodDays);
+            }
+            return Math.floor(amount * (3 / 12));
+        }
+
+        function getAllowanceFormulaText(originalAmount) {
+            const amount = Number(originalAmount || 0);
+            const periodDays = Number(total3MonthDays || 0);
+            if (isManualMode && periodDays > 0 && periodDays < 89) {
+                return `${numberWithCommas(amount)} ÷ 365 × ${periodDays}`;
+            }
+            return `${numberWithCommas(amount)} ÷ 12 × 3`;
+        }
+
+        function calcAverageWage() {
+            let totalBase = 0; let totalEtc = 0;
+            document.querySelectorAll('.base-wage').forEach(el => totalBase += Number(el.value.replace(/,/g, '') || 0));
+            document.querySelectorAll('.etc-wage').forEach(el => totalEtc += Number(el.value.replace(/,/g, '') || 0));
+
+            const totalBaseEl = document.getElementById('totalBaseWage');
+            const totalEtcEl = document.getElementById('totalEtcWage');
+            if (totalBaseEl) totalBaseEl.innerText = numberWithCommas(totalBase) + " 원";
+            if (totalEtcEl) totalEtcEl.innerText = numberWithCommas(totalEtc) + " 원";
+
+            const annualBonusOriginal = Number(document.getElementById('annualBonus').value.replace(/,/g, '') || 0);
+            const annualLeaveOriginal = Number(document.getElementById('annualLeaveWage').value.replace(/,/g, '') || 0);
+            const annualBonus = getAllowanceAdjustedAmount(annualBonusOriginal);
+            const annualLeave = getAllowanceAdjustedAmount(annualLeaveOriginal);
+            const totalWageSum = totalBase + totalEtc + annualBonus + annualLeave;
+            document.getElementById('totalWageSum').value = numberWithCommas(Math.floor(totalWageSum));
+            const periodDays = total3MonthDays;
+            const avgWage = periodDays > 0 ? (totalWageSum / periodDays) : 0;
+            
+            // 1일 평균임금 소수점 무조건 올림(Math.ceil) 세팅
+            document.getElementById('avgWagePerDay').value = numberWithCommas(Math.ceil(avgWage));
+            calcFinalSeverance();
+            return avgWage;
+        }
+
+        function calcFinalSeverance() {
+            const avgWageStr = document.getElementById('avgWagePerDay').value.replace(/,/g, '');
+            const avgWage = Number(avgWageStr || 0);
+            const normalWage = Number(document.getElementById('normalWagePerDay').value.replace(/,/g, '') || 0);
+            const daysStr = document.getElementById('finalWorkDaysSummary').innerText.replace(' 일', '');
+            const workDays = Number(daysStr || 0);
+            const baseWage = Math.max(avgWage, normalWage);
+            const severance = Math.floor(baseWage * 30 * (workDays / 365));
+            const consolationPayEl = document.getElementById('severanceConsolationPay');
+            const consolationPay = Number((consolationPayEl ? consolationPayEl.value : '0').replace(/,/g, '') || 0);
+            const finalTotal = severance + consolationPay;
+            document.getElementById('finalSeverance').value = numberWithCommas(Math.floor(finalTotal));
+        }
+
+        function getInputValue(id) {
+            const el = document.getElementById(id);
+            return el ? el.value.trim() : '';
+        }
+
+        function getSelectedDateText(prefix) {
+            const y = document.getElementById(prefix + 'Year').value;
+            const m = document.getElementById(prefix + 'Month').value;
+            const d = document.getElementById(prefix + 'Day').value;
+            if (!y || !m || !d) return '';
+            return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        }
+
+        /* 팝업 전용 유틸 매핑 가동 */
+        function dotDateToDash(value) { return value ? value.replace(/\./g, '-') : ''; }
+        function getNumberFromText(value) { return Number(String(value || '').replace(/[^0-9.-]/g, '') || 0); }
+        function formatPrintWon(value, showZero = true) {
+            const num = Math.floor(Number(value || 0));
+            if (!showZero && !num) return '';
+            return numberWithCommas(num) + ' 원';
+        }
+        function formatPrintNumber(value, suffix = '') {
+            const num = Math.floor(Number(value || 0));
+            if (!num) return '';
+            return numberWithCommas(num) + suffix;
+        }
+        function formatPrintNumberZero(value, suffix = '') {
+            const num = Math.floor(Number(value || 0));
+            return numberWithCommas(num) + suffix;
+        }
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getPrintPeriods() {
+            const starts = Array.from(document.querySelectorAll('.p-start'));
+            const ends = Array.from(document.querySelectorAll('.p-end'));
+            const days = Array.from(document.querySelectorAll('.period-days-field'));
+            const bases = Array.from(document.querySelectorAll('.base-wage'));
+            const etcs = Array.from(document.querySelectorAll('.etc-wage'));
+            const periods = [];
+
+            for (let i = 0; i < starts.length && i < 4; i++) {
+                periods.push({
+                    start: dotDateToDash(starts[i] ? starts[i].value : ''),
+                    end: dotDateToDash(ends[i] ? ends[i].value : ''),
+                    days: getNumberFromText(days[i] ? days[i].value : 0),
+                    base: getNumberFromText(bases[i] ? bases[i].value : 0),
+                    etc: getNumberFromText(etcs[i] ? etcs[i].value : 0)
+                });
+            }
+            while (periods.length < 4) {
+                periods.push({ start: '', end: '', days: '', base: '', etc: '', sum: '' });
+            }
+            return periods;
+        }
+
+        function makeNumberPeriodCells(periods, key) {
+            return periods.map(item => {
+                if (!item.start || !item.end) return '<td></td>';
+                const value = item[key];
+                if (value === '' || value === null || value === undefined || Number(value) === 0) return '<td></td>';
+                return `<td>${formatPrintNumber(value)}</td>`;
+            }).join('');
+        }
+
+        function makeMoneyPeriodCells(periods, key) {
+            return periods.map(item => {
+                if (!item.start || !item.end) return '<td></td>';
+                const value = item[key];
+                return `<td class="right">${formatPrintWon(value)}</td>`;
+            }).join('');
+        }
+
+        function printSeveranceStatement() {
+            calcAverageWage();
+            calcFinalSeverance();
+
+            const companyName = getInputValue('companyName');
+            const workerName = getInputValue('workerName');
+            const employeeNo = getInputValue('employeeNo');
+            const rrnFront = getInputValue('rrnFront');
+            const rrnBack = getInputValue('rrnBack');
+            const rrn = (rrnFront || rrnBack) ? `${rrnFront}-${rrnBack}` : '';
+            const department = getInputValue('department');
+            const position = getInputValue('position');
+            const address = getInputValue('address');
+
+            const joinDate = getSelectedDateText('join');
+            const leaveDate = getSelectedDateText('leave');
+            const calcStartDate = getSelectedDateText('calcStart');
+            const calcEndDate = getSelectedDateText('calcEnd');
+            const workDays = getNumberFromText(document.getElementById('finalWorkDaysSummary').innerText);
+
+            const periods = getPrintPeriods();
+            periods.forEach((item) => {
+                item.sum = item.start ? getNumberFromText(item.base) + getNumberFromText(item.etc) : '';
+            });
+
+            const totalBase = periods.reduce((sum, item) => sum + getNumberFromText(item.base), 0);
+            const totalEtc = periods.reduce((sum, item) => sum + getNumberFromText(item.etc), 0);
+            const totalDays = periods.reduce((sum, item) => sum + getNumberFromText(item.days), 0);
+            const totalBaseEtc = totalBase + totalEtc;
+
+            const annualBonusOriginal = getNumberFromText(document.getElementById('annualBonus').value);
+            const annualLeaveOriginal = getNumberFromText(document.getElementById('annualLeaveWage').value);
+            const annualBonusAdjusted = getAllowanceAdjustedAmount(annualBonusOriginal);
+            const annualLeaveAdjusted = getAllowanceAdjustedAmount(annualLeaveOriginal);
+            const bonusFormulaText = getAllowanceFormulaText(annualBonusOriginal);
+            const leaveFormulaText = getAllowanceFormulaText(annualLeaveOriginal);
+
+            const avgWage = getNumberFromText(document.getElementById('avgWagePerDay').value);
+            const normalWage = getNumberFromText(document.getElementById('normalWagePerDay').value);
+            const standardWage = Math.max(avgWage, normalWage);
+            const finalSeverance = Math.floor(standardWage * 30 * (workDays / 365));
+            const consolationPayInput = document.getElementById('severanceConsolationPay');
+            const consolationPay = getNumberFromText(consolationPayInput ? consolationPayInput.value : 0);
+            const finalSeveranceTotal = finalSeverance + consolationPay;
+            const severanceFormula = `${formatPrintWon(standardWage)} × 30 × ${formatPrintNumberZero(workDays)} ÷ 365<br><span class="formula-result">= <strong>${formatPrintWon(finalSeverance)}</strong></span>`;
+
+            const today = new Date();
+            const todayText = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+            const periodHeaderCells = periods.map(item => {
+                if (!item.start || !item.end) return '<th class="period-date-cell"></th>';
+                return `<th class="period-date-cell" style="white-space: nowrap; font-size: 11px; font-weight: normal; line-height: 1.45;">${escapeHtml(item.start)} 부터<br>${escapeHtml(item.end)} 까지</th>`;
+            }).join('');
+
+            const printHtml = `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>퇴직금산정내역서</title>
+    <style>
+        @page { size: A4 portrait; margin: 12mm 14mm; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #111; margin: 0; padding: 0; font-size: 12px; }
+        .print-wrap { width: 100%; max-width: 760px; margin: 0 auto; height: 265mm; position: relative; box-sizing: border-box; }
+        .title { text-align: center; font-size: 21px; letter-spacing: 12px; font-weight: 700; margin: 10px 0 25px; text-indent: 12px; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { border: 1px solid #cbd5e1; padding: 7px 6px; text-align: center; vertical-align: middle; word-break: keep-all; background: #fff; font-weight: normal; }
+        .info-table th, .info-table td { height: 34px; }
+        .info-table th, .calc-table th { background: #f1f5f9 !important; color: #1e293b; font-weight: normal; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .info-table td { text-align: center !important; }
+        .section-title { font-size: 13px; font-weight: 700; text-align: center; padding: 9px 0; background: #fff; letter-spacing: 8px; text-indent: 8px; }
+        .calc-table { margin-top: 15px; }
+        .right { text-align: right !important; padding-right: 12px !important; }
+        .formula { line-height: 1.5; text-align: right; padding-right: 12px; }
+        .formula-result { display: inline-block; min-width: 120px; text-align: right; }
+        .vertical-label { writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 4px; font-size: 11px; background: #f8fafc; }
+        .blue-cell { background: #e0f2fe !important; color: #1e40af !important; font-weight: bold !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .bottom-anchor-zone { position: absolute; bottom: 5mm; left: 0; width: 100%; }
+        .confirm { text-align: center; font-size: 13px; font-weight: normal; }
+        .date { text-align: center; margin-top: 10px; font-weight: normal; }
+        .sign-area { margin-top: 35px; margin-left: auto; width: 360px; line-height: 2.2; font-weight: normal; font-size: 13px; }
+        .sign-line { display: grid; grid-template-columns: 65px 1fr 50px; align-items: center; column-gap: 8px; }
+        .sign-label { text-align: left; }
+        .sign-name { text-align: left; padding-left: 4px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+        .sign-seal { text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="print-wrap">
+        <div class="title"><b>퇴 직 금 산 정 내 역 서</b></div>
+
+        <table class="info-table">
+            <colgroup>
+                <col style="width: 13%;"><col style="width: 20%;"><col style="width: 13%;"><col style="width: 20%;"><col style="width: 14%;"><col style="width: 20%;">
+            </colgroup>
+            <tr>
+                <th>사업장명</th><td>${escapeHtml(companyName)}</td>
+                <th>근로자명</th><td>${escapeHtml(workerName)}</td>
+                <th>사번</th><td>${escapeHtml(employeeNo)}</td>
+            </tr>
+            <tr>
+                <th>주민번호</th><td>${escapeHtml(rrn)}</td>
+                <th>부서</th><td>${escapeHtml(department)}</td>
+                <th>직위</th><td>${escapeHtml(position)}</td>
+            </tr>
+            <tr>
+                <th>주소</th><td colspan="5">${escapeHtml(address)}</td>
+            </tr>
+            <tr>
+                <th>입사일자</th><td>${escapeHtml(joinDate)}</td>
+                <th>퇴직금 기산일</th><td>${escapeHtml(calcStartDate)}</td>
+                <th rowspan="2" style="font-size:11px; line-height:1.4; padding:5px; white-space: nowrap;">퇴직금 산정일수</th>
+                <td rowspan="2" style="font-size:13px; color: #111;">${formatPrintNumber(workDays, ' 일')}</td>
+            </tr>
+            <tr>
+                <th>퇴사일자</th><td>${escapeHtml(leaveDate)}</td>
+                <th>퇴직금 산정일</th><td>${escapeHtml(calcEndDate)}</td>
+            </tr>
+        </table>
+
+        <table class="calc-table">
+            <colgroup>
+                <col style="width: 6%;"><col style="width: 12%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 18%;">
+            </colgroup>
+            <thead>
+                <tr><th colspan="7" class="section-title">산 정 내 역</th></tr>
+                <tr><th colspan="2">평균임금<br>산정기간</th>${periodHeaderCells}<th style="font-weight: normal;">합계</th></tr>
+                <tr><th colspan="2">기간별일수</th>${makeNumberPeriodCells(periods, 'days')}<td>${formatPrintNumber(totalDays)} 일</td></tr>
+            </thead>
+            <tbody>
+                <tr><th rowspan="5" class="vertical-label">임금내역</th><th>기본급</th>${makeMoneyPeriodCells(periods, 'base')}<td class="right">${formatPrintWon(totalBase)}</td></tr>
+                <tr><th>제수당</th>${makeMoneyPeriodCells(periods, 'etc')}<td class="right">${formatPrintWon(totalEtc)}</td></tr>
+                <tr><th>상여금</th><td colspan="4" style="font-size:11px; color:#555;">${escapeHtml(bonusFormulaText)}</td><td class="right">${formatPrintWon(annualBonusAdjusted)}</td></tr>
+                <tr><th>연차수당</th><td colspan="4" style="font-size:11px; color:#555;">${escapeHtml(leaveFormulaText)}</td><td class="right">${formatPrintWon(annualLeaveAdjusted)}</td></tr>
+                <tr style="background:#f8fafc;"><th>합계</th>${makeMoneyPeriodCells(periods, 'sum')}<td class="right">${formatPrintWon(totalBaseEtc)}</td></tr>
+                <tr style="background:#fdfdfd;"><th colspan="2">1일 평균임금</th><td colspan="2" class="right">${formatPrintWon(avgWage)}</td><th>1일 통상임금</th><td colspan="2" class="right">${formatPrintWon(normalWage)}</td></tr>
+                <tr><th rowspan="3" colspan="2">퇴직금<br>산정</th><td colspan="2" style="text-align:left; padding-left:10px;">① 법정 퇴직금</td><td colspan="3" class="formula">${severanceFormula}</td></tr>
+                <tr><td colspan="2" style="text-align:left; padding-left:10px;">② 퇴직위로금 등</td><td colspan="3" class="right">${formatPrintWon(consolationPay)}</td></tr>
+                <tr>
+                    <td colspan="2" class="blue-cell" style="text-align:left; padding-left:10px; font-size:12px;">③ 최종 퇴직금 총액</td>
+                    <td colspan="3" class="blue-cell right"><strong>${formatPrintWon(finalSeveranceTotal)}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="bottom-anchor-zone">
+            <div class="confirm">상기 사실을 확인함.</div>
+            <div class="date">${todayText}</div>
+            <div class="sign-area">
+                <div class="sign-line"><span class="sign-label">사용자 :</span><span class="sign-name">${escapeHtml(companyName)}</span><span class="sign-seal"></span></div>
+                <div class="sign-line" style="margin-top:5px;"><span class="sign-label">근로자 :</span><span class="sign-name">${escapeHtml(workerName)}</span><span class="sign-seal">(인)</span></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+
+            const printWindow = window.open('', '_blank', 'width=900,height=950');
+            if (!printWindow) { alert('팝업 차단을 해제해 주세요.'); return; }
+            printWindow.document.open(); printWindow.document.write(printHtml); printWindow.document.close();
+            printWindow.focus(); setTimeout(() => { printWindow.print(); }, 400);
+        }
+
+        function confirmResetInputs() { if (confirm("입력 정보를 초기화하시겠습니까?")) { location.reload(); } }
+    </script>
+</body>
+</html>

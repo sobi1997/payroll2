@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>노무법인 두웰 - 아웃소싱 연간 업무 플로우</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Malgun Gothic', sans-serif; }
+        body { background-color: #f4f6f9; padding: 30px 20px; color: #333; }
+
+        /* 🖥️ 메인 컨테이너 */
+        .container {
+            max-width: 1410px;   /* 두 뷰 간격 48px에서도 카드 폭을 기존(≈420px) 그대로 유지 */
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #cfd8dc;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* 🟦 헤더 영역 */
+        .launcher-header {
+            background-color: #0d47a1;
+            color: #fff;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-icon {
+            fill: #90caf9;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
+        .header-text { text-align: left; }
+
+        .header-text h1 {
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            font-size: 13px;
+            color: #90caf9;
+        }
+
+        /* 메인 포털 이동 버튼 */
+        .btn-back-portal {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-back-portal:hover {
+            background-color: #fff;
+            color: #0d47a1;
+        }
+
+        .launcher-body {
+            padding: 25px;
+        }
+
+        /* 📢 안내 및 상시 업무 요약 박스 */
+        .portal-notice-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 25px;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .portal-notice-box strong {
+            color: #0d47a1;
+        }
+        .routine-tasks {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .routine-tasks .task-desc {
+            font-size: 13px;
+            color: #334155;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+        .routine-tag {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #334155;
+            font-weight: bold;
+        }
+
+        /* 🗓️ 12개월 그리드 레이아웃 (3열 x 4행) */
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 48px;   /* 3개월 뷰와 동일 간격 → 두 뷰 카드 폭이 완전히 같아짐 */
+        }
+
+        /* 📦 월별 카드 박스 기본 */
+        .month-card {
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            /* width/flex-basis는 전환에서 제외(모드 전환 시 폭이 애니메이션되며 깨지는 것 방지) */
+            transition: background-color 0.25s ease, border-color 0.25s ease,
+                        box-shadow 0.25s ease, opacity 0.25s ease,
+                        color 0.25s ease, transform 0.25s ease;
+            position: relative;
+        }
+
+        /* ▫️ [1] 나머지 9개 달 (비활성 기본) - 연하게 처리 */
+        .month-card.other-month {
+            opacity: 0.45;
+            border: 1px solid #e2e8f0;
+            background-color: #fafafa;
+        }
+        .month-card.other-month .month-header {
+            background-color: #f1f5f9;
+            color: #94a3b8;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .month-card.other-month .task-desc {
+            color: #94a3b8;
+            font-weight: normal;
+        }
+        .month-card.other-month .date-badge {
+            opacity: 0.6;
+        }
+
+        /* ✨ [수정] 마우스 올리면 지난달/다음달 스타일(파란 톤 + 또렷한 글씨)로 선명해짐 */
+        .month-card.other-month:hover {
+            opacity: 1 !important;
+            border: 1.5px solid #60a5fa !important;
+            box-shadow: 0 4px 14px rgba(96, 165, 250, 0.22) !important;
+            background-color: #ffffff !important;
+            transform: translateY(-2px);
+        }
+        .month-card.other-month:hover .month-header {
+            background-color: #dbeafe !important;
+            color: #1e40af !important;
+            border-bottom: 1px solid #bfdbfe;
+        }
+        .month-card.other-month:hover .task-desc {
+            color: #1e293b !important;
+            font-weight: 500 !important;
+        }
+        .month-card.other-month:hover .date-badge {
+            opacity: 1 !important;
+            background-color: #ffffff;
+            border-color: #93c5fd;
+            color: #1d4ed8;
+        }
+
+        /* 🟦 [2] 당월 (이번달) - 가장 진하고 선명한 메인 딥블루 (볼드체 완화) */
+        .month-card.current-month {
+            opacity: 1 !important;
+            border: 2px solid #0d47a1 !important;
+            box-shadow: 0 8px 24px rgba(13, 71, 161, 0.22) !important;
+            transform: translateY(-2px);
+        }
+        .month-card.current-month .month-header {
+            background-color: #0d47a1 !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid #0a3880;
+        }
+        /* 당월 글자 두께 자연스럽게 조정 */
+        .month-card.current-month .task-desc {
+            color: #0f172a !important;
+            font-weight: 500 !important; 
+        }
+
+        /* 🔷 [3] 지난달 - 소프트 파란색 톤 */
+        .month-card.prev-month {
+            opacity: 0.95 !important;
+            border: 1.5px solid #93c5fd !important;
+            box-shadow: 0 4px 12px rgba(147, 197, 253, 0.2) !important;
+        }
+        .month-card.prev-month .month-header {
+            background-color: #eff6ff !important;
+            color: #1d4ed8 !important;
+            border-bottom: 1px solid #dbeafe;
+        }
+        .month-card.prev-month .task-desc {
+            color: #334155 !important;
+            font-weight: 500;
+        }
+
+        /* 🔷 [4] 다음달 - 소프트 파란색 톤 */
+        .month-card.next-month {
+            opacity: 0.95 !important;
+            border: 1.5px solid #60a5fa !important;
+            box-shadow: 0 4px 12px rgba(96, 165, 250, 0.22) !important;
+        }
+        .month-card.next-month .month-header {
+            background-color: #dbeafe !important;
+            color: #1e40af !important;
+            border-bottom: 1px solid #bfdbfe;
+        }
+        .month-card.next-month .task-desc {
+            color: #1e293b !important;
+            font-weight: 500;
+        }
+
+        /* 월 헤더 공통 */
+        .month-header {
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .month-header .month-num {
+            font-size: 17px;
+            letter-spacing: -0.5px;
+        }
+
+        /* 🏷️ 상태 알약 배지 */
+        .status-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            letter-spacing: -0.3px;
+        }
+        .badge-current { background-color: #ffffff; color: #0d47a1; border: 1px solid #90caf9; }
+        .badge-prev { background-color: #ffffff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .badge-next { background-color: #ffffff; color: #1d4ed8; border: 1px solid #93c5fd; }
+
+        /* 🗂️ 카드 내부 깔끔한 섹터 구분 */
+        .card-body {
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+        }
+
+        .sector-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* 섹션 간 깔끔한 점선 구분 */
+        .sector-group + .sector-group {
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 10px;
+        }
+
+        .sector-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            letter-spacing: -0.3px;
+        }
+
+        /* 리스트 항목 */
+        .task-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .task-item {
+            font-size: 13px;
+            line-height: 1.45;
+            letter-spacing: -0.4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 5px;
+        }
+
+        /* 단정한 날짜 태그 */
+        .date-badge {
+            font-size: 11px;
+            font-weight: bold;
+            color: #475569;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 1px 5px;
+            border-radius: 3px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            transition: all 0.2s;
+            min-width: 34px;
+            text-align: center;
+        }
+
+        /* 지난달 · 당월 · 다음달 카드의 날짜 배지도 파란색으로 통일 (hover 배지와 동일) */
+        .month-card.prev-month .date-badge,
+        .month-card.current-month .date-badge,
+        .month-card.next-month .date-badge {
+            background-color: #ffffff;
+            border-color: #93c5fd;
+            color: #1d4ed8;
+        }
+
+        /* 🔢 급여 · 소싱 업무용 번호 표기 (배지 없이 ①②③) */
+        .task-num {
+            font-size: 14px;
+            font-weight: bold;
+            color: #64748b;
+            flex-shrink: 0;
+            min-width: 18px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* 푸터 영역 */
+        .footer-logo {
+            text-align: right;
+            margin-top: 25px;
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 15px;
+        }
+        .footer-logo .maker-credit {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: normal;
+        }
+
+        /* 🎚️ 3개월 보기 캐러셀 + 전체 보기 컨트롤 */
+        .flow-wrapper {
+            position: relative;
+        }
+        /* 🪟 3개월만 보이는 창(뷰포트) */
+        .flow-viewport {
+            width: 100%;
+            overflow: hidden;
+            padding: 12px 2px;   /* 카드 그림자 세로 잘림 방지 */
+            margin: -12px -2px;
+        }
+        /* 네모 박스 없이 〈 〉 글자 모양만 (카드 위에서도 보이도록 흰 외곽선 효과) */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            width: 46px;
+            height: 68px;
+            border: none;
+            background: transparent;
+            padding: 0;
+            color: #0d47a1;
+            font-size: 34px;
+            line-height: 1;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 5px #fff, 0 0 5px #fff, 0 1px 3px rgba(255, 255, 255, 0.9);
+            transition: color 0.15s, transform 0.15s, opacity 0.15s;
+        }
+        /* 지난달 〈 당월 〉 다음달 : 화살표를 카드 사이 틈 중앙에 배치(간격 48px) */
+        #navPrev { left: calc((100% - 96px) / 3 + 24px); }
+        #navNext { left: calc((100% - 96px) / 3 * 2 + 72px); }
+        .nav-arrow:hover {
+            color: #08306b;
+            transform: translate(-50%, -50%) scale(1.25);
+        }
+        /* 전체 보기 모드에선 화살표 숨김 */
+        .flow-wrapper.mode-all .nav-arrow { display: none; }
+
+        /* 🎠 3개월 캐러셀: 창 안에서 띠(track)가 통째로 부드럽게 미끄러짐 */
+        .flow-wrapper:not(.mode-all) .flow-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 48px;   /* 전체월(그리드)과 동일 → 카드 폭·글자 줄바꿈 완전히 같아짐 + 화살표 틈 확보 */
+            transform: translateX(0);
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        .flow-wrapper:not(.mode-all) .flow-grid > .month-card {
+            flex: 0 0 calc((100% - 96px) / 3);   /* 전체월 카드와 동일 폭(간격 48px×2) */
+        }
+
+        /* 양끝에서 화살표 비활성화 */
+        .nav-arrow:disabled {
+            opacity: 0.25;
+            cursor: default;
+        }
+        .nav-arrow:disabled:hover {
+            color: #0d47a1;
+            transform: translate(-50%, -50%);
+        }
+
+        .view-toggle-wrap {
+            text-align: center;
+            margin-top: 26px;
+        }
+        .view-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: #0d47a1;
+            border: 1.5px solid #bfdbfe;
+            padding: 10px 26px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: -0.2px;
+            box-shadow: 0 2px 10px rgba(13, 71, 161, 0.10);
+            transition: all 0.18s;
+        }
+        .view-toggle-btn::before {
+            content: "▦";
+            font-size: 15px;
+            line-height: 1;
+        }
+        .view-toggle-btn.mode-back::before {
+            content: "‹";
+            font-size: 20px;
+        }
+        .view-toggle-btn:hover {
+            background: #0d47a1;
+            color: #fff;
+            border-color: #0d47a1;
+            box-shadow: 0 8px 20px rgba(13, 71, 161, 0.28);
+            transform: translateY(-1px);
+        }
+
+        /* 📱 반응형 대응 */
+        @media (max-width: 1024px) {
+            .flow-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 650px) {
+            .flow-grid { grid-template-columns: 1fr; }
+            .launcher-header { flex-direction: column; align-items: flex-start; }
+            .btn-back-portal { align-self: flex-end; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- 🟦 상단 헤더 -->
+        <div class="launcher-header">
+            <div class="header-left">
+                <svg class="header-icon" viewBox="0 0 24 24">
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/>
+                </svg>
+                <div class="header-text">
+                    <h1>노무법인 두웰 - 아웃소싱 연간 업무 플로우</h1>
+                    <p>월별 주요 급여대행 · 4대보험 정기신고 · 세무연계 · 연간 노무행정 Schedule</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="launcher-body">
+            
+            <!-- 📢 공통 반복 업무 안내 -->
+            <div class="portal-notice-box">
+                <strong>[매월 공통 루틴 업무]</strong> 아래 연간 특정 이슈 외에, 매월 기본으로 진행되는 일정입니다.
+                <div class="routine-tasks">
+                    <span class="date-badge">15일</span>
+                    <span class="task-desc">근로자 4대보험 취득/상실 · 일용직신고</span>
+                </div>
+            </div>
+
+            <!-- 🗓️ 1월~12월 연간 업무 그리드 (화살표로 3개월씩 이동) -->
+            <div class="flow-wrapper" id="flowWrapper">
+                <button class="nav-arrow" id="navPrev" aria-label="이전 달 보기">‹</button>
+                <div class="flow-viewport" id="flowViewport">
+                <div class="flow-grid" id="flowGrid">
+
+                <!-- 01월 -->
+                <div class="month-card" data-month="1">
+                    <div class="month-header"><span class="month-num">01월</span></div>
+                    <div class="card-body">
+                        <div class="sector-group">
+                            <div class="sector-title">💳 급여</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">최저임금 변경분 반영 및 급여 테이블 점검</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="task-num">②</span>
+                                    <span class="task-desc">4대보험 요율변경, 이에 따른 두루누리 사업장 변동 산입</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="task-num">③</span>
+                                    <span class="task-desc">급여기산일 상이사업장 계산주의</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 02월 -->
+                <div class="month-card" data-month="2">
+                    <div class="month-header"><span class="month-num">02월</span></div>
+                    <div class="card-body">
+                        <div class="sector-group">
+                            <div class="sector-title">💳 급여</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">근로자 소득세/지방소득세 연말정산 반영</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="sector-group">
+                            <div class="sector-title">📌 주요일정</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="date-badge">28일</span>
+                                    <span class="task-desc">연말정산 환급/추가징수액 최종 확정 및 지급명세서 검토</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 03월 -->
+                <div class="month-card" data-month="3">
+                    <div class="month-header"><span class="month-num">03월</span></div>
+                    <div class="card-body">
+                        <div class="sector-group">
+                            <div class="sector-title">📌 주요일정</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="date-badge">15일</span>
+                                    <span class="task-desc">근로자 고용·산재보험 보수총액 신고 마감</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 04월 -->
+                <div class="month-card" data-month="4">
+                    <div class="month-header"><span class="month-num">04월</span></div>
+                    <div class="card-body">
+                        <div class="sector-group">
+                            <div class="sector-title">💳 급여</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">근로자 건강보험 연말정산 반영</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="sector-group">
+                            <div class="sector-title">🤝 소싱업무</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">근로자 건강보험 연말정산 산출내역서 안내 및 분할여부 확인</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 05월 -->
+                <div class="month-card" data-month="5">
+                    <div class="month-header"><span class="month-num">05월</span></div>
+                    <div class="card-body">
+                        <div class="sector-group">
+                            <div class="sector-title">📌 주요일정</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="date-badge">10일</span>
+                                    <span class="task-desc">근로자 건강보험 연말정산 분할납부 마감</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="sector-group">
+                            <div class="sector-title">🤝 소싱업무</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">개인사업자대표 소득/보수총액신고 세무자료 요청</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="task-num">②</span>
+                                    <span class="task-desc">개인사업자대표(일반) 소득/보수총액 신고</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 06월 -->
+                <div class="month-card" data-month="6">
+                    <div class="month-header"><span class="month-num">06월</span></div>
+                    <div class="card-body">
+                        <div class="sector-group">
+                            <div class="sector-title">🤝 소싱업무</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">개인사업자대표(성실) 소득/보수총액신고</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="task-num">②</span>
+                                    <span class="task-desc">개인사업자대표(일반) 건강보험 연말정산 분할여부 확인</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 07월 -->
+                <div class="month-card" data-month="7">
+                    <div class="month-header"><span class="month-num">07월</span></div>
+                    <div class="card-body">
+                        <div class="sector-group">
+                            <div class="sector-title">💳 급여</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">국민연금 상한액/하한액 조정 확인</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="task-num">②</span>
+                                    <span class="task-desc">국민연금 기준소득월액 조정분 적용</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="task-num">③</span>
+                                    <span class="task-desc">이에 따른 세후 근로자 급여 확인</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="sector-group">
+                            <div class="sector-title">📌 주요일정</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="date-badge">10일</span>
+                                    <span class="task-desc">개인사업자대표(일반) 건강보험 연말정산 분할납부 마감</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="sector-group">
+                            <div class="sector-title">🤝 소싱업무</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">개인사업자대표(결손) 소득/보수총액신고 세무자료 요청/신고</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="task-num">②</span>
+                                    <span class="task-desc">개인사업자대표(성실) 건강보험 연말정산 분할여부 확인</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 08월 -->
+                <div class="month-card" data-month="8">
+                    <div class="month-header"><span class="month-num">08월</span></div>
+                    <div class="card-body">
+                        <div class="sector-group">
+                            <div class="sector-title">💳 급여</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">국민연금 기준소득월액 조정분 적용</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="sector-group">
+                            <div class="sector-title">📌 주요일정</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="date-badge">5일</span>
+                                    <span class="task-desc">고용노동부 내년도 최저임금 결정 고시 확인</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="date-badge">10일</span>
+                                    <span class="task-desc">개인사업자대표(성실) 건강보험 연말정산 분할납부 마감</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 09월 -->
+                <div class="month-card" data-month="9">
+                    <div class="month-header"><span class="month-num">09월</span></div>
+                    <div class="card-body">
+                    </div>
+                </div>
+
+                <!-- 10월 -->
+                <div class="month-card" data-month="10">
+                    <div class="month-header"><span class="month-num">10월</span></div>
+                    <div class="card-body">
+                    </div>
+                </div>
+
+                <!-- 11월 -->
+                <div class="month-card" data-month="11">
+                    <div class="month-header"><span class="month-num">11월</span></div>
+                    <div class="card-body">
+                    </div>
+                </div>
+
+                <!-- 12월 -->
+                <div class="month-card" data-month="12">
+                    <div class="month-header"><span class="month-num">12월</span></div>
+                    <div class="card-body">
+                        <div class="sector-group">
+                            <div class="sector-title">💳 급여</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">대상사업장 미사용 연차수당 정산</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="task-num">②</span>
+                                    <span class="task-desc">대상사업장 포괄휴일 정산</span>
+                                </li>
+                                <li class="task-item">
+                                    <span class="task-num">③</span>
+                                    <span class="task-desc">당해연도 2일~말일 입사자 건강, 요양보험 정산</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="sector-group">
+                            <div class="sector-title">🤝 소싱업무</div>
+                            <ul class="task-list">
+                                <li class="task-item">
+                                    <span class="task-num">①</span>
+                                    <span class="task-desc">차년도 근로계약서 작성 및 발송</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+                </div>
+                <button class="nav-arrow" id="navNext" aria-label="다음 달 보기">›</button>
+            </div>
+
+            <!-- 🔘 전체월 보기 / 3개월 보기 전환 -->
+            <div class="view-toggle-wrap">
+                <button id="toggleViewBtn" class="view-toggle-btn">전체 월</button>
+            </div>
+
+            <!-- 📄 하단 제작자 표기 -->
+            <div class="footer-logo">
+                <span class="maker-credit">made by 전형섭</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ⚡ [당월 / 지난달 / 다음달] 및 [나머지 연한 달] 자동 구분 스크립트 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const currentMonth = today.getMonth() + 1; // 1 ~ 12
+            const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+            const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+
+            const monthCards = document.querySelectorAll('.month-card');
+
+            // 카드에 상태(색+배지) 부여/초기화 헬퍼
+            function clearCardStyle(card) {
+                card.classList.remove('current-month', 'prev-month', 'next-month', 'other-month');
+                const old = card.querySelector('.status-badge');
+                if (old) old.remove();
+            }
+            function setCardStyle(card, cls, badgeCls, label) {
+                card.classList.add(cls);
+                const badge = document.createElement('span');
+                badge.className = 'status-badge ' + badgeCls;
+                badge.textContent = label;
+                card.querySelector('.month-header').appendChild(badge);
+            }
+
+            // 🔀 카드 내 섹션 순서 정렬: 주요일정 → 급여 → 소싱업무
+            const sectionOrder = { '주요일정': 1, '급여': 2, '소싱업무': 3 };
+            document.querySelectorAll('.card-body').forEach(function(body) {
+                const groups = Array.from(body.querySelectorAll('.sector-group'));
+                groups.sort(function(a, b) {
+                    const ka = a.querySelector('.sector-title').textContent.replace(/[^가-힣]/g, '');
+                    const kb = b.querySelector('.sector-title').textContent.replace(/[^가-힣]/g, '');
+                    return (sectionOrder[ka] || 99) - (sectionOrder[kb] || 99);
+                });
+                groups.forEach(function(g) { body.appendChild(g); });
+            });
+
+            // 🔢 급여 · 소싱 업무 섹션의 번호를 ①②③... 순서로 자동 매김
+            const circleNums = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
+            document.querySelectorAll('.sector-group').forEach(function(group) {
+                const nums = group.querySelectorAll('.task-num');
+                nums.forEach(function(el, idx) {
+                    el.textContent = circleNums[idx] || (idx + 1) + '.';
+                });
+            });
+
+            // 🎚️ 3개월 캐러셀(지난달·당월·다음달) + 전체 12개월 보기 토글
+            const wrapper = document.getElementById('flowWrapper');
+            const toggleBtn = document.getElementById('toggleViewBtn');
+            const navPrev = document.getElementById('navPrev');
+            const navNext = document.getElementById('navNext');
+            const allCards = document.querySelectorAll('.month-card');
+
+            const viewport = document.getElementById('flowViewport');
+            const grid = document.getElementById('flowGrid');
+            const GAP = 48; // 3개월 캐러셀 카드 사이 간격(px) = 전체월과 동일(포맷 일치+화살표 틈)
+
+            let viewMode = 'compact';        // 'compact'(3개월) | 'all'(전체)
+            function clampStart(s) { return Math.min(10, Math.max(1, s)); }
+            // 기본: 당월이 항상 보이도록 [지난달·당월·다음달] 중앙 정렬 후 양끝 보정
+            let windowStart = clampStart(currentMonth - 1);
+
+            // 전체 보기: 실제 날짜 기준(당월/지난달/다음달만 강조, 나머지 연하게)
+            function styleAll() {
+                monthCards.forEach(function(card) {
+                    clearCardStyle(card);
+                    const m = parseInt(card.getAttribute('data-month'), 10);
+                    if (m === currentMonth) setCardStyle(card, 'current-month', 'badge-current', '당월');
+                    else if (m === prevMonth) setCardStyle(card, 'prev-month', 'badge-prev', '지난달');
+                    else if (m === nextMonth) setCardStyle(card, 'next-month', 'badge-next', '다음달');
+                    else card.classList.add('other-month');
+                });
+            }
+            // 3개월 캐러셀: 위치 기준(왼=지난달·가운데=당월·오른=다음달) → 어떤 달이든 그 색으로
+            function styleCompact() {
+                monthCards.forEach(function(card) {
+                    clearCardStyle(card);
+                    const m = parseInt(card.getAttribute('data-month'), 10);
+                    const slot = m - windowStart; // 0=왼, 1=가운데, 2=오른
+                    if (slot === 0) setCardStyle(card, 'prev-month', 'badge-prev', '지난달');
+                    else if (slot === 1) setCardStyle(card, 'current-month', 'badge-current', '당월');
+                    else if (slot === 2) setCardStyle(card, 'next-month', 'badge-next', '다음달');
+                    else card.classList.add('other-month'); // 화면 밖(잘려서 안 보임)
+                });
+            }
+
+            // 띠(track)를 windowStart 위치로 이동. animate=false면 즉시(전환 애니 없이) 배치
+            function positionTrack(animate) {
+                if (viewMode !== 'compact') return;
+                if (!animate) grid.style.transition = 'none';
+                // 카드 폭은 트랙(그리드) 내부폭에서 계산 → 카드 width 트랜지션에 영향받지 않아 정확
+                const cardW = (grid.clientWidth - GAP * 2) / 3;
+                const step = cardW + GAP;
+                grid.style.transform = 'translateX(' + (-(windowStart - 1) * step) + 'px)';
+                // 화살표도 카드와 동일한 측정값으로 두 틈 중앙에 배치 → 좌우 완전 대칭(데칼코마니)
+                navPrev.style.left = (cardW + GAP / 2) + 'px';
+                navNext.style.left = (2 * cardW + GAP + GAP / 2) + 'px';
+                if (!animate) { void grid.offsetWidth; grid.style.transition = ''; }
+            }
+
+            function updateRange() {
+                navPrev.disabled = windowStart <= 1;
+                navNext.disabled = windowStart >= 10;
+            }
+
+            function render() {
+                if (viewMode === 'all') {
+                    wrapper.classList.add('mode-all');
+                    toggleBtn.textContent = '돌아가기';
+                    toggleBtn.classList.add('mode-back');
+                    grid.style.transition = '';
+                    grid.style.transform = '';
+                    styleAll();
+                } else {
+                    wrapper.classList.remove('mode-all');
+                    toggleBtn.textContent = '전체 월';
+                    toggleBtn.classList.remove('mode-back');
+                    styleCompact();
+                    updateRange();
+                    positionTrack(false); // 초기/모드 전환 시엔 애니메이션 없이 위치만
+                }
+            }
+
+            navPrev.addEventListener('click', function() {
+                if (windowStart > 1) { windowStart--; styleCompact(); updateRange(); positionTrack(true); }
+            });
+            navNext.addEventListener('click', function() {
+                if (windowStart < 10) { windowStart++; styleCompact(); updateRange(); positionTrack(true); }
+            });
+            toggleBtn.addEventListener('click', function() {
+                if (viewMode === 'compact') {
+                    viewMode = 'all';
+                } else {
+                    viewMode = 'compact';
+                    windowStart = clampStart(currentMonth - 1); // 돌아오면 당월 중심으로 리셋
+                }
+                render();
+            });
+            // 창 크기 바뀌면 띠 위치 재계산(애니메이션 없이)
+            window.addEventListener('resize', function() { positionTrack(false); });
+
+            render();
+        });
+    </script>
+
+</body>
+</html>

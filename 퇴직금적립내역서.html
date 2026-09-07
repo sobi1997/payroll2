@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퇴직금적립내역서</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; }
+        body { background-color: #f4f6f9; padding: 30px; color: #333; }
+        
+        .wrapper { max-width: 1100px; margin: 0 auto; background: white; border: 1px solid #cfd8dc; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .header { background-color: #0d47a1; color: white; padding: 18px 24px; font-size: 20px; font-weight: bold; }
+        .content-body { padding: 30px; }
+        
+        .group-title { font-size: 15px; font-weight: bold; color: #0d47a1; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .group-title span { background: #0d47a1; color: white; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+
+        /* 가입자 정보 영역 */
+        #workerInfoArea { background: #fafafa; border: 1px solid #e0e0e0; padding: 25px; margin-bottom: 25px; border-radius: 4px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px 25px; }
+        .info-item { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+        .info-item label { width: 100px; font-weight: bold; color: #455a64; flex-shrink: 0; }
+        
+        .editable { background: #fffde7 !important; border: 1px solid #ccc; border-radius: 3px; padding: 8px; color: #000; font-size: 14px; }
+        .info-item input { flex: 1; padding: 7px; border: 1px solid #ccc; border-radius: 3px; background: #fffde7; color: #000; width: 100%; }
+
+        /* 날짜 설정 및 컨트롤러 바 */
+        .input-row-container { background: #fafafa; padding: 20px; border: 1px solid #e0e0e0; margin-bottom: 25px; display: flex; flex-direction: column; gap: 15px; }
+        .date-input-line { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        
+        .date-row { display: flex; align-items: center; gap: 5px; flex: 1; font-size: 14px; }
+        .date-row label { width: 110px; font-weight: bold; color: #455a64; margin-right: 4px; }
+        .date-row input { text-align: center; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 3px; color: #333; font-size: 14px; }
+        .date-row input.year { width: 75px; }
+        .date-row input.month, .date-row input.day { width: 55px; }
+
+        /* 중도정산 활성화 토글 바 (퇴직금 계산기와 동일) */
+        .table-toolbar-sec2 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .mode-select-area { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: bold; color: #e65100; background: #fff3e0; padding: 6px 12px; border: 1px solid #ffe0b2; border-radius: 4px; }
+
+        /* 블루 프리셋 툴바 라인 */
+        .range-select-line { background: #e3f2fd; padding: 15px; border: 1px solid #90caf9; border-radius: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px; font-size: 14px; }
+        .range-select-line label { font-weight: bold; color: #0d47a1; }
+        .range-select-line select { padding: 6px; border: 1px solid #cbd5e1; border-radius: 3px; background: #fff; font-weight: bold; color: #333; }
+        
+        .manual-date-group { display: none; align-items: center; gap: 10px; background: #ffffff; padding: 6px 12px; border: 1px solid #90caf9; border-radius: 4px; }
+
+        /* 엑셀 데이터 입력 영역 */
+        .excel-paste-area { background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px; border-radius: 4px; margin-bottom: 25px; }
+        .excel-textarea { width: 100%; height: 100px; padding: 10px; border: 1px solid #b0bec5; border-radius: 3px; font-family: monospace; font-size: 13px; resize: vertical; }
+
+        /* 테이블 툴바 조작계 */
+        .table-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .toolbar-right-zone { display: flex; align-items: center; gap: 12px; }
+        
+        /* 수식 옵션 그룹 스타일 */
+        .calc-option-group { display: flex; align-items: center; gap: 10px; background: #fff; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        .calc-option-group .group-label { font-weight: bold; color: #1e293b; margin-right: 4px; }
+        .calc-option-group label { font-weight: bold; color: #475569; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .calc-option-group input[type="radio"] { cursor: pointer; }
+
+        .view-mode-toggle { display: flex; align-items: center; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 6px; border: 1px solid #cbd5e1; }
+        .view-mode-toggle button { padding: 6px 14px; border: none; background: transparent; font-size: 13px; font-weight: bold; color: #64748b; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
+        .view-mode-toggle button.active { background: #0d47a1; color: white; }
+        
+        .btn-toggle-fold { background: #1565c0; color: white; border: none; padding: 6px 14px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; display: none; }
+        .btn-toggle-fold:hover { background: #0d47a1; }
+
+        /* 테이블 구조 */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13px; text-align: center; }
+        th { background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 12px; font-weight: bold; color: #1e293b; }
+        td { border: 1px solid #cbd5e1; padding: 10px; background: white; }
+        td input { width: 100%; padding: 6px; text-align: center; border: 1px solid #ccc; border-radius: 3px; }
+        
+        /* 기준금액 내부 분할 레이아웃 */
+        .base-wage-combo-cell { display: flex; gap: 8px; align-items: center; width: 100%; }
+        .base-wage-combo-cell .memo-input { text-align: left; font-weight: bold; flex: 1; }
+        .base-wage-combo-cell .right-money { text-align: right; font-weight: bold; flex: 2; }
+        
+        td input.right-money { text-align: right; font-weight: bold; }
+        
+        /* 자동수식 잠금 스타일 */
+        .readonly { background-color: #e0f2fe !important; border: 1px solid #7dd3fc !important; color: #1e40af !important; font-weight: bold; outline: none; border-radius: 3px; }
+
+        /* 하단 결과판 레이아웃 */
+        .bottom-flex-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 15px; border-top: 2px solid #0d47a1; padding-top: 25px; }
+        .result-column { display: flex; flex-direction: column; gap: 12px; }
+        .result-row { display: flex; align-items: center; height: 35px; }
+        .result-row label { width: 140px; font-weight: bold; font-size: 14px; color: #475569; }
+        .result-row input { padding: 8px; text-align: right; width: 180px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 3px; }
+        
+        .final-box { background: #eff6ff; border: 2px solid #2563eb; padding: 20px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; height: 50px; width: 100%; }
+        .final-box label { font-size: 16px; color: #1e40af; font-weight: bold; flex-shrink: 0; }
+        .final-box .final-input-container { flex: 1; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 5px; font-size: 16px; color: #1e40af; font-weight: bold; }
+        .final-box input { font-size: 20px; color: #1e40af; font-weight: bold; border: none !important; background: transparent !important; text-align: right; width: 220px; outline: none; box-shadow: none !important; padding: 0; margin: 0; }
+
+        .action-buttons { display: flex; gap: 15px; margin-top: 35px; justify-content: center; border-top: 1px solid #e2e8f0; padding-top: 24px; }
+        .btn-action { padding: 13px 40px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 15px; border-radius: 4px; }
+        .btn-action:hover { filter: brightness(90%); }
+        .btn-calc { background-color: #0d47a1; }
+        .btn-reset { background-color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="header">퇴직금적립내역서</div>
+
+        <div class="content-body">
+            
+            <div class="group-title"><span>1</span> 근로자 및 기본 정보 입력</div>
+            <div id="workerInfoArea">
+                <div class="info-grid">
+                    <div class="info-item"><label>사업장명</label><input type="text" id="companyName" class="editable" placeholder="예: 노무법인 두웰"></div>
+                    <div class="info-item"><label>근로자명</label><input type="text" id="workerName" class="editable" placeholder="예: 전형섭"></div>
+                    <div class="info-item"><label>사번</label><input type="text" id="employeeNo" class="editable" placeholder="예: 1001"></div>
+                    <div class="info-item"><label>부서</label><input type="text" id="department" class="editable" placeholder="예: 급여아웃소싱"></div>
+                    <div class="info-item"><label>직위</label><input type="text" id="position" class="editable" placeholder="예: 주임"></div>
+                    <div class="info-item">
+                        <label>주민등록번호</label>
+                        <input type="text" id="rrnFront" class="editable" maxlength="6" style="width:90px; text-align:center; flex:none;" placeholder="앞6자리">
+                        <span>-</span>
+                        <input type="text" id="rrnBack" class="editable" maxlength="7" style="width:100px; text-align:center; flex:none;" placeholder="뒤7자리">
+                    </div>
+                    <div class="info-item" style="grid-column: span 3;"><label>주소</label><input type="text" id="address" class="editable" placeholder="서울특별시 강남구 ..."></div>
+                    <div class="info-item" style="grid-column: span 1;"><label>입금은행</label><input type="text" id="bankName" class="editable" placeholder="예: 신한은행"></div>
+                    <div class="info-item" style="grid-column: span 2;"><label>입금계좌</label><input type="text" id="bankAccount" class="editable" placeholder="000-000-000000"></div>
+                </div>
+            </div>
+
+            <div class="table-toolbar-sec2">
+                <div class="group-title" style="margin-bottom: 0;"><span>2</span> 재직기간 및 적립 기간 선택</div>
+                <div class="mode-select-area">
+                    <input type="checkbox" id="midCalcChk" onchange="toggleMidCalcMode()">
+                    <label for="midCalcChk" style="cursor:pointer;">퇴직금 중도정산 활성화</label>
+                </div>
+            </div>
+            <div class="input-row-container">
+                <div class="date-input-line">
+                    <div class="date-row">
+                        <label>입사일자</label>
+                        <input type="text" id="joinYear" class="year editable" maxlength="4" placeholder="0000" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'year')"> 년
+                        <input type="text" id="joinMonth" class="month editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                        <input type="text" id="joinDay" class="day editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'day')"> 일
+                    </div>
+                    <div class="date-row">
+                        <label>퇴직일자</label>
+                        <input type="text" id="leaveYear" class="year editable" maxlength="4" placeholder="0000" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'year')"> 년
+                        <input type="text" id="leaveMonth" class="month editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                        <input type="text" id="leaveDay" class="day editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'day')"> 일
+                    </div>
+                    <div class="date-row">
+                        <label style="color:#1e40af;">퇴직금 기산일자</label>
+                        <input type="text" id="calcStartYear" class="year readonly" placeholder="0000" tabindex="-1" readonly onblur="normalizeDateInput(this, 'year')"> 년
+                        <input type="text" id="calcStartMonth" class="month readonly" placeholder="00" tabindex="-1" readonly onblur="normalizeDateInput(this, 'month')"> 월
+                        <input type="text" id="calcStartDay" class="day readonly" placeholder="00" tabindex="-1" readonly onblur="normalizeDateInput(this, 'day')"> 일
+                    </div>
+                    <div class="date-row">
+                        <label style="color:#1e40af;">퇴직금 산정일자</label>
+                        <input type="text" id="calcEndYear" class="year readonly" placeholder="0000" tabindex="-1" readonly onblur="normalizeDateInput(this, 'year')"> 년
+                        <input type="text" id="calcEndMonth" class="month readonly" placeholder="00" tabindex="-1" readonly onblur="normalizeDateInput(this, 'month')"> 월
+                        <input type="text" id="calcEndDay" class="day readonly" placeholder="00" tabindex="-1" readonly onblur="normalizeDateInput(this, 'day')"> 일
+                    </div>
+                </div>
+
+                <div class="range-select-line">
+                    <label>📅 적립 기간 선택 :</label>
+                    <select id="rangePreset" onchange="togglePresetLayout()">
+                        <option value="all">전체기간</option>
+                        <option value="year_full">특정연도</option>
+                        <option value="manual">직접선택</option>
+                    </select>
+
+                    <div id="presetYearGroup" style="display:none; align-items:center; gap:5px;">
+                        <select id="targetYear" onchange="dateInputChanged()">
+                            <option value="2020">2020년</option><option value="2021">2021년</option><option value="2022">2022년</option>
+                            <option value="2023">2023년</option><option value="2024">2024년</option><option value="2025">2025년</option>
+                            <option value="2026" selected>2026년</option><option value="2027">2027년</option><option value="2028">2028년</option>
+                            <option value="2029">2029년</option><option value="2030">2030년</option>
+                        </select> 내역
+                    </div>
+
+                    <div id="manualDateGroup" class="manual-date-group">
+                        <div class="date-row">
+                            <span style="font-weight:bold; color:#0d47a1; margin-right:5px;">시작:</span>
+                            <input type="text" id="customStartYear" class="year editable" maxlength="4" placeholder="0000" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'year')"> 년
+                            <input type="text" id="customStartMonth" class="month editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                        </div>
+                        <span style="font-weight:bold; color:#ccc; margin: 0 5px;">|</span>
+                        <div class="date-row">
+                            <span style="font-weight:bold; color:#c62828; margin-right:5px;">종료:</span>
+                            <input type="text" id="customEndYear" class="year editable" maxlength="4" placeholder="0000" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'year')"> 년
+                            <input type="text" id="customEndMonth" class="month editable" maxlength="2" placeholder="00" oninput="dateInputChanged()" onblur="normalizeDateInput(this, 'month')"> 월
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="excel-paste-area">
+                <div class="group-title" style="color:#1565c0;"><span style="background:#1565c0;">✓</span> 엑셀 데이터 붙여넣기</div>
+                <p style="font-size:12px; color:#546e7a; margin-bottom:8px;">💡 아이페이 지급년월과 기준급액 표만을 복사 붙여넣으세요 (셀 구분용 탭 공백을 자동인식)</p>
+                <textarea id="excelInput" class="excel-textarea editable" placeholder="2026-01	2,156,880" oninput="parseExcelData()"></textarea>
+            </div>
+
+            <div class="table-toolbar">
+                <div class="group-title" style="margin-bottom: 0;"><span>3</span> 퇴직적립금 산정 명세</div>
+                <div class="toolbar-right-zone">
+                    <div class="calc-option-group">
+                        <span class="group-label">적립액 원단위</span>
+                        <label><input type="radio" name="roundOption" value="up" onchange="changeRoundOption()"> 올림</label>
+                        <label><input type="radio" name="roundOption" value="down" onchange="changeRoundOption()"> 버림</label>
+                        <label><input type="radio" name="roundOption" value="keep" checked onchange="changeRoundOption()"> 유지</label>
+                    </div>
+                    
+                    <button type="button" id="btnToggleFold" class="btn-toggle-fold" onclick="toggleTableFold()">▼ 명세 펼치기</button>
+                    <div class="view-mode-toggle">
+                        <button type="button" id="btnViewMonth" class="active" onclick="switchViewMode('month')">월별 계산</button>
+                        <button type="button" id="btnViewYear" onclick="switchViewMode('year')">연도별 계산</button>
+                    </div>
+                </div>
+            </div>
+
+            <table id="mainDataTable">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">산정 기간</th>
+                        <th style="width: 30%;">기준 금액 (원)</th>
+                        <th style="width: 30%;">적립액(원)</th>
+                    </tr>
+                </thead>
+                <tbody id="accumTableBody">
+                    <tr>
+                        <td colspan="3" style="color:#78909c; padding:20px;">위 엑셀창에 데이터를 붙여넣거나 아래 합계란을 검토해 주세요.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="group-title"><span>4</span> 최종 합계 및 퇴직금 적립총액 검토</div>
+            <div class="bottom-flex-layout">
+                <div class="result-column">
+                    <div class="result-row">
+                        <label>기준금액 합계</label>
+                        <input type="text" id="totalBaseSum" class="readonly" value="0" tabindex="-1" readonly> 원
+                    </div>
+                    <div class="result-row">
+                        <label>적립액 합계</label>
+                        <input type="text" id="totalAccumSum" class="readonly" value="0" tabindex="-1" readonly> 원
+                    </div>
+                </div>
+                <div class="result-column" style="justify-content: center;">
+                    <div class="final-box">
+                        <label>퇴직금 적립총액</label>
+                        <div class="final-input-container"><input type="text" id="finalPayAmount" class="readonly" value="0" tabindex="-1" readonly> 원</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-action btn-calc" onclick="printAccumStatement()">출력하기</button>
+                <button class="btn-action btn-reset" onclick="confirmResetInputs()">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalRawLines = []; 
+        let currentViewMode = 'month'; 
+        let globalYearLines = []; 
+        let isTableFolded = false; 
+
+        function onlyNumber(value) {
+            return String(value).replace(/[^0-9]/g, '');
+        }
+
+        function normalizeDateInput(input, type) {
+            let num = onlyNumber(input.value);
+            if (num === '') {
+                input.value = '';
+                return;
+            }
+            if (type === 'year') input.value = num.length === 4 ? num : '';
+            if (type === 'month') {
+                const month = Number(num);
+                input.value = month >= 1 && month <= 12 ? String(month).padStart(2, '0') : '';
+            }
+            if (type === 'day') {
+                const day = Number(num);
+                input.value = day >= 1 && day <= 31 ? String(day).padStart(2, '0') : '';
+            }
+            syncCalcDates();
+        }
+
+        // 중도정산 비활성 시 기산일자 = 입사일자, 산정일자 = 퇴직일자로 자동 동기화
+        let isMidCalcMode = false;
+        function syncCalcDates() {
+            if (isMidCalcMode) return;
+            document.getElementById('calcStartYear').value = document.getElementById('joinYear').value;
+            document.getElementById('calcStartMonth').value = document.getElementById('joinMonth').value;
+            document.getElementById('calcStartDay').value = document.getElementById('joinDay').value;
+            document.getElementById('calcEndYear').value = document.getElementById('leaveYear').value;
+            document.getElementById('calcEndMonth').value = document.getElementById('leaveMonth').value;
+            document.getElementById('calcEndDay').value = document.getElementById('leaveDay').value;
+        }
+
+        function toggleMidCalcMode() {
+            isMidCalcMode = document.getElementById('midCalcChk').checked;
+            const ids = ['calcStartYear','calcStartMonth','calcStartDay','calcEndYear','calcEndMonth','calcEndDay'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (isMidCalcMode) {
+                    el.removeAttribute('readonly'); el.removeAttribute('tabindex');
+                    el.classList.remove('readonly'); el.classList.add('editable');
+                } else {
+                    el.setAttribute('readonly', 'true'); el.setAttribute('tabindex', '-1');
+                    el.classList.remove('editable'); el.classList.add('readonly');
+                }
+            });
+            if (!isMidCalcMode) syncCalcDates();
+        }
+
+        function dateInputChanged() {
+            syncCalcDates();
+            renderTable();
+        }
+
+        function togglePresetLayout() {
+            const preset = document.getElementById('rangePreset').value;
+            document.getElementById('presetYearGroup').style.display = (preset === 'year_full') ? "inline-flex" : "none";
+            document.getElementById('manualDateGroup').style.display = (preset === 'manual') ? "inline-flex" : "none";
+            renderTable();
+        }
+
+        function numberWithCommas(x) { 
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); 
+        }
+
+        function formatPeriodString(str) {
+            let clean = str.trim();
+            let match = clean.match(/^(\d{4})[^0-9]+(\d{2,2})\b/);
+            if (!match) {
+                match = clean.match(/^(\d{4})(\d{2})/);
+            }
+            if (match) {
+                return `${match[1]}년 ${match[2]}월`;
+            }
+            return clean;
+        }
+
+        // 적립액 원단위 반올림 규칙
+        //  · 유지 : 소수점 첫째자리에서 올림 (원단위, 예 108.3 → 109)
+        //  · 올림 : 10원 단위 올림 (예 109 → 110)
+        //  · 버림 : 10원 단위 버림 (예 109 → 100)
+        function applyRound(val, option) {
+            if (option === 'up') return Math.ceil(val / 10) * 10;
+            if (option === 'down') return Math.floor(val / 10) * 10;
+            return Math.ceil(val);
+        }
+
+        function calculateAccumAmount(baseWageNum) {
+            const option = document.querySelector('input[name="roundOption"]:checked').value;
+            return applyRound(baseWageNum / 12, option);
+        }
+
+        function changeRoundOption() {
+            globalRawLines.forEach(row => {
+                row.accum = calculateAccumAmount(row.base);
+            });
+            buildYearGroupData();
+            renderTable();
+        }
+
+        function parseExcelData() {
+            const rawText = document.getElementById('excelInput').value;
+            globalRawLines = [];
+
+            if(!rawText.trim()) {
+                renderTable();
+                return;
+            }
+
+            const lines = rawText.split('\n');
+            lines.forEach(line => {
+                if(!line.trim()) return;
+                
+                const columns = line.split('\t');
+                let periodStr = columns[0] ? columns[0].trim() : '';
+                let baseWageStr = columns[1] ? columns[1].replace(/[^0-9]/g, '') : '0';
+                
+                let baseWageNum = Number(baseWageStr || 0);
+                let targetAccum = calculateAccumAmount(baseWageNum);
+
+                let foundYear = "기타";
+                let yearMatch = periodStr.match(/\b(20\d{2})\b/);
+                if(yearMatch) {
+                    foundYear = yearMatch[1] + "년";
+                }
+
+                globalRawLines.push({
+                    period: formatPeriodString(periodStr),
+                    yearGroup: foundYear,
+                    base: baseWageNum,
+                    accum: targetAccum,
+                    memo: ''
+                });
+            });
+
+            buildYearGroupData();
+            
+            if(globalRawLines.length > 3) {
+                isTableFolded = true;
+            } else {
+                isTableFolded = false;
+            }
+            
+            renderTable();
+        }
+
+        function buildYearGroupData() {
+            const option = document.querySelector('input[name="roundOption"]:checked').value;
+            let yearMap = {};
+            globalRawLines.forEach(row => {
+                if(!yearMap[row.yearGroup]) {
+                    yearMap[row.yearGroup] = { base: 0 };
+                }
+                yearMap[row.yearGroup].base += row.base;
+            });
+
+            globalYearLines = [];
+            for(let yearKey in yearMap) {
+                const yBase = yearMap[yearKey].base;
+                globalYearLines.push({
+                    period: yearKey,
+                    base: yBase,
+                    accum: applyRound(yBase / 12, option), // 연도별 계산: 연 기준금액 총합 ÷ 12
+                    memo: ''
+                });
+            }
+        }
+
+        function getFilteredData() {
+            const preset = document.getElementById('rangePreset').value;
+            
+            if (preset === 'year_full') {
+                const targetYearStr = document.getElementById('targetYear').value + "년";
+                if (currentViewMode === 'month') {
+                    return globalRawLines.filter(row => row.yearGroup === targetYearStr);
+                } else {
+                    return globalYearLines.filter(row => row.period === targetYearStr);
+                }
+            } 
+            
+            else if (preset === 'manual') {
+                const sY = document.getElementById('customStartYear').value;
+                const sM = document.getElementById('customStartMonth').value;
+                const eY = document.getElementById('customEndYear').value;
+                const eM = document.getElementById('customEndMonth').value;
+                
+                if(!sY || !sM || !eY || !eM) {
+                    return (currentViewMode === 'month') ? globalRawLines : globalYearLines;
+                }
+                
+                const startVal = parseInt(sY + sM);
+                const endVal = parseInt(eY + eM);
+                
+                if (currentViewMode === 'month') {
+                    return globalRawLines.filter(row => {
+                        let match = row.period.match(/^(\d{4})년\s*(\d{2})월/);
+                        if(!match) return true;
+                        let itemVal = parseInt(match[1] + match[2]);
+                        return itemVal >= startVal && itemVal <= endVal;
+                    });
+                } else {
+                    return globalYearLines.filter(row => {
+                        let match = row.period.match(/^(\d{4})년/);
+                        if(!match) return true;
+                        let itemY = parseInt(match[1]);
+                        return itemY >= parseInt(sY) && itemY <= parseInt(eY);
+                    });
+                }
+            }
+            
+            return (currentViewMode === 'month') ? globalRawLines : globalYearLines;
+        }
+
+        function updateFinalSums(baseSum, accumSum) {
+            document.getElementById('totalBaseSum').value = numberWithCommas(baseSum);
+            document.getElementById('totalAccumSum').value = numberWithCommas(accumSum);
+            document.getElementById('finalPayAmount').value = numberWithCommas(accumSum);
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('accumTableBody');
+            const toggleBtn = document.getElementById('btnToggleFold');
+            const dataTable = document.getElementById('mainDataTable');
+
+            if(globalRawLines.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="color:#78909c; padding:20px;">위 엑셀창에 데이터를 붙여넣거나 아래 합계란을 검토해 주세요.</td></tr>`;
+                toggleBtn.style.display = 'none';
+                dataTable.style.display = 'table';
+                updateFinalSums(0, 0);
+                return;
+            }
+
+            let filteredList = getFilteredData();
+            
+            let accumulatedBaseSum = 0;
+            let accumulatedAccumSum = 0;
+            filteredList.forEach(row => {
+                accumulatedBaseSum += row.base;
+                accumulatedAccumSum += row.accum;
+            });
+
+            if(filteredList.length > 3) {
+                toggleBtn.style.display = 'inline-block';
+                if(isTableFolded) {
+                    toggleBtn.innerText = "▼ 명세 펼치기";
+                    filteredList = filteredList.slice(0, 3);
+                } else {
+                    toggleBtn.innerText = "▲ 명세 접기";
+                }
+            } else {
+                toggleBtn.style.display = 'none';
+            }
+
+            if (filteredList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="color:#c62828; padding:20px; font-weight:bold;">선택하신 기간에 일치하는 데이터가 존재하지 않습니다.</td></tr>`;
+                updateFinalSums(0, 0);
+                return;
+            }
+
+            let tableContentHtml = '';
+
+            filteredList.forEach((row, idx) => {
+                const currentMemo = row.memo || '';
+                if(currentViewMode === 'month') {
+                    tableContentHtml += `
+                        <tr>
+                            <td><input type="text" id="printPeriod_${idx}" class="editable" value="${row.period}" oninput="syncLiveText(${idx}, 'month')"></td>
+                            <td>
+                                <div class="base-wage-combo-cell">
+                                    <input type="text" class="memo-input editable" id="printMemo_${idx}" value="${currentMemo}" placeholder="메모 입력" oninput="syncMemoText(${idx}, 'month')">
+                                    <input type="text" class="right-money editable" id="printBase_${idx}" value="${numberWithCommas(row.base)}" oninput="recalcRowDirect(${idx}, 'month')">
+                                </div>
+                            </td>
+                            <td><input type="text" class="right-money readonly" id="printAccum_${idx}" value="${numberWithCommas(row.accum)}" tabindex="-1" readonly></td>
+                        </tr>
+                    `;
+                } else {
+                    tableContentHtml += `
+                        <tr>
+                            <td><input type="text" id="printPeriod_Y_${idx}" class="editable" value="${row.period}" oninput="syncLiveText(${idx}, 'year')"></td>
+                            <td>
+                                <div class="base-wage-combo-cell">
+                                    <input type="text" class="memo-input editable" id="printMemo_Y_${idx}" value="${currentMemo}" placeholder="메모 입력" oninput="syncMemoText(${idx}, 'year')">
+                                    <input type="text" class="right-money editable" id="printBase_Y_${idx}" value="${numberWithCommas(row.base)}" oninput="recalcRowDirect(${idx}, 'year')">
+                                </div>
+                            </td>
+                            <td><input type="text" class="right-money readonly" id="printAccum_Y_${idx}" value="${numberWithCommas(row.accum)}" tabindex="-1" readonly></td>
+                        </tr>
+                    `;
+                }
+            });
+
+            tbody.innerHTML = tableContentHtml;
+            updateFinalSums(accumulatedBaseSum, accumulatedAccumSum);
+        }
+
+        function toggleTableFold() {
+            isTableFolded = !isTableFolded;
+            renderTable();
+        }
+
+        function switchViewMode(mode) {
+            currentViewMode = mode;
+            document.getElementById('btnViewMonth').classList.toggle('active', mode === 'month');
+            document.getElementById('btnViewYear').classList.toggle('active', mode === 'year');
+            renderTable();
+        }
+
+        function syncLiveText(idx, mode) {
+            let filteredList = getFilteredData();
+            if(!filteredList[idx]) return;
+            if(mode === 'month') {
+                filteredList[idx].period = document.getElementById(`printPeriod_${idx}`).value;
+            } else {
+                filteredList[idx].period = document.getElementById(`printPeriod_Y_${idx}`).value;
+            }
+        }
+
+        function syncMemoText(idx, mode) {
+            let filteredList = getFilteredData();
+            if(!filteredList[idx]) return;
+            if(mode === 'month') {
+                filteredList[idx].memo = document.getElementById(`printMemo_${idx}`).value;
+            } else {
+                filteredList[idx].memo = document.getElementById(`printMemo_Y_${idx}`).value;
+            }
+        }
+
+        function recalcRowDirect(idx, mode) {
+            let filteredList = getFilteredData();
+            if(!filteredList[idx]) return;
+
+            if(mode === 'month') {
+                const baseInput = document.getElementById(`printBase_${idx}`);
+                const accumInput = document.getElementById(`printAccum_${idx}`);
+                let rawBase = baseInput.value.replace(/[^0-9]/g, '');
+                baseInput.value = rawBase === '' ? '0' : numberWithCommas(rawBase);
+                let baseNum = Number(rawBase || 0);
+                
+                let targetAccum = calculateAccumAmount(baseNum);
+                accumInput.value = numberWithCommas(targetAccum);
+
+                filteredList[idx].base = baseNum;
+                filteredList[idx].accum = targetAccum;
+                buildYearGroupData();
+            } else {
+                const baseInput = document.getElementById(`printBase_Y_${idx}`);
+                const accumInput = document.getElementById(`printAccum_Y_${idx}`);
+                let rawBase = baseInput.value.replace(/[^0-9]/g, '');
+                baseInput.value = rawBase === '' ? '0' : numberWithCommas(rawBase);
+                let baseNum = Number(rawBase || 0);
+                
+                let targetAccum = calculateAccumAmount(baseNum);
+                accumInput.value = numberWithCommas(targetAccum);
+
+                filteredList[idx].base = baseNum;
+                filteredList[idx].accum = targetAccum;
+            }
+
+            let totalBase = 0; let totalAccum = 0;
+            let fullList = getFilteredData(); 
+            fullList.forEach(row => {
+                totalBase += row.base;
+                totalAccum += row.accum;
+            });
+            updateFinalSums(totalBase, totalAccum);
+        }
+
+        function confirmResetInputs() {
+            if (confirm("모든 데이터를 초기화하시겠습니까?")) location.reload();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+
+    <script>
+        function printAccumStatement() {
+            syncCalcDates(); // 중도정산 비활성 시 기산일/산정일을 입사일/퇴직일 기준으로 최신화
+            const companyName = document.getElementById('companyName').value;
+            const workerName = document.getElementById('workerName').value;
+            const employeeNo = document.getElementById('employeeNo').value;
+            const rrnFront = document.getElementById('rrnFront').value;
+            const rrnBack = document.getElementById('rrnBack').value;
+            
+            const rrn = (rrnFront && rrnBack) ? `${rrnFront}-${rrnBack}` : (rrnFront || rrnBack || '');
+            
+            const department = document.getElementById('department').value;
+            const position = document.getElementById('position').value;
+            const address = document.getElementById('address').value;
+            const bankName = document.getElementById('bankName').value;
+            const bankAccount = document.getElementById('bankAccount').value;
+
+            const joinDate = `${document.getElementById('joinYear').value || ''}-${document.getElementById('joinMonth').value || ''}-${document.getElementById('joinDay').value || ''}`;
+            const leaveDate = `${document.getElementById('leaveYear').value || ''}-${document.getElementById('leaveMonth').value || ''}-${document.getElementById('leaveDay').value || ''}`;
+            const calcStartDate = `${document.getElementById('calcStartYear').value || ''}-${document.getElementById('calcStartMonth').value || ''}-${document.getElementById('calcStartDay').value || ''}`;
+            const calcEndDate = `${document.getElementById('calcEndYear').value || ''}-${document.getElementById('calcEndMonth').value || ''}-${document.getElementById('calcEndDay').value || ''}`;
+            
+            const totalBaseSum = document.getElementById('totalBaseSum').value;
+            const totalAccumSum = document.getElementById('totalAccumSum').value;
+
+            const preset = document.getElementById('rangePreset').value;
+            let displayTitle = '<b>퇴 직 금 적 립 내 역 서</b>';
+            if (preset === 'all') {
+                displayTitle = '<b>퇴 직 금 적 립 내 역 서(전체)</b>';
+            } else if (preset === 'year_full') {
+                const targetYear = document.getElementById('targetYear').value;
+                displayTitle = `<b>퇴 직 금 적 립 내 역 서(${targetYear})</b>`;
+            }
+
+            let finalPrintPagesHtml = '';
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            // 요구사항 반영: 사용자를 원상복구하고, 근로자명 옆의 (인)을 볼드체 클래스(bold-seal)로 감쌌습니다.
+            const commonSignBlockHtml = `
+                <div class="print-absolute-footer">
+                    <div class="confirm" style="margin-bottom: 10px; font-size: 13px;">상기 사실을 확인함.</div>
+                    <div class="print-confirm-date-line" style="text-align: center; font-size: 13px; font-weight: normal; margin-bottom: 25px; color: #333;">${todayStr}</div>
+                    <div class="sign-area">
+                        <div class="sign-line"><span class="sign-label">사용자 :</span><span class="sign-name">${escapeHtml(companyName)}</span><span class="sign-seal"></span></div>
+                        <div class="sign-line" style="margin-top:4px;"><span class="sign-label">근로자 :</span><span class="sign-name">${escapeHtml(workerName)}</span><span class="sign-seal bold-seal">(인)</span></div>
+                    </div>
+                </div>
+            `;
+
+            let filteredList = getFilteredData();
+
+            if (currentViewMode === 'month') {
+                let dataByYear = {};
+                filteredList.forEach((row) => {
+                    let yKey = row.yearGroup;
+                    if(!dataByYear[yKey]) dataByYear[yKey] = [];
+                    dataByYear[yKey].push({ p: row.period, b: numberWithCommas(row.base), a: numberWithCommas(row.accum), m: row.memo || '' });
+                });
+
+                let uniqueYears = Object.keys(dataByYear).sort();
+
+                if (filteredList.length <= 12) {
+                    let trsHtml = '';
+                    uniqueYears.forEach(yKey => {
+                        dataByYear[yKey].forEach(row => {
+                            let memoSpan = row.m ? `<span class="print-memo-tag">${escapeHtml(row.m)}&nbsp;&nbsp;&nbsp;</span>` : '';
+                            trsHtml += `<tr><td>${escapeHtml(row.p)}</td><td class="right">${memoSpan}${escapeHtml(row.b)}</td><td class="right bold-accum">${escapeHtml(row.a)}</td></tr>`;
+                        });
+                    });
+
+                    finalPrintPagesHtml = `
+                        <div class="print-page-sheet">
+                            <div class="title">${displayTitle}</div>
+                            <table class="info-table">
+                                <colgroup><col style="width: 13%;"><col style="width: 20%;"><col style="width: 13%;"><col style="width: 20%;"><col style="width: 14%;"><col style="width: 20%;"></colgroup>
+                                <tr><th>사업장명</th><td>${escapeHtml(companyName)}</td><th>근로자명</th><td>${escapeHtml(workerName)}</td><th>사번</th><td>${escapeHtml(employeeNo)}</td></tr>
+                                <tr><th>주민번호</th><td>${escapeHtml(rrn)}</td><th>부서</th><td>${escapeHtml(department)}</td><th>직위</th><td>${escapeHtml(position)}</td></tr>
+                                <tr><th>주소</th><td colspan="5">${escapeHtml(address)}</td></tr>
+                                <tr><th>입사일자</th><td>${escapeHtml(joinDate)}</td><th>퇴직금 기산일</th><td>${escapeHtml(calcStartDate)}</td><th>입금은행</th><td>${escapeHtml(bankName)}</td></tr>
+                                <tr><th>퇴사일자</th><td>${escapeHtml(leaveDate)}</td><th>퇴직금 산정일</th><td>${escapeHtml(calcEndDate)}</td><th>입금계좌</th><td>${escapeHtml(bankAccount)}</td></tr>
+                            </table>
+                            <table class="calc-table" style="margin-top:20px;">
+                                <colgroup><col style="width: 45%;"><col style="width: 27%;"><col style="width: 28%;"></colgroup>
+                                <thead>
+                                    <tr><th colspan="3" class="section-title">산 정 내 역</th></tr>
+                                    <tr><th>산정기간</th><th>기준금액</th><th>적립액(원)</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${trsHtml}
+                                    <tr class="print-total-row"><td>합 계</td><td class="right">${totalBaseSum}</td><td class="right">${totalAccumSum}</td></tr>
+                                </tbody>
+                            </table>
+                            <div class="payable-box"><div class="payable-label">퇴직금 적립총액</div><div class="payable-value">${totalAccumSum} 원</div></div>
+                            ${commonSignBlockHtml}
+                        </div>
+                    `;
+                } else {
+                    let pageChunks = [];
+                    for (let i = 0; i < uniqueYears.length; i += 2) {
+                        pageChunks.push(uniqueYears.slice(i, i + 2));
+                    }
+
+                    pageChunks.forEach((pageYears, pageIdx) => {
+                        let pageTablesHtml = '';
+                        let leftYearKey = pageYears[0];
+                        let rightYearKey = pageYears[1] || null;
+
+                        let leftData = dataByYear[leftYearKey] || [];
+                        let rightData = rightYearKey ? (dataByYear[rightYearKey] || []) : [];
+
+                        let leftBaseSum = 0, leftAccumSum = 0;
+                        leftData.forEach(r => { leftBaseSum += Number(r.b.replace(/,/g, '')); leftAccumSum += Number(r.a.replace(/,/g, '')); });
+                        
+                        let rightBaseSum = 0, rightAccumSum = 0;
+                        rightData.forEach(r => { rightBaseSum += Number(r.b.replace(/,/g, '')); rightAccumSum += Number(r.a.replace(/,/g, '')); });
+
+                        let trsHtml = '';
+                        for(let i=0; i<12; i++) {
+                            let l = leftData[i] ? leftData[i] : { p: '', b: '', a: '', m: '' };
+                            let r = rightData[i] ? rightData[i] : { p: '', b: '', a: '', m: '' };
+
+                            let lMemoSpan = l.m ? `<span class="print-memo-tag">${escapeHtml(l.m)}&nbsp;&nbsp;&nbsp;</span>` : '';
+                            let rMemoSpan = r.m ? `<span class="print-memo-tag">${escapeHtml(r.m)}&nbsp;&nbsp;&nbsp;</span>` : '';
+
+                            let lCell = l.p ? `<td>${escapeHtml(l.p)}</td><td class="right">${lMemoSpan}${escapeHtml(l.b)}</td><td class="right bold-accum">${escapeHtml(l.a)}</td>` : `<td></td><td></td><td></td>`;
+                            let rCell = r.p ? `<td>${escapeHtml(r.p)}</td><td class="right">${rMemoSpan}${escapeHtml(r.b)}</td><td class="right bold-accum">${escapeHtml(r.a)}</td>` : `<td></td><td></td><td></td>`;
+                            
+                            trsHtml += `<tr style="height: 28px !important;">${lCell}${rCell}</tr>`;
+                        }
+
+                        pageTablesHtml = `
+                            <div class="year-section-block">
+                                <table class="calc-table split-2way-table">
+                                    <thead>
+                                        <tr><th colspan="6" class="section-title">산 정 내 역</th></tr>
+                                        <tr>
+                                            <th>산정기간</th><th>기준금액</th><th>적립액(원)</th>
+                                            <th>산정기간</th><th>기준금액</th><th>적립액(원)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${trsHtml}
+                                        <tr class="year-summary-row print-total-row" style="height: 30px !important;">
+                                            <td>연간 합계</td><td class="right">${leftBaseSum > 0 ? numberWithCommas(leftBaseSum) : ''}</td><td class="right">${leftAccumSum > 0 ? numberWithCommas(leftAccumSum) : ''}</td>
+                                            <td>연간 합계</td><td class="right">${rightBaseSum > 0 ? numberWithCommas(rightBaseSum) : ''}</td><td class="right">${rightAccumSum > 0 ? numberWithCommas(rightAccumSum) : ''}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+
+                        let finalTotalBlock = '';
+                        if (pageIdx === pageChunks.length - 1) {
+                            finalTotalBlock = `
+                                <div class="payable-box" style="margin-top: 15px;">
+                                    <div class="payable-label">총 기준금액 합계: ${totalBaseSum} 원</div>
+                                    <div class="payable-value">퇴직금 적립총액: ${totalAccumSum} 원</div>
+                                </div>
+                            `;
+                        }
+
+                        finalPrintPagesHtml += `
+                            <div class="print-page-sheet">
+                                <div class="title">${displayTitle}</div>
+                                <table class="info-table">
+                                    <colgroup><col style="width: 13%;"><col style="width: 20%;"><col style="width: 13%;"><col style="width: 20%;"><col style="width: 14%;"><col style="width: 20%;"></colgroup>
+                                    <tr><th>사업장명</th><td>${escapeHtml(companyName)}</td><th>근로자명</th><td>${escapeHtml(workerName)}</td><th>사번</th><td>${escapeHtml(employeeNo)}</td></tr>
+                                    <tr><th>주민번호</th><td>${escapeHtml(rrn)}</td><th>부서</th><td>${escapeHtml(department)}</td><th>직위</th><td>${escapeHtml(position)}</td></tr>
+                                    <tr><th>주소</th><td colspan="5">${escapeHtml(address)}</td></tr>
+                                    <tr><th>입사일자</th><td>${escapeHtml(joinDate)}</td><th>퇴직금 기산일</th><td>${escapeHtml(calcStartDate)}</td><th>입금은행</th><td>${escapeHtml(bankName)}</td></tr>
+                                <tr><th>퇴사일자</th><td>${escapeHtml(leaveDate)}</td><th>퇴직금 산정일</th><td>${escapeHtml(calcEndDate)}</td><th>입금계좌</th><td>${escapeHtml(bankAccount)}</td></tr>
+                                </table>
+                                ${pageTablesHtml}
+                                ${finalTotalBlock}
+                                ${commonSignBlockHtml}
+                            </div>
+                        `;
+                    });
+                }
+            } else {
+                let rowsYearHtml = '';
+                filteredList.forEach((row) => {
+                    let memoSpan = row.memo ? `<span class="print-memo-tag">${escapeHtml(row.memo)}&nbsp;&nbsp;&nbsp;</span>` : '';
+                    rowsYearHtml += `<tr style="height: 30px;"><td>${escapeHtml(row.period)}</td><td class="right">${memoSpan}${numberWithCommas(row.base)}</td><td class="right bold-accum">${numberWithCommas(row.accum)}</td></tr>`;
+                });
+
+                finalPrintPagesHtml = `
+                    <div class="print-page-sheet">
+                        <div class="title">${displayTitle}</div>
+                        <table class="info-table">
+                            <colgroup><col style="width: 13%;"><col style="width: 20%;"><col style="width: 13%;"><col style="width: 20%;"><col style="width: 14%;"><col style="width: 20%;"></colgroup>
+                            <tr><th>사업장명</th><td>${escapeHtml(companyName)}</td><th>근로자명</th><td>${escapeHtml(workerName)}</td><th>사번</th><td>${escapeHtml(employeeNo)}</td></tr>
+                            <tr><th>주민번호</th><td>${escapeHtml(rrn)}</td><th>부서</th><td>${escapeHtml(department)}</td><th>직위</th><td>${escapeHtml(position)}</td></tr>
+                            <tr><th>주소</th><td colspan="5">${escapeHtml(address)}</td></tr>
+                            <tr><th>입사일자</th><td>${escapeHtml(joinDate)}</td><th>퇴직금 기산일</th><td>${escapeHtml(calcStartDate)}</td><th>입금은행</th><td>${escapeHtml(bankName)}</td></tr>
+                                <tr><th>퇴사일자</th><td>${escapeHtml(leaveDate)}</td><th>퇴직금 산정일</th><td>${escapeHtml(calcEndDate)}</td><th>입금계좌</th><td>${escapeHtml(bankAccount)}</td></tr>
+                        </table>
+                        <table class="calc-table" style="margin-top:20px;">
+                            <colgroup><col style="width: 45%;"><col style="width: 27%;"><col style="width: 28%;"></colgroup>
+                            <thead>
+                                <tr><th colspan="3" class="section-title">산 정 내 역</th></tr>
+                                <tr><th>산정기간</th><th>기준금액</th><th>적립액(원)</th></tr>
+                            </thead>
+                            <tbody>
+                                ${rowsYearHtml}
+                                <tr class="print-total-row" style="height:32px;"><td>합 계</td><td class="right">${totalBaseSum}</td><td class="right">${totalAccumSum}</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="payable-box"><div class="payable-label">퇴직금 적립총액</div><div class="payable-value">${totalAccumSum} 원</div></div>
+                        ${commonSignBlockHtml}
+                    </div>
+                `;
+            }
+
+            const printHtml = `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>퇴직금적립내역서 인쇄 프리뷰</title>
+    <style>
+        @page { size: A4 portrait; margin: 12mm 14mm; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #111; margin: 0; padding: 0; font-size: 11px; background: #fff; }
+        
+        .print-page-sheet { display: block; position: relative !important; width: 100%; max-width: 780px; height: 268mm !important; margin: 0 auto; page-break-after: always !important; }
+        .print-page-sheet:last-child { page-break-after: avoid !important; }
+        
+        .title { text-align: center; font-size: 21px; letter-spacing: 12px; font-weight: 700; margin: 15px 0 25px; text-indent: 12px; }
+        
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 5px; }
+        th, td { border: 1px solid #94a3b8; padding: 4px; text-align: center; vertical-align: middle; word-break: keep-all; background: #fff; font-weight: normal; font-size: 10.5px; }
+        
+        .calc-table tbody tr { height: 28px !important; }
+        .info-table th, .info-table td { height: 30px; }
+        .info-table th, .calc-table th { background: #f1f5f9 !important; color: #1e293b; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .section-title { font-size: 12px; font-weight: 700; text-align: center; padding: 8px 0; background: #f1f5f9 !important; letter-spacing: 8px; text-indent: 8px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        
+        .right { text-align: right !important; padding-right: 8px !important; }
+        .bold-accum { font-weight: bold !important; }
+        
+        .print-memo-tag { float: left; font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; font-size: 10.5px; color: #333333; font-weight: normal; margin-left: 2px; }
+        
+        .print-total-row, .print-total-row td { background-color: #fcfdfe !important; font-weight: bold !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        
+        .payable-box { display: flex; width: 100%; border: 1px solid #94a3b8; height: 42px; margin-top: 15px; }
+        .payable-label { width: 60%; background: #f1f5f9 !important; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #1e293b; border-right: 1px solid #94a3b8; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .payable-value { width: 40%; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; background: #e0f2fe !important; color: #1e40af !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        
+        .print-absolute-footer { position: absolute !important; bottom: 5mm !important; left: 0; width: 100%; }
+        
+        .print-confirm-date-line { text-align: left; font-size: 12px; font-weight: bold; margin-bottom: 25px; padding-left: 5px; letter-spacing: 1px; color: #111; }
+        .confirm { text-align: center; font-size: 13px; font-weight: normal; }
+        .sign-area { margin-top: 25px; margin-left: auto; width: 380px; line-height: 2.2; font-size: 12px; }
+        .sign-line { display: grid; grid-template-columns: 72px 1fr 40px; align-items: center; column-gap: 8px; font-weight: bold; }
+        
+        /* (인) 볼드 적용을 위한 전용 스타일 추가 */
+        .bold-seal { font-weight: bold !important; font-size: 12px; text-align: center; }
+        
+        @media print { body { background: #fff; } .print-page-sheet { page-break-after: always !important; } }
+    </style>
+</head>
+<body>
+    ${finalPrintPagesHtml}
+</body>
+</html>`;
+
+            const printWindow = window.open('', '_blank', 'width=950,height=950');
+            if (printWindow) {
+                printWindow.document.open();
+                printWindow.document.write(printHtml);
+                printWindow.document.close();
+                printWindow.focus();
+                setTimeout(() => { printWindow.print(); }, 450);
+            } else {
+                alert("팝업이 차단되었습니다. 브라우저 주소창 오른편의 팝업 차단 설정을 해제해 주세요.");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>두웰 상담일지 양식</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Malgun Gothic', sans-serif; }
+        
+        body { background-color: #f4f6f9; padding: 20px 0; color: #333; overflow-y: scroll; }
+
+        .capture-outer {
+            width: 100%;
+            max-width: 480px; 
+            margin: 0 auto;
+            padding: 0; 
+            background: transparent !important;
+        }
+
+        .wrapper {
+            width: 100%;
+            background: #fff;
+            border: 1px solid #1e3a8a;
+            box-sizing: border-box;
+        }
+
+        .header {
+            background-color: #1e3a8a;
+            color: #fff;
+            padding: 16px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .content-body {
+            padding: 0;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 85px 1fr;
+            border-bottom: 1px solid #d1d5db;
+            align-items: stretch;
+        }
+        
+        .info-label {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 10px 8px;
+            border-right: 1px solid #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-label.client-group {
+            background-color: #edf2f7; 
+            color: #1e3a8a; 
+        }
+
+        .info-value {
+            padding: 9px 12px;
+            font-size: 14px;
+            color: #000;
+            position: relative;
+            background-color: #ffffff;
+            transition: background-color 0.1s;
+            display: flex;
+            align-items: center;
+        }
+
+        .select-zone-bg {
+            background-color: #f8fafc !important;
+        }
+
+        .hide-bg-on-capture {
+            background-color: #ffffff !important;
+        }
+
+        .conditional-row {
+            display: none; 
+        }
+        .conditional-row .info-label {
+            background-color: #f0fdf4; 
+            color: #166534;
+        }
+        .conditional-row .info-value {
+            background-color: #ffffff !important;
+        }
+
+        .thick-blue-border {
+            border-bottom: 2px solid #1e3a8a !important;
+        }
+
+        .info-value input[type="text"], 
+        .info-value select {
+            width: 100%;
+            border: none;
+            border-radius: 0;
+            outline: none;
+            font-size: 14px;
+            color: #000;
+            background: transparent;
+            font-family: inherit;
+            line-height: normal;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        #consultCategory, #consultCategoryInput, #consultCategoryCaptureView {
+            font-weight: bold !important;
+            color: #0056b3 !important;
+        }
+        #consultCategory {
+            cursor: pointer;
+        }
+
+        select option {
+            color: #000 !important;
+            background-color: #fff;
+            font-weight: normal !important;
+        }
+
+        select option.fav-city {
+            background-color: #e0f2fe !important;
+        }
+
+        .placeholder-selected {
+            color: #ccc !important;
+        }
+
+        select option.direct-input-option {
+            background-color: #f1f5f9 !important; 
+            color: #1f2937 !important;
+        }
+
+        .select-editable-container {
+            position: relative;
+            width: 100%;
+            height: 20px; 
+            display: flex;
+            align-items: center;
+        }
+        .select-editable-container select {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+        .select-editable-container input {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2;
+            display: none;
+            background: #fff !important;
+            border: none; outline: none; font-size: 14px; color: #000;
+        }
+
+        .row-capture-view {
+            width: 100%;
+            font-size: 14px;
+            color: #000 !important;
+            line-height: normal;
+            word-break: break-all;
+            display: none;
+        }
+
+        .full-row {
+            display: block;
+            border-bottom: 1px solid #d1d5db;
+        }
+        
+        .full-row .info-label {
+            border-right: none;
+            border-bottom: 1px solid #d1d5db;
+            width: 100%;
+            background-color: #edf2f7; 
+            color: #1f2937; 
+            padding: 10px 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .full-row .info-value {
+            padding: 10px 12px;
+        }
+        
+        .full-row input[type="text"] {
+            font-size: 15px;
+        }
+
+        .full-row select {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            color: #000;
+            background: transparent;
+            font-family: inherit;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .last-row {
+            border-bottom: 1px solid #d1d5db; 
+        }
+
+        .timestamp-area {
+            text-align: right;
+            font-size: 11px;
+            color: #94a3b8;
+            padding: 6px 12px 10px 0;
+            background-color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value input::placeholder,
+        .info-value select.placeholder-selected,
+        .pure-textarea::placeholder {
+            color: #ccc !important;
+            opacity: 1;
+        }
+
+        .pure-textarea {
+            width: 100%;
+            min-height: 22px;
+            height: 22px;
+            border: none !important;
+            outline: none !important;
+            font-size: 15px;
+            color: #000;
+            background: transparent;
+            font-family: inherit;
+            line-height: 22px;
+            resize: none;
+            overflow: hidden;
+            display: block;
+            padding: 0 !important; 
+            margin: 0 !important;
+            box-sizing: content-box !important; 
+        }
+
+        .capture-text-view {
+            display: none;
+            width: 100%;
+            font-size: 15px;
+            color: #000 !important;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .content-view-min {
+            min-height: 90px !important;
+        }
+        
+        .button-area {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+            padding: 16px;
+            transition: all 0.1s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-copy { background: #2563eb; }
+        .btn-copy:active { background: #1d4ed8; }
+        .btn-copy.success { background: #10b981; }
+    </style>
+</head>
+<body>
+
+    <div class="capture-outer" id="capture-area">
+        <div class="wrapper" id="tableWrapper">
+            <div class="header">상담일지</div>
+            <div class="content-body">
+                
+                <div class="info-row">
+                    <div class="info-label" style="background-color: #e0f2fe; color: #0056b3;">상담분야</div>
+                    <div class="info-value select-zone-bg" id="consultCategoryContainer">
+                        <div class="select-editable-container" id="consultCategoryMainZone">
+                            <select id="consultCategory" class="placeholder-selected" onchange="onCategoryChange(); updateSelectColor(this);">
+                                <option value="" selected>상담분야 선택</option>
+                                <option value="기업자문">기업자문</option>
+                                <option value="컨설팅">컨설팅</option>
+                                <option value="급여 및 4대보험 아웃소싱">급여 및 4대보험 아웃소싱</option>
+                                <option value="교육·강의">교육·강의</option>
+                                <option value="산업재해">산업재해</option>
+                                <option value="부당해고">부당해고</option>
+                                <option value="임금체불">임금체불</option>
+                                <option value="대지급금(체당금)">대지급금(체당금)</option>
+                                <option value="직장내 괴롭힘 및 성희롱">직장내 괴롭힘 및 성희롱</option>
+                                <option value="단체교섭 등집단적 노사관계">단체교섭 등 집단적 노사관계</option>
+                                <option value="custom" class="direct-input-option">직접 입력</option>
+                            </select>
+                            <input type="text" id="consultCategoryInput" placeholder="직접 입력" onblur="onConsultCategoryInputBlur()">
+                        </div>
+                        <div id="consultCategoryCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">회사명</div>
+                    <div class="info-value">
+                        <input type="text" id="companyName" value="" placeholder="회사명 입력">
+                        <div id="companyNameCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+
+                <div class="info-row" id="businessTypeRow">
+                    <div class="info-label">업종</div>
+                    <div class="info-value">
+                        <input type="text" id="businessType" value="" placeholder="업종 입력" onkeydown="handleBusinessTypeTab(event)">
+                        <div id="businessTypeCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+                
+                <div class="info-row thick-blue-border" id="locationRow">
+                    <div class="info-label">지역</div>
+                    <div class="info-value select-zone-bg" id="locationContainer">
+                        <div class="select-editable-container" id="locationMainZone">
+                            <select id="locationSelect" class="placeholder-selected" onchange="onLocationChange(); updateSelectColor(this);" onkeydown="handleSelectEnter(event, 'clientTypeSelect')">
+                                <option value="" selected>지역 선택</option>
+                                <option value="대구" class="fav-city">대구</option>
+                                <option value="구미" class="fav-city">구미</option>
+                                <option value="포항" class="fav-city">포항</option>
+                                <option value="서울" class="fav-city">서울</option>
+                                <option value="경기">경기</option>
+                                <option value="인천">인천</option>
+                                <option value="강원">강원</option>
+                                <option value="충남">충남</option>
+                                <option value="충북">충북</option>
+                                <option value="대전">대전</option>
+                                <option value="경북">경북</option>
+                                <option value="경남">경남</option>
+                                <option value="부산">부산</option>
+                                <option value="울산">울산</option>
+                                <option value="전북">전북</option>
+                                <option value="전남">전남</option>
+                                <option value="광주">광주</option>
+                                <option value="제주">제주</option>
+                                <option value="custom" class="direct-input-option">직접 입력</option>
+                            </select>
+                            <input type="text" id="locationInput" placeholder="직접 입력" onblur="onLocationInputBlur()" onkeydown="handleDirectInputEnter(event, 'clientTypeSelect')">
+                        </div>
+                        <div id="locationCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+
+                <div class="info-row conditional-row" id="workerCountRow">
+                    <div class="info-label">근로자 수</div>
+                    <div class="info-value">
+                        <input type="text" id="workerCount" value="" placeholder="ex: 20" onchange="formatCountWithUnit(this)" onblur="formatCountWithUnit(this)">
+                        <div id="workerCountCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+
+                <div class="info-row conditional-row" id="studentCountRow">
+                    <div class="info-label">교육인원</div>
+                    <div class="info-value">
+                        <input type="text" id="studentCount" value="" placeholder="ex: 20" onchange="formatCountWithUnit(this)" onblur="formatCountWithUnit(this)">
+                        <div id="studentCountCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+
+                <div class="info-row conditional-row" id="eduScheduleRow">
+                    <div class="info-label">교육일정</div>
+                    <div class="info-value">
+                        <input type="text" id="eduScheduleInput" value="" placeholder="ex: 6/17 14:00-15:00">
+                        <div id="eduScheduleCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+
+                <div class="info-row"> 
+                    <div class="info-label client-group">상담자</div>
+                    <div class="info-value select-zone-bg" id="clientTypeContainer">
+                        <div class="select-editable-container" id="clientTypeMainZone">
+                            <select id="clientTypeSelect" class="placeholder-selected" onchange="onClientTypeChange(); updateSelectColor(this);" onkeydown="handleSelectEnter(event, 'clientContact')">
+                                <option value="" selected>상담자 선택</option>
+                                <option value="사업주">사업주</option>
+                                <option value="담당자">담당자</option>
+                                <option value="근로자">근로자</option>
+                                <option value="custom" class="direct-input-option">직접 입력</option>
+                            </select>
+                            <input type="text" id="clientTypeInput" placeholder="직접 입력" onblur="onClientInputBlur()" onkeydown="handleDirectInputEnter(event, 'clientContact')">
+                        </div>
+                        <div id="clientTypeCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label client-group">연락처</div>
+                    <div class="info-value">
+                        <input type="text" id="clientContact" value="" maxlength="13" placeholder="연락처 입력" onfocus="isDeleting = false;" onblur="isDeleting = false;" oninput="formatPhoneNumber(this)" onkeydown="handleDirectInputEnter(event, 'funnelSelect')">
+                        <div id="clientContactCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+
+                <div class="info-row" id="funnelRow" style="border-bottom: 2px solid #1e3a8a;">
+                    <div class="info-label client-group">경로</div>
+                    <div class="info-value select-zone-bg" id="funnelContainer">
+                        <div class="select-editable-container" id="funnelMainZone">
+                            <select id="funnelSelect" class="placeholder-selected" onchange="onFunnelChange(); updateSelectColor(this);" onkeydown="handleSelectEnter(event, 'titleInput')">
+                                <option value="" selected>경로 선택</option>
+                                <option value="포털검색">포털검색</option>
+                                <option value="온라인예약">온라인예약</option>
+                                <option value="홈페이지">홈페이지</option>
+                                <option value="소개">소개</option>
+                                <option value="custom" class="direct-input-option">직접 입력</option>
+                            </select>
+                            <input type="text" id="funnelInput" placeholder="직접 입력" onblur="onFunnelInputBlur()" onkeydown="handleSelectEnter(event, 'titleInput')">
+                        </div>
+                        <div id="funnelCaptureView" class="row-capture-view"></div>
+                    </div>
+                </div>
+
+                <div class="full-row" id="titleRow">
+                    <div class="info-label">제목</div>
+                    <div class="info-value" id="titleContainer">
+                        <input type="text" id="titleInput" value="" placeholder="상담 한줄 요약">
+                        <div class="select-editable-container" id="titleSelectZone" style="display: none; width: 100%;">
+                            <select id="titleSelect" class="placeholder-selected" onchange="onTitleSelectChange(); updateSelectColor(this);">
+                                <option value="" selected>제목 선택</option>
+                                <option value="급여아웃소싱 신규 상담">급여아웃소싱 신규 상담</option>
+                                <option value="급여아웃소싱 및 법률자문 신규상담">급여아웃소싱 및 법률자문 신규상담</option>
+                                <option value="custom" class="direct-input-option">직접 입력</option>
+                            </select>
+                            <input type="text" id="titleCustomInput" placeholder="직접 입력" onblur="onTitleCustomInputBlur()">
+                        </div>
+                        <div id="titleCaptureView" class="row-capture-view" style="font-size:15px;"></div>
+                    </div>
+                </div>
+
+                <div class="full-row" id="contentRow">
+                    <div class="info-label">내용</div>
+                    <div class="info-value">
+                        <textarea id="contentInput" class="pure-textarea" placeholder="상담 세부내용" style="min-height: 90px; height: 90px;" oninput="autoResizeTextarea(this)" onpaste="setTimeout(()=>{autoResizeTextarea(this)},10)"></textarea>
+                        <div id="contentCaptureView" class="capture-text-view content-view-min"></div>
+                    </div>
+                </div>
+                
+                <div class="full-row last-row" id="commentRow">
+                    <div class="info-label">코멘트</div>
+                    <div class="info-value select-zone-bg" id="commentContainer">
+                        <div class="select-editable-container" id="commentSelectZone">
+                            <select id="commentSelect" class="placeholder-selected" onchange="onCommentChange(); updateSelectColor(this);">
+                                <option value="" selected>코멘트 선택</option>
+                                <option value="금일 중으로 상담 요청 주셨습니다.">금일 중으로 상담 요청 주셨습니다.</option>
+                                <option value="custom" class="direct-input-option">직접 입력</option>
+                            </select>
+                        </div>
+                        <textarea id="commentCustomInput" class="pure-textarea" placeholder="직접 입력" style="display: none;" oninput="autoResizeTextarea(this)" onpaste="setTimeout(()=>{autoResizeTextarea(this)},10)" onblur="onCommentInputBlur()"></textarea>
+                        <div id="commentCaptureView" class="capture-text-view" style="min-height: 25px;"></div>
+                    </div>
+                </div>
+
+                <div class="timestamp-area" id="logTimestamp"></div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="button-area">
+        <button class="btn btn-copy" id="copyBtn" onclick="copyTableToClipboard()">캡처 및 복사하기</button>
+    </div>
+
+    <script>
+        setLiveTimestamp();
+
+        function formatCountWithUnit(obj) {
+            let val = obj.value.trim();
+            if (val === "") return;
+            let pureNums = val.replace(/[^0-9]/g, "");
+            if (pureNums !== "") { obj.value = pureNums + "명"; } 
+            else { obj.value = ""; }
+        }
+
+        let isDeleting = false;
+        document.getElementById('clientContact').addEventListener('keydown', function(e) {
+            isDeleting = (e.key === 'Backspace');
+        });
+
+        function formatPhoneNumber(obj) {
+            let val = obj.value.replace(/[^0-9]/g, "");
+            let formatted = "";
+
+            if (isDeleting) {
+                if (val.length <= 3) {
+                    formatted = val;
+                } else if (val.length <= 7) {
+                    formatted = val.substr(0, 3) + "-" + val.substr(3);
+                } else {
+                    formatted = val.substr(0, 3) + "-" + val.substr(3, 4) + "-" + val.substr(7);
+                }
+                obj.value = formatted;
+                return;
+            }
+
+            if (val.length < 4) {
+                formatted = val;
+            } else if (val.length <= 7) {
+                formatted = val.substr(0, 3) + "-" + val.substr(3);
+            } else if (val.length <= 10) {
+                formatted = val.substr(0, 3) + "-" + val.substr(3, 4) + "-" + val.substr(7);
+            } else {
+                formatted = val.substr(0, 3) + "-" + val.substr(3, 4) + "-" + val.substr(7, 4);
+            }
+            obj.value = formatted;
+        }
+
+        function setLiveTimestamp() {
+            const now = new Date();
+            const yy = String(now.getFullYear()).substr(2, 2);
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('logTimestamp').innerText = `${yy}${mm}${dd} ${hh}:${min}`;
+        }
+
+        function handleBusinessTypeTab(e) {
+            if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault(); 
+                document.getElementById('locationSelect').focus();
+            }
+        }
+
+        function handleSelectEnter(e, nextId) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const nextTarget = document.getElementById(nextId);
+                if (nextTarget) nextTarget.focus();
+            }
+        }
+
+        function handleDirectInputEnter(e, nextId) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const nextTarget = document.getElementById(nextId);
+                if (nextTarget) nextTarget.focus();
+            }
+        }
+
+        function updateSelectColor(selectObj) {
+            if (selectObj.value === "") { selectObj.classList.add('placeholder-selected'); } 
+            else { selectObj.classList.remove('placeholder-selected'); }
+        }
+
+        function autoResizeTextarea(textareaObj) {
+            let isContentInput = (textareaObj.id === 'contentInput');
+            let baseMinHeight = isContentInput ? 90 : 22;
+            
+            textareaObj.style.height = baseMinHeight + 'px'; 
+            let currentScrollHeight = textareaObj.scrollHeight;
+            
+            if (currentScrollHeight > baseMinHeight + 5) {
+                textareaObj.style.height = currentScrollHeight + 'px'; 
+            } else {
+                textareaObj.style.height = baseMinHeight + 'px';
+            }
+        }
+
+        function onCategoryChange() {
+            const select = document.getElementById('consultCategory');
+            const input = document.getElementById('consultCategoryInput');
+            const container = document.getElementById('consultCategoryContainer');
+            const category = select.value;
+            
+            const locationRow = document.getElementById('locationRow');
+            const workerRow = document.getElementById('workerCountRow');
+            const studentRow = document.getElementById('studentCountRow');
+            const eduScheduleRow = document.getElementById('eduScheduleRow');
+            const contentInput = document.getElementById('contentInput');
+            
+            const titleInput = document.getElementById('titleInput');
+            const titleSelectZone = document.getElementById('titleSelectZone');
+            const titleContainer = document.getElementById('titleContainer');
+            const titleSelect = document.getElementById('titleSelect');
+            const titleCustomInput = document.getElementById('titleCustomInput');
+
+            locationRow.classList.remove('thick-blue-border');
+            workerRow.classList.remove('thick-blue-border');
+            eduScheduleRow.classList.remove('thick-blue-border');
+
+            workerRow.style.display = "none";
+            studentRow.style.display = "none";
+            eduScheduleRow.style.display = "none";
+            
+            document.getElementById('workerCount').value = "";
+            document.getElementById('studentCount').value = "";
+            document.getElementById('eduScheduleInput').value = "";
+            
+            document.getElementById('workerCountCaptureView').innerText = "";
+            document.getElementById('studentCountCaptureView').innerText = "";
+            document.getElementById('eduScheduleCaptureView').innerText = "";
+            
+            document.getElementById('titleRow').style.display = "block";
+            titleInput.style.display = "block";
+            titleInput.value = "";
+            titleSelectZone.style.display = "none";
+            titleSelect.value = "";
+            titleCustomInput.style.display = "none";
+            titleCustomInput.value = "";
+            titleContainer.classList.remove('select-zone-bg');
+            updateSelectColor(titleSelect);
+
+            if (category === 'custom') {
+                input.style.display = 'block';
+                input.value = '';
+                input.focus();
+                container.classList.remove('select-zone-bg'); 
+                locationRow.classList.add('thick-blue-border'); 
+            } else {
+                input.style.display = 'none';
+                input.value = '';
+                container.classList.add('select-zone-bg');
+                
+                if (category === "급여 및 4대보험 아웃소싱") {
+                    workerRow.style.display = "grid"; 
+                    workerRow.classList.add('thick-blue-border'); 
+                    titleInput.style.display = "none";
+                    titleSelectZone.style.display = "flex";
+                    titleContainer.classList.add('select-zone-bg');
+                } else if (category === "교육·강의") {
+                    studentRow.style.display = "grid";
+                    eduScheduleRow.style.display = "grid"; 
+                    eduScheduleRow.classList.add('thick-blue-border'); 
+                } else {
+                    locationRow.classList.add('thick-blue-border'); 
+                }
+            }
+            autoResizeTextarea(contentInput); 
+        }
+
+        function onTitleSelectChange() {
+            const select = document.getElementById('titleSelect');
+            const input = document.getElementById('titleCustomInput');
+            const container = document.getElementById('titleContainer');
+            if (select.value === 'custom') {
+                input.style.display = 'block';
+                input.value = '';
+                input.focus();
+                container.classList.remove('select-zone-bg');
+            } else {
+                input.style.display = 'none';
+                input.value = '';
+                container.classList.add('select-zone-bg');
+            }
+        }
+
+        function onTitleCustomInputBlur() {
+            const select = document.getElementById('titleSelect');
+            const input = document.getElementById('titleCustomInput');
+            const container = document.getElementById('titleContainer');
+            if (input.value.trim() === "") {
+                input.style.display = 'none';
+                select.value = '';
+                container.classList.add('select-zone-bg');
+                updateSelectColor(select);
+            }
+        }
+        
+        function onConsultCategoryInputBlur() {
+            const select = document.getElementById('consultCategory');
+            const input = document.getElementById('consultCategoryInput');
+            const container = document.getElementById('consultCategoryContainer');
+            if (input.value.trim() === "") {
+                input.style.display = 'none';
+                select.value = '';
+                container.classList.add('select-zone-bg'); 
+                updateSelectColor(select);
+            }
+        }
+
+        function onLocationChange() {
+            const select = document.getElementById('locationSelect');
+            const input = document.getElementById('locationInput');
+            const container = document.getElementById('locationContainer');
+            if (select.value === 'custom') {
+                input.style.display = 'block';
+                input.value = '';
+                input.focus();
+                container.classList.remove('select-zone-bg');
+            } else {
+                input.style.display = 'none';
+                input.value = '';
+                container.classList.add('select-zone-bg');
+            }
+        }
+        function onLocationInputBlur() {
+            const select = document.getElementById('locationSelect');
+            const input = document.getElementById('locationInput');
+            const container = document.getElementById('locationContainer');
+            if (input.value.trim() === "") {
+                input.style.display = 'none';
+                select.value = '';
+                container.classList.add('select-zone-bg');
+                updateSelectColor(select);
+            }
+        }
+
+        function onClientTypeChange() {
+            const select = document.getElementById('clientTypeSelect');
+            const input = document.getElementById('clientTypeInput');
+            const container = document.getElementById('clientTypeContainer');
+            if (select.value === 'custom') {
+                input.style.display = 'block';
+                input.value = '';
+                input.focus();
+                container.classList.remove('select-zone-bg');
+            } else {
+                input.style.display = 'none';
+                input.value = '';
+                container.classList.add('select-zone-bg');
+            }
+        }
+        function onClientInputBlur() {
+            const select = document.getElementById('clientTypeSelect');
+            const input = document.getElementById('clientTypeInput');
+            const container = document.getElementById('clientTypeContainer');
+            if (input.value.trim() === "") {
+                input.style.display = 'none';
+                select.value = '';
+                container.classList.add('select-zone-bg');
+                updateSelectColor(select);
+            }
+        }
+
+        function onFunnelChange() {
+            const select = document.getElementById('funnelSelect');
+            const input = document.getElementById('funnelInput');
+            const container = document.getElementById('funnelContainer');
+            if (select.value === 'custom') {
+                input.style.display = 'block';
+                input.value = '';
+                input.focus();
+                container.classList.remove('select-zone-bg');
+            } else {
+                input.style.display = 'none';
+                input.value = '';
+                container.classList.add('select-zone-bg');
+            }
+        }
+        function onFunnelInputBlur() {
+            const select = document.getElementById('funnelSelect');
+            const input = document.getElementById('funnelInput');
+            const container = document.getElementById('funnelContainer');
+            if (input.value.trim() === "") {
+                input.style.display = 'none';
+                select.value = '';
+                container.classList.add('select-zone-bg');
+                updateSelectColor(select);
+            }
+        }
+
+        function onCommentChange() {
+            const select = document.getElementById('commentSelect');
+            const selectZone = document.getElementById('commentSelectZone');
+            const commentCustomInput = document.getElementById('commentCustomInput');
+            const container = document.getElementById('commentContainer');
+            if (select.value === 'custom') {
+                selectZone.style.display = 'none';
+                commentCustomInput.style.display = 'block';
+                commentCustomInput.value = '';
+                commentCustomInput.style.height = '22px'; 
+                commentCustomInput.focus();
+                container.classList.remove('select-zone-bg');
+            } else {
+                selectZone.style.display = 'block';
+                commentCustomInput.style.display = 'none';
+                commentCustomInput.value = '';
+                container.classList.add('select-zone-bg');
+            }
+        }
+
+        function onCommentInputBlur() {
+            const select = document.getElementById('commentSelect');
+            const selectZone = document.getElementById('commentSelectZone');
+            const commentCustomInput = document.getElementById('commentCustomInput');
+            const container = document.getElementById('commentContainer');
+            if (commentCustomInput.value.trim() === "") {
+                commentCustomInput.style.display = 'none';
+                selectZone.style.display = 'block';
+                select.value = '';
+                container.classList.add('select-zone-bg');
+                updateSelectColor(select);
+            }
+        }
+
+        function copyTableToClipboard() {
+            const element = document.getElementById('tableWrapper');
+            const btn = document.getElementById('copyBtn');
+            const contentInput = document.getElementById('contentInput');
+            const contentCaptureView = document.getElementById('contentCaptureView');
+            const selectContainers = document.querySelectorAll('.info-value');
+
+            btn.innerText = "캡처 중...";
+            btn.disabled = true;
+
+            document.body.style.overflow = 'hidden';
+
+            contentCaptureView.innerText = contentInput.value;
+            contentCaptureView.style.height = contentInput.style.height;
+            
+            contentInput.style.display = 'none';
+            contentCaptureView.style.display = 'block';
+
+            setLiveTimestamp();
+            const currentLiveTimeText = document.getElementById('logTimestamp').innerText;
+
+            element.style.border = 'none';
+            selectContainers.forEach(container => container.classList.add('hide-bg-on-capture'));
+
+            // [상태 저장용 객체] 각 요소의 캡처 전 display 상태를 정밀 기록
+            const preCaptureState = {};
+
+            const fields = [
+                { id: 'consultCategory', inputId: 'consultCategoryInput', viewId: 'consultCategoryCaptureView', zoneId: 'consultCategoryMainZone', label: '상담분야', isSelect: true },
+                { id: 'companyName', viewId: 'companyNameCaptureView', label: '회사명', isSelect: false },
+                { id: 'businessType', viewId: 'businessTypeCaptureView', label: '업종', isSelect: false },
+                { id: 'locationSelect', inputId: 'locationInput', viewId: 'locationCaptureView', zoneId: 'locationMainZone', label: '지역', isSelect: true },
+                { id: 'workerCount', viewId: 'workerCountCaptureView', label: '근로자 수', isSelect: false, isCond: 'workerCountRow' },
+                { id: 'studentCount', viewId: 'studentCountCaptureView', label: '교육인원', isSelect: false, isCond: 'studentCountRow' },
+                { id: 'eduScheduleInput', viewId: 'eduScheduleCaptureView', label: '교육일정', isSelect: false, isCond: 'eduScheduleRow' },
+                { id: 'clientTypeSelect', inputId: 'clientTypeInput', viewId: 'clientTypeCaptureView', zoneId: 'clientTypeMainZone', label: '상담자', isSelect: true },
+                { id: 'clientContact', viewId: 'clientContactCaptureView', label: '연락처', isSelect: false },
+                { id: 'funnelSelect', inputId: 'funnelInput', viewId: 'funnelCaptureView', zoneId: 'funnelMainZone', label: '경로', isSelect: true }
+            ];
+
+            let txtResult = `━━━━━━━━━━━━━━━━━━━━━━━━\n 🏢 두웰 노무법인 상담일지 (${currentLiveTimeText})\n━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+
+            fields.forEach((f, idx) => {
+                const view = document.getElementById(f.viewId);
+                if (!view) return;
+                let currentVal = "";
+
+                if (!f.isSelect) {
+                    const input = document.getElementById(f.id);
+                    if (input) {
+                        preCaptureState[f.id] = input.style.display;
+                        currentVal = input.value;
+                        if (currentVal.includes("선택")) currentVal = "";
+                        input.style.display = 'none';
+                    }
+                    view.innerText = currentVal === "" ? "\u00A0" : currentVal;
+                    preCaptureState[f.viewId] = view.style.display;
+                    view.style.display = 'block';
+                }
+                else {
+                    const select = document.getElementById(f.id);
+                    const input = document.getElementById(f.inputId);
+                    const zone = document.getElementById(f.zoneId);
+                    
+                    if (zone) preCaptureState[f.zoneId] = zone.style.display;
+                    if (input) preCaptureState[f.inputId] = input.style.display;
+                    if (select) preCaptureState[f.id] = select.style.display;
+
+                    if (select && select.value === 'custom') {
+                        currentVal = input ? input.value : "";
+                    } else if (select && select.value !== "") {
+                        currentVal = select.options[select.selectedIndex].text;
+                    }
+                    if (currentVal.includes("선택")) currentVal = "";
+                    view.innerText = currentVal === "" ? "\u00A0" : currentVal;
+                    
+                    if (zone) zone.style.display = 'none';
+                    preCaptureState[f.viewId] = view.style.display;
+                    view.style.display = 'block';
+                }
+
+                let cleanTextVal = currentVal.replace(/\u00A0/g, " ");
+                if (f.isCond) {
+                    const row = document.getElementById(f.isCond);
+                    if (row && row.style.display !== 'none' && cleanTextVal !== "") {
+                        txtResult += `■ ${f.label} : ${cleanTextVal}\n`;
+                    }
+                } else {
+                    txtResult += `■ ${f.label} : ${cleanTextVal || '미입력'}\n`;
+                }
+                if (idx === 3 && document.getElementById('workerCountRow').style.display === 'none' && document.getElementById('studentCountRow').style.display === 'none') {
+                    txtResult += `────────────────────────\n`;
+                }
+            });
+
+            // 제목 처리 및 복사 텍스트 누적
+            const titleView = document.getElementById('titleCaptureView');
+            const titleMainInput = document.getElementById('titleInput');
+            const titleSelectZone = document.getElementById('titleSelectZone');
+            const titleSelect = document.getElementById('titleSelect');
+            const titleCustomInput = document.getElementById('titleCustomInput');
+            
+            preCaptureState['titleInput'] = titleMainInput.style.display;
+            preCaptureState['titleSelectZone'] = titleSelectZone.style.display;
+            preCaptureState['titleSelect'] = titleSelect.style.display;
+            preCaptureState['titleCustomInput'] = titleCustomInput.style.display;
+            preCaptureState['titleCaptureView'] = titleView.style.display;
+
+            let finalTitleText = "";
+            if (titleMainInput && titleMainInput.style.display !== 'none') {
+                finalTitleText = titleMainInput.value;
+                titleMainInput.style.display = 'none';
+            } else {
+                if (titleSelect && titleSelect.value === 'custom') {
+                    finalTitleText = titleCustomInput ? titleCustomInput.value : "";
+                } else if (titleSelect && titleSelect.value !== "") {
+                    finalTitleText = titleSelect.options[titleSelect.selectedIndex].text;
+                }
+                if (titleSelectZone) titleSelectZone.style.display = 'none';
+            }
+            if (finalTitleText.includes("선택")) finalTitleText = "";
+            let cleanTitleText = finalTitleText.replace(/\u00A0/g, " ");
+            if (titleView) {
+                titleView.innerText = cleanTitleText === "" ? "\u00A0" : cleanTitleText;
+                titleView.style.display = 'block';
+            }
+            txtResult += `■ 제목 : ${cleanTitleText || '제목없음'}\n`;
+
+            // 내용 처리 및 복사 텍스트 누적
+            let cleanContentText = contentInput.value.replace(/\u00A0/g, " ");
+            txtResult += `■ 내용 : \n${cleanContentText ? cleanContentText : '내용없음'}\n`;
+
+            // 코멘트 처리 및 복사 텍스트 누적
+            const commentSelect = document.getElementById('commentSelect');
+            const commentSelectZone = document.getElementById('commentSelectZone');
+            const commentCustomInput = document.getElementById('commentCustomInput');
+            const commentCaptureView = document.getElementById('commentCaptureView');
+            
+            preCaptureState['commentSelectZone'] = commentSelectZone.style.display;
+            preCaptureState['commentCustomInput'] = commentCustomInput.style.display;
+            preCaptureState['commentCaptureView'] = commentCaptureView.style.display;
+
+            let finalCommentText = "";
+            if (commentCustomInput && commentCustomInput.style.display === 'block') {
+                finalCommentText = commentCustomInput.value;
+            } else if (commentSelect && commentSelect.value !== "" && !commentSelect.value.includes("선택")) {
+                finalCommentText = commentSelect.options[commentSelect.selectedIndex].text;
+            }
+            let cleanCommentText = finalCommentText.replace(/\u00A0/g, " ");
+            if (commentCaptureView) {
+                commentCaptureView.innerText = cleanCommentText === "" ? "\u00A0" : cleanCommentText;
+                commentCaptureView.style.display = 'block';
+            }
+            
+            commentSelectZone.style.display = 'none';
+            commentCustomInput.style.display = 'none';
+
+            txtResult += `■ 코멘트 : ${cleanCommentText || '미입력'}\n━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+            // 렌더링 대기 후 html2canvas 실행
+            setTimeout(() => {
+                html2canvas(element, { scale: 3, backgroundColor: '#ffffff', logging: false }).then(canvas => {
+                    // UI 완벽 원상복구 로직
+                    element.style.border = '1px solid #1e3a8a';
+                    selectContainers.forEach(container => container.classList.remove('hide-bg-on-capture'));
+                    
+                    fields.forEach(f => {
+                        const view = document.getElementById(f.viewId);
+                        const input = document.getElementById(f.id);
+                        const zone = document.getElementById(f.zoneId);
+                        const subInput = document.getElementById(f.inputId);
+
+                        if (input) input.style.display = preCaptureState[f.id] || '';
+                        if (zone) zone.style.display = preCaptureState[f.zoneId] || '';
+                        if (subInput) subInput.style.display = preCaptureState[f.inputId] || '';
+                        if (view) view.style.display = preCaptureState[f.viewId] || 'none';
+                    });
+
+                    titleMainInput.style.display = preCaptureState['titleInput'] || '';
+                    titleSelectZone.style.display = preCaptureState['titleSelectZone'] || '';
+                    titleSelect.style.display = preCaptureState['titleSelect'] || '';
+                    titleCustomInput.style.display = preCaptureState['titleCustomInput'] || '';
+                    titleView.style.display = preCaptureState['titleCaptureView'] || 'none';
+
+                    contentInput.style.display = 'block';
+                    contentCaptureView.style.display = 'none';
+
+                    commentSelectZone.style.display = preCaptureState['commentSelectZone'] || '';
+                    commentCustomInput.style.display = preCaptureState['commentCustomInput'] || '';
+                    commentCaptureView.style.display = preCaptureState['commentCaptureView'] || 'none';
+
+                    document.body.style.overflow = 'auto';
+
+                    canvas.toBlob(blob => {
+                        const item = new ClipboardItem({ "image/png": blob, "text/plain": new Blob([txtResult], { type: "text/plain" }) });
+                        navigator.clipboard.write([item]).then(() => {
+                            btn.innerText = "복사완료"; btn.classList.add('success'); btn.disabled = false;
+                            setTimeout(() => { btn.innerText = "캡처 및 복사하기"; btn.classList.remove('success'); }, 2500);
+                        });
+                    }, 'image/png');
+                });
+            }, 50);
+        }
+    </script>
+</body>
+</html>
