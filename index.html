@@ -244,7 +244,7 @@
             <div class="cat-panel" id="catPanel" hidden>
                 <button class="cat-back" id="catBack">‹ 카테고리</button>
                 <div class="cat-title" id="catTitle"></div>
-                <div class="card-grid cols-2" id="catCards"></div>
+                <div class="cat-cards card-grid cols-2" id="catCards"></div>
             </div>
         </section>
 
@@ -254,13 +254,38 @@
             <div class="section-head">
                 <span class="en">Mail Templates</span>
                 <div class="ko">메일 템플릿</div>
-                <p class="desc">실무 안내 메일을 항목만 채우면 제목·본문까지 완성.</p>
+                <p class="desc">카테고리를 선택하면 관련 메일 템플릿이 열립니다.</p>
             </div>
-            <div class="card-grid cols-2">
-                <a class="card" href="신규업체 기초요청자료_템플릿.html"><span class="en">New Client</span><span class="ko">신규업체 기초요청자료</span><span class="sub">약정서·EDI·통장사본 등 신규 사업장 정보 취합</span></a>
-                <a class="card" href="소득총액신고 세무요청_탬플릿.html"><span class="en">Income Report</span><span class="ko">소득총액신고 세무요청</span><span class="sub">근로자·개인사업자대표 소득총액신고 서류 요청</span></a>
-                <a class="card" href="건강보험연말정산 분할납부안내.html"><span class="en">Health Insurance</span><span class="ko">건강보험 분할납부 안내</span><span class="sub">건강보험 연말정산 정산보험료 분할납부 안내</span></a>
-                <a class="card" href="담당자 휴가안내_템플릿.html"><span class="en">Vacation Notice</span><span class="ko">담당자 휴가 안내</span><span class="sub">담당자 부재기간·업무 복귀일 자동 안내</span></a>
+
+            <!-- 카테고리 타일 -->
+            <div class="cat-grid" id="mailGrid">
+                <button class="cat-tile" data-cat="new">
+                    <span class="cat-cnt">1</span>
+                    <span class="cat-ico"><svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="mNew" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7ff0c0"/><stop offset="1" stop-color="#16c2a3"/></linearGradient></defs><rect x="11" y="7" width="26" height="34" rx="6" fill="url(#mNew)"/><path d="M24 17v14M17 24h14" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg></span>
+                    <span class="cat-name">신규</span>
+                </button>
+                <button class="cat-tile" data-cat="tax">
+                    <span class="cat-cnt">1</span>
+                    <span class="cat-ico"><svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="mTax" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8fb6ff"/><stop offset="1" stop-color="#3a6ff0"/></linearGradient></defs><rect x="11" y="7" width="26" height="34" rx="6" fill="url(#mTax)"/><circle cx="19.5" cy="19.5" r="2.4" fill="#fff"/><circle cx="28.5" cy="28.5" r="2.4" fill="#fff"/><path d="M30 18L18 30" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span>
+                    <span class="cat-name">세무연계</span>
+                </button>
+                <button class="cat-tile" data-cat="site">
+                    <span class="cat-cnt">1</span>
+                    <span class="cat-ico"><svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="mSite" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffc978"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs><rect x="12" y="9" width="24" height="32" rx="4" fill="url(#mSite)"/><g fill="#fff"><rect x="17" y="15" width="4" height="4" rx="1"/><rect x="27" y="15" width="4" height="4" rx="1"/><rect x="17" y="23" width="4" height="4" rx="1"/><rect x="27" y="23" width="4" height="4" rx="1"/><rect x="21.5" y="32" width="5" height="9" rx="1"/></g></svg></span>
+                    <span class="cat-name">사업장</span>
+                </button>
+                <button class="cat-tile" data-cat="etc">
+                    <span class="cat-cnt">1</span>
+                    <span class="cat-ico"><svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="mEtc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9a3ff"/><stop offset="1" stop-color="#8b6bff"/></linearGradient></defs><rect x="7" y="7" width="34" height="34" rx="10" fill="url(#mEtc)"/><g fill="#fff"><circle cx="16" cy="24" r="2.6"/><circle cx="24" cy="24" r="2.6"/><circle cx="32" cy="24" r="2.6"/></g></svg></span>
+                    <span class="cat-name">기타</span>
+                </button>
+            </div>
+
+            <!-- 카테고리별 목록 (드릴다운) -->
+            <div class="cat-panel" id="mailPanel" hidden>
+                <button class="cat-back">‹ 카테고리</button>
+                <div class="cat-title"></div>
+                <div class="cat-cards card-grid cols-2"></div>
             </div>
         </section>
 
@@ -341,36 +366,54 @@
         el.addEventListener('click',()=>{ goTo(+el.dataset.goto); document.getElementById('navLinks').classList.remove('open'); });
     });
     document.getElementById('navToggle').addEventListener('click',()=>document.getElementById('navLinks').classList.toggle('open'));
-    /* ===== 계산기·양식 카테고리 드릴다운 ===== */
-    const CATS={
-      retire:{name:'퇴직금',items:[
-        {href:'퇴직금계산.html',en:'Severance Pay',ko:'퇴직금 계산기',sub:'평균임금 산정·재직일수 기반 법정 퇴직금 자동 추산'},
-        {href:'퇴직금적립내역서.html',en:'Severance Reserve',ko:'퇴직금 적립 내역서',sub:'연도별·임직원별 퇴직급여 충당금 및 누적 적립 관리'}
-      ]},
-      insure:{name:'4대보험',items:[
-        {href:'퇴사자4대보험정산.html',en:'Insurance Settlement',ko:'퇴사자 4대보험 정산',sub:'중도퇴사자 건강보험·국민연금 등 중도 정산'}
-      ]},
-      worker:{name:'근로자 관리',items:[
-        {href:'상시근로자수판단.html',en:'Employee Count',ko:'상시근로자 수 계산',sub:'가동일수 분할 및 5인 이상 여부 법리 판단'}
-      ]},
-      mother:{name:'모성보호',items:[
-        {href:'임신기근로시간단축_대상기간계산.html',en:'Reduced Work Hours',ko:'임신기 근로시간단축',sub:'출산예정일 기준 12주 이내·32주 이후 대상기간 계산'}
-      ]}
+    /* ===== 카테고리 타일 드릴다운 (계산기·양식 / 메일 템플릿 공용) ===== */
+    const DRILL={
+      calc:{
+        retire:{name:'퇴직금',items:[
+          {href:'퇴직금계산.html',en:'Severance Pay',ko:'퇴직금 계산기',sub:'평균임금 산정·재직일수 기반 법정 퇴직금 자동 추산'},
+          {href:'퇴직금적립내역서.html',en:'Severance Reserve',ko:'퇴직금 적립 내역서',sub:'연도별·임직원별 퇴직급여 충당금 및 누적 적립 관리'}
+        ]},
+        insure:{name:'4대보험',items:[
+          {href:'퇴사자4대보험정산.html',en:'Insurance Settlement',ko:'퇴사자 4대보험 정산',sub:'중도퇴사자 건강보험·국민연금 등 중도 정산'}
+        ]},
+        worker:{name:'근로자 관리',items:[
+          {href:'상시근로자수판단.html',en:'Employee Count',ko:'상시근로자 수 계산',sub:'가동일수 분할 및 5인 이상 여부 법리 판단'}
+        ]},
+        mother:{name:'모성보호',items:[
+          {href:'임신기근로시간단축_대상기간계산.html',en:'Reduced Work Hours',ko:'임신기 근로시간단축',sub:'출산예정일 기준 12주 이내·32주 이후 대상기간 계산'}
+        ]}
+      },
+      template:{
+        new:{name:'신규',items:[
+          {href:'신규업체 기초요청자료_템플릿.html',en:'New Client',ko:'신규업체 기초요청자료',sub:'약정서·EDI·통장사본 등 신규 사업장 정보 취합'}
+        ]},
+        tax:{name:'세무연계',items:[
+          {href:'소득총액신고 세무요청_탬플릿.html',en:'Income Report',ko:'소득총액신고 세무요청',sub:'근로자·개인사업자대표 소득총액신고 서류 요청'}
+        ]},
+        site:{name:'사업장',items:[
+          {href:'건강보험연말정산 분할납부안내.html',en:'Health Insurance',ko:'건강보험 분할납부 안내',sub:'건강보험 연말정산 정산보험료 분할납부 안내'}
+        ]},
+        etc:{name:'기타',items:[
+          {href:'담당자 휴가안내_템플릿.html',en:'Vacation Notice',ko:'담당자 휴가 안내',sub:'담당자 부재기간·업무 복귀일 자동 안내'}
+        ]}
+      }
     };
-    const catGrid=document.getElementById('catGrid');
-    const catPanel=document.getElementById('catPanel');
-    const catCards=document.getElementById('catCards');
-    const catTitle=document.getElementById('catTitle');
-    function openCat(key){
-        const c=CATS[key]; if(!c) return;
-        catTitle.textContent=c.name;
-        catCards.className='card-grid '+(c.items.length>1?'cols-2':'single');
-        catCards.innerHTML=c.items.map(it=>'<a class="card" href="'+it.href+'"><span class="en">'+it.en+'</span><span class="ko">'+it.ko+'</span><span class="sub">'+it.sub+'</span></a>').join('');
-        catGrid.hidden=true; catPanel.hidden=false;
-    }
-    function closeCat(){ if(catPanel) catPanel.hidden=true; if(catGrid) catGrid.hidden=false; }
-    document.querySelectorAll('.cat-tile').forEach(t=>t.addEventListener('click',()=>openCat(t.dataset.cat)));
-    document.getElementById('catBack').addEventListener('click',closeCat);
+    const drillClosers=[];
+    document.querySelectorAll('.section').forEach(sec=>{
+        const grid=sec.querySelector('.cat-grid'), panel=sec.querySelector('.cat-panel'), data=DRILL[sec.id];
+        if(!grid||!panel||!data) return;
+        const cards=panel.querySelector('.cat-cards'), title=panel.querySelector('.cat-title');
+        const open=(key)=>{ const c=data[key]; if(!c) return;
+            title.textContent=c.name;
+            cards.className='cat-cards card-grid '+(c.items.length>1?'cols-2':'single');
+            cards.innerHTML=c.items.map(it=>'<a class="card" href="'+it.href+'"><span class="en">'+it.en+'</span><span class="ko">'+it.ko+'</span><span class="sub">'+it.sub+'</span></a>').join('');
+            grid.hidden=true; panel.hidden=false; };
+        const close=()=>{ panel.hidden=true; grid.hidden=false; };
+        grid.querySelectorAll('.cat-tile').forEach(t=>t.addEventListener('click',()=>open(t.dataset.cat)));
+        panel.querySelector('.cat-back').addEventListener('click',close);
+        drillClosers.push(close);
+    });
+    function closeCat(){ drillClosers.forEach(fn=>fn()); }
 
     window.addEventListener('resize',render);
     render();
