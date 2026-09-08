@@ -7,24 +7,24 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard','Malgun Gothic', sans-serif; }
-        body { background-color: #f5f7fb; padding: 40px 20px; color: #333; }
+        body { background-color: #ffffff; padding: 34px 20px; color: #333; }
 
         /* 🖥️ 메인 컨테이너 */
         .container {
             max-width: 1410px;
             margin: 0 auto;
-            background: #fff;
-            border: 1px solid #eef2f8;
-            box-shadow: 0 20px 55px rgba(30,50,120,0.10);
-            border-radius: 20px;
-            overflow: hidden;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            border-radius: 0;
+            overflow: visible;
         }
 
         /* 🟦 헤더 영역 */
         .launcher-header {
-            background: linear-gradient(125deg,#2b4d9e 0%,#203c7d 100%);
-            color: #fff;
-            padding: 44px 30px 36px;
+            background: linear-gradient(180deg,#eef3ff 0%,#ffffff 100%);
+            color: #16223a;
+            padding: 50px 30px 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,10 +32,12 @@
             text-align: center;
             gap: 8px;
             position: relative;
+            border-bottom: 1px solid #eef2f8;
+            border-radius: 18px 18px 0 0;
         }
-        .cover-logo { height: 30px; width: auto; margin-bottom: 10px; }
-        .launcher-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-        .launcher-header p { font-size: 13px; color: #c3cae8; }
+        .cover-logo { height: 32px; width: auto; margin-bottom: 12px; }
+        .launcher-header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.7px; color: #16223a; }
+        .launcher-header p { font-size: 13.5px; color: #5b6b86; }
 
         .header-left {
             display: flex;
@@ -68,21 +70,22 @@
         .btn-back-portal {
             position: absolute;
             left: 24px;
-            top: 22px;
-            background-color: rgba(255, 255, 255, 0.14);
-            color: #fff;
+            top: 24px;
+            background-color: #ffffff;
+            color: #2b4d9e;
             text-decoration: none;
             padding: 7px 15px;
             border-radius: 100px;
             font-size: 13px;
             font-weight: bold;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid #dfe5f0;
             transition: all 0.2s;
             white-space: nowrap;
         }
         .btn-back-portal:hover {
-            background-color: #fff;
-            color: #2b4d9e;
+            background-color: #2b4d9e;
+            color: #fff;
+            border-color: #2b4d9e;
         }
 
         .launcher-body {
@@ -485,7 +488,7 @@
         <!-- 🟦 상단 표지 배너 -->
         <div class="launcher-header">
             <a href="index.html" class="btn-back-portal">‹ 홈으로</a>
-            <img src="logo_dowell_white.png" alt="Labor law Firm DOWELL" class="cover-logo">
+            <img src="logo_dowell_navy.png" alt="Labor law Firm DOWELL" class="cover-logo">
             <h1>아웃소싱 연간 업무 플로우</h1>
             <p>월별 급여대행 · 4대보험 정기신고 · 세무연계 · 연간 노무행정 Schedule</p>
         </div>
