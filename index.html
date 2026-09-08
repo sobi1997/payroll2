@@ -105,6 +105,25 @@
     .dropzone .dz-badge{margin-top:4px;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--blue);
         background:rgba(47,107,255,0.09);border:1px solid rgba(47,107,255,0.2);padding:5px 13px;border-radius:100px;}
 
+    /* ===== 카테고리 타일 ===== */
+    .cat-grid{position:relative;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;width:100%;max-width:880px;}
+    .cat-tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;
+        padding:30px 16px 24px;background:#fff;border:1px solid var(--card-bd);border-radius:18px;box-shadow:var(--card-sh);
+        cursor:pointer;font-family:var(--font);transition:transform .22s,box-shadow .22s,border-color .22s;}
+    .cat-tile:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(30,70,150,0.17);border-color:transparent;}
+    .cat-ico{width:56px;height:56px;display:flex;align-items:center;justify-content:center;}
+    .cat-ico svg{width:56px;height:56px;display:block;filter:drop-shadow(0 6px 11px rgba(30,70,150,0.20));}
+    .cat-name{font-size:15.5px;font-weight:700;color:var(--ink);letter-spacing:-0.3px;}
+    .cat-cnt{position:absolute;top:12px;right:13px;font-size:11px;font-weight:700;color:var(--blue);
+        background:rgba(47,107,255,0.1);border-radius:100px;padding:2px 9px;}
+    /* 드릴다운 패널 */
+    .cat-panel{position:relative;z-index:2;width:100%;max-width:960px;}
+    .cat-back{display:inline-flex;align-items:center;gap:6px;margin-bottom:18px;background:#fff;border:1px solid var(--card-bd);
+        color:var(--ink);font-family:var(--font);font-weight:600;font-size:14px;padding:8px 16px;border-radius:100px;cursor:pointer;
+        box-shadow:0 4px 14px rgba(30,70,150,0.08);transition:color .2s,border-color .2s;}
+    .cat-back:hover{color:var(--blue);border-color:var(--blue);}
+    .cat-title{font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-0.5px;margin-bottom:22px;}
+
     /* ===== 우측 도트 네비 ===== */
     .dots{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:15px;}
     .dots button{width:10px;height:10px;border-radius:50%;border:1.5px solid #b9c6da;background:transparent;cursor:pointer;padding:0;transition:all .25s;position:relative;}
@@ -130,6 +149,7 @@
         .nav-toggle{display:block;z-index:60;}
         .dots,.pageno{display:none;}
         .card-grid.cols-3,.card-grid.cols-2{grid-template-columns:1fr;max-width:460px;}
+        .cat-grid{grid-template-columns:repeat(2,1fr);max-width:420px;}
         .card{min-height:auto;}
         .hero .stats{gap:26px;}
     }
@@ -192,14 +212,38 @@
             <div class="section-head">
                 <span class="en">Calculators · Forms</span>
                 <div class="ko">계산기 · 양식</div>
-                <p class="desc">평균임금·재직일수·보험 정산 등 실무 연산을 자동으로.</p>
+                <p class="desc" id="calcDesc">카테고리를 선택하면 관련 계산기·양식이 열립니다.</p>
             </div>
-            <div class="card-grid cols-3">
-                <a class="card" href="퇴직금계산.html"><span class="en">Severance Pay</span><span class="ko">퇴직금 계산기</span><span class="sub">평균임금 산정·재직일수 기반 법정 퇴직금 자동 추산</span></a>
-                <a class="card" href="퇴직금적립내역서.html"><span class="en">Severance Reserve</span><span class="ko">퇴직금 적립 내역서</span><span class="sub">연도별·임직원별 퇴직급여 충당금 및 누적 적립 관리</span></a>
-                <a class="card" href="상시근로자수판단.html"><span class="en">Employee Count</span><span class="ko">상시근로자 수 계산</span><span class="sub">가동일수 분할 및 5인 이상 여부 법리 판단</span></a>
-                <a class="card" href="퇴사자4대보험정산.html"><span class="en">Insurance Settlement</span><span class="ko">퇴사자 4대보험 정산</span><span class="sub">중도퇴사자 건강보험·국민연금 등 중도 정산</span></a>
-                <a class="card" href="임신기근로시간단축_대상기간계산.html"><span class="en">Reduced Work Hours</span><span class="ko">임신기 근로시간단축</span><span class="sub">출산예정일 기준 12주 이내·32주 이후 대상기간 계산</span></a>
+
+            <!-- 카테고리 타일 -->
+            <div class="cat-grid" id="catGrid">
+                <button class="cat-tile" data-cat="retire">
+                    <span class="cat-cnt">2</span>
+                    <span class="cat-ico"><svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd76f"/><stop offset="1" stop-color="#ff9d2e"/></linearGradient></defs><path d="M18 8h12l-3.2 5.2C33 16 37 22 37 29c0 6-5 11-13 11s-13-5-13-11c0-7 4-13 10.2-15.8L18 8z" fill="url(#gGold)"/><text x="24" y="33" font-size="14" font-weight="800" fill="#fff" text-anchor="middle" font-family="Pretendard,sans-serif">₩</text></svg></span>
+                    <span class="cat-name">퇴직금</span>
+                </button>
+                <button class="cat-tile" data-cat="insure">
+                    <span class="cat-cnt">1</span>
+                    <span class="cat-ico"><svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6fb8ff"/><stop offset="1" stop-color="#2f6bff"/></linearGradient></defs><path d="M24 6l14 5v9c0 9-6 16-14 19-8-3-14-10-14-19v-9l14-5z" fill="url(#gBlue)"/><path d="M17 24.5l5 5 9.5-10.5" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    <span class="cat-name">4대보험</span>
+                </button>
+                <button class="cat-tile" data-cat="worker">
+                    <span class="cat-cnt">1</span>
+                    <span class="cat-ico"><svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gGreen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8be78b"/><stop offset="1" stop-color="#22b07d"/></linearGradient></defs><circle cx="18" cy="17" r="7" fill="url(#gGreen)"/><circle cx="33" cy="19" r="5.5" fill="url(#gGreen)" opacity=".7"/><path d="M5 40c0-7.2 5.5-11.5 13-11.5S31 32.8 31 40z" fill="url(#gGreen)"/><path d="M29 40c0-5 3.2-9 8.5-9 4.3 0 7.5 3 7.5 8.5" fill="url(#gGreen)" opacity=".7"/></svg></span>
+                    <span class="cat-name">근로자 관리</span>
+                </button>
+                <button class="cat-tile" data-cat="mother">
+                    <span class="cat-cnt">1</span>
+                    <span class="cat-ico"><svg viewBox="0 0 48 48" fill="none"><defs><linearGradient id="gPink" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9ecb"/><stop offset="1" stop-color="#c86bff"/></linearGradient></defs><circle cx="24" cy="24" r="17" fill="url(#gPink)"/><path d="M24 14v10.5l7 4" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    <span class="cat-name">모성보호</span>
+                </button>
+            </div>
+
+            <!-- 카테고리별 도구 목록 (드릴다운) -->
+            <div class="cat-panel" id="catPanel" hidden>
+                <button class="cat-back" id="catBack">‹ 카테고리</button>
+                <div class="cat-title" id="catTitle"></div>
+                <div class="card-grid cols-2" id="catCards"></div>
             </div>
         </section>
 
@@ -267,9 +311,9 @@
     }
     function goTo(i){
         i=Math.max(0,Math.min(sections.length-1,i));
-        if(!isDesktop()){ sections[i].scrollIntoView({behavior:'smooth'}); idx=i; render(); return; }
+        if(!isDesktop()){ closeCat(); sections[i].scrollIntoView({behavior:'smooth'}); idx=i; render(); return; }
         if(i===idx||locking) return;
-        idx=i; render();
+        closeCat(); idx=i; render();
         locking=true; setTimeout(()=>locking=false,950);
     }
 
@@ -296,6 +340,37 @@
         el.addEventListener('click',()=>{ goTo(+el.dataset.goto); document.getElementById('navLinks').classList.remove('open'); });
     });
     document.getElementById('navToggle').addEventListener('click',()=>document.getElementById('navLinks').classList.toggle('open'));
+    /* ===== 계산기·양식 카테고리 드릴다운 ===== */
+    const CATS={
+      retire:{name:'퇴직금',items:[
+        {href:'퇴직금계산.html',en:'Severance Pay',ko:'퇴직금 계산기',sub:'평균임금 산정·재직일수 기반 법정 퇴직금 자동 추산'},
+        {href:'퇴직금적립내역서.html',en:'Severance Reserve',ko:'퇴직금 적립 내역서',sub:'연도별·임직원별 퇴직급여 충당금 및 누적 적립 관리'}
+      ]},
+      insure:{name:'4대보험',items:[
+        {href:'퇴사자4대보험정산.html',en:'Insurance Settlement',ko:'퇴사자 4대보험 정산',sub:'중도퇴사자 건강보험·국민연금 등 중도 정산'}
+      ]},
+      worker:{name:'근로자 관리',items:[
+        {href:'상시근로자수판단.html',en:'Employee Count',ko:'상시근로자 수 계산',sub:'가동일수 분할 및 5인 이상 여부 법리 판단'}
+      ]},
+      mother:{name:'모성보호',items:[
+        {href:'임신기근로시간단축_대상기간계산.html',en:'Reduced Work Hours',ko:'임신기 근로시간단축',sub:'출산예정일 기준 12주 이내·32주 이후 대상기간 계산'}
+      ]}
+    };
+    const catGrid=document.getElementById('catGrid');
+    const catPanel=document.getElementById('catPanel');
+    const catCards=document.getElementById('catCards');
+    const catTitle=document.getElementById('catTitle');
+    function openCat(key){
+        const c=CATS[key]; if(!c) return;
+        catTitle.textContent=c.name;
+        catCards.className='card-grid '+(c.items.length>1?'cols-2':'single');
+        catCards.innerHTML=c.items.map(it=>'<a class="card" href="'+it.href+'"><span class="en">'+it.en+'</span><span class="ko">'+it.ko+'</span><span class="sub">'+it.sub+'</span></a>').join('');
+        catGrid.hidden=true; catPanel.hidden=false;
+    }
+    function closeCat(){ if(catPanel) catPanel.hidden=true; if(catGrid) catGrid.hidden=false; }
+    document.querySelectorAll('.cat-tile').forEach(t=>t.addEventListener('click',()=>openCat(t.dataset.cat)));
+    document.getElementById('catBack').addEventListener('click',closeCat);
+
     window.addEventListener('resize',render);
     render();
 </script>
