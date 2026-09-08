@@ -7,7 +7,7 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard','Malgun Gothic', sans-serif; }
-        body { background-color: #ffffff; padding: 34px 20px; color: #333; min-height: 100vh; display: flex; flex-direction: column; }
+        body { background: linear-gradient(180deg,#e7edf8 0%,#eef3fb 45%,#f4f7fc 100%); background-attachment: fixed; padding: 34px 20px; color: #333; min-height: 100vh; display: flex; flex-direction: column; }
 
         /* 🖥️ 메인 컨테이너 */
         .container {
@@ -23,22 +23,23 @@
 
         /* 🟦 헤더 영역 */
         .launcher-header {
-            background: linear-gradient(180deg,#eef3ff 0%,#ffffff 100%);
+            background: transparent;
             color: #16223a;
-            padding: 50px 30px 40px;
+            padding: 10px 30px 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            gap: 8px;
+            gap: 12px;
             position: relative;
-            border-bottom: 1px solid #eef2f8;
-            border-radius: 18px 18px 0 0;
         }
-        .cover-logo { height: 32px; width: auto; margin-bottom: 12px; }
-        .launcher-header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.7px; color: #16223a; }
-        .launcher-header p { font-size: 13.5px; color: #5b6b86; }
+        .cover-eyebrow {
+            font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+            color: #3a5bb5; background: rgba(43,77,158,0.08);
+            border: 1px solid rgba(43,77,158,0.16); padding: 6px 15px; border-radius: 100px;
+        }
+        .launcher-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; color: #16223a; }
 
         .header-left {
             display: flex;
@@ -141,7 +142,9 @@
         /* 📦 월별 카드 박스 기본 */
         .month-card {
             background: #ffffff;
-            border-radius: 14px;
+            border: 1px solid #e6ecf6;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(30,50,120,0.07);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -198,14 +201,17 @@
         /* 🟦 [2] 당월 (이번달) - 가장 진하고 선명한 메인 딥블루 (볼드체 완화) */
         .month-card.current-month {
             opacity: 1 !important;
-            border: 2px solid #2b4d9e !important;
-            box-shadow: 0 8px 24px rgba(58, 74, 140, 0.22) !important;
-            transform: translateY(-2px);
+            border: 1.5px solid #2b4d9e !important;
+            box-shadow: 0 16px 40px rgba(43, 77, 158, 0.28) !important;
+            transform: translateY(-3px);
         }
         .month-card.current-month .month-header {
-            background-color: #2b4d9e !important;
+            background: linear-gradient(120deg,#2b4d9e 0%,#3a5bb5 100%) !important;
             color: #ffffff !important;
-            border-bottom: 1px solid #203c7d;
+            border-bottom: none;
+        }
+        .month-card.current-month .card-body {
+            background: #f7f9ff;
         }
         /* 당월 글자 두께 자연스럽게 조정 */
         .month-card.current-month .task-desc {
@@ -288,7 +294,7 @@
 
         /* 섹션 간 깔끔한 점선 구분 */
         .sector-group + .sector-group {
-            border-top: 1px dashed #e2e8f0;
+            border-top: 1px solid #eef2f8;
             padding-top: 10px;
         }
 
@@ -355,11 +361,18 @@
             line-height: 1.4;
         }
 
+        /* 📭 등록된 일정이 없는 달 안내문 */
+        .empty-note {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 108px; color: #aeb8c9; font-size: 13px; font-weight: 500; letter-spacing: -0.2px;
+        }
+        .month-card.current-month .empty-note { color: #90a2ca; }
+
         /* 푸터 영역 */
         .footer-logo {
             text-align: right;
             margin-top: 25px;
-            border-top: 1px dashed #e2e8f0;
+            border-top: 1px solid #eef2f8;
             padding-top: 15px;
         }
         .footer-logo .maker-credit {
@@ -489,6 +502,7 @@
         <!-- 🟦 상단 표지 배너 -->
         <div class="launcher-header">
             <a href="index.html" class="btn-back-portal">‹ 홈으로</a>
+            <span class="cover-eyebrow">Annual Work Flow</span>
             <h1>아웃소싱 연간 업무 플로우</h1>
         </div>
 
@@ -795,6 +809,13 @@
             const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
 
             const monthCards = document.querySelectorAll('.month-card');
+
+            // 📭 등록된 일정이 없는 달: 안내문 표시
+            document.querySelectorAll('.card-body').forEach(function(body){
+                if(!body.textContent.trim()){
+                    body.innerHTML = '<div class="empty-note">등록된 일정 없음</div>';
+                }
+            });
 
             // 카드에 상태(색+배지) 부여/초기화 헬퍼
             function clearCardStyle(card) {
