@@ -112,18 +112,19 @@
         padding:30px 16px 24px;background:#fff;border:1px solid var(--card-bd);border-radius:18px;box-shadow:var(--card-sh);
         cursor:pointer;font-family:var(--font);transition:transform .22s,box-shadow .22s,border-color .22s;}
     .cat-tile:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(30,70,150,0.17);border-color:transparent;}
+    .cat-tile.active{border-color:var(--blue);box-shadow:0 16px 34px rgba(47,107,255,0.20);transform:translateY(-4px);background:#f6faff;}
+    .cat-tile.active .cat-cnt{background:var(--blue);color:#fff;}
     .cat-ico{width:56px;height:56px;display:flex;align-items:center;justify-content:center;}
     .cat-ico svg{width:56px;height:56px;display:block;filter:drop-shadow(0 6px 11px rgba(30,70,150,0.20));}
     .cat-name{font-size:15.5px;font-weight:700;color:var(--ink);letter-spacing:-0.3px;}
     .cat-cnt{position:absolute;top:12px;right:13px;font-size:11px;font-weight:700;color:var(--blue);
         background:rgba(47,107,255,0.1);border-radius:100px;padding:2px 9px;}
-    /* 드릴다운 패널 */
-    .cat-panel{position:relative;z-index:2;width:100%;max-width:960px;}
-    .cat-back{display:inline-flex;align-items:center;gap:6px;margin-bottom:18px;background:#fff;border:1px solid var(--card-bd);
-        color:var(--ink);font-family:var(--font);font-weight:600;font-size:14px;padding:8px 16px;border-radius:100px;cursor:pointer;
-        box-shadow:0 4px 14px rgba(30,70,150,0.08);transition:color .2s,border-color .2s;}
-    .cat-back:hover{color:var(--blue);border-color:var(--blue);}
-    .cat-title{font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-0.5px;margin-bottom:22px;}
+    /* 펼침 패널 (타일 아래로 확장) */
+    .cat-panel{position:relative;z-index:2;width:100%;max-width:960px;margin-top:26px;
+        animation:catOpen .28s cubic-bezier(.22,1,.36,1);}
+    @keyframes catOpen{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+    .cat-title{font-size:19px;font-weight:800;color:var(--ink);letter-spacing:-0.4px;margin-bottom:16px;text-align:center;}
+    .cat-cards{margin-left:auto;margin-right:auto;}
 
     /* ===== 우측 도트 네비 ===== */
     .dots{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:15px;}
@@ -242,7 +243,6 @@
 
             <!-- 카테고리별 도구 목록 (드릴다운) -->
             <div class="cat-panel" id="catPanel" hidden>
-                <button class="cat-back" id="catBack">‹ 카테고리</button>
                 <div class="cat-title" id="catTitle"></div>
                 <div class="cat-cards card-grid cols-2" id="catCards"></div>
             </div>
@@ -283,7 +283,6 @@
 
             <!-- 카테고리별 목록 (드릴다운) -->
             <div class="cat-panel" id="mailPanel" hidden>
-                <button class="cat-back">‹ 카테고리</button>
                 <div class="cat-title"></div>
                 <div class="cat-cards card-grid cols-2"></div>
             </div>
@@ -299,7 +298,7 @@
             </div>
             <div class="card-grid cols-2">
                 <a class="card" href="상담일지.html"><span class="en">Consultation Log</span><span class="ko">상담일지 양식</span><span class="sub">고객사 인바운드 상담 내역 기록·캡처·공유용 (노무법인 표준)</span></a>
-                <a class="card" href="아웃소싱 연간업무플로우.html"><span class="en">Monthly Flow</span><span class="ko">아웃소싱 월별 업무 플로우</span><span class="sub">당월·지난달·다음달 자동 강조, 월별 주요 일정 정리</span></a>
+                <a class="card" href="아웃소싱 월별업무플로우.html"><span class="en">Monthly Flow</span><span class="ko">아웃소싱 월별 업무 플로우</span><span class="sub">당월·지난달·다음달 자동 강조, 월별 주요 일정 정리</span></a>
             </div>
             <div class="credit">노무법인 두웰 · 급여 아웃소싱 실무 포털 &nbsp;|&nbsp; made by 전형섭</div>
         </section>
@@ -403,14 +402,20 @@
         const grid=sec.querySelector('.cat-grid'), panel=sec.querySelector('.cat-panel'), data=DRILL[sec.id];
         if(!grid||!panel||!data) return;
         const cards=panel.querySelector('.cat-cards'), title=panel.querySelector('.cat-title');
-        const open=(key)=>{ const c=data[key]; if(!c) return;
+        const tiles=grid.querySelectorAll('.cat-tile');
+        let activeKey=null;
+        const close=()=>{ activeKey=null; tiles.forEach(t=>t.classList.remove('active')); panel.hidden=true; };
+        const open=(key)=>{
+            if(activeKey===key){ close(); return; }              // 같은 타일 재클릭 → 접기
+            const c=data[key]; if(!c) return;
+            activeKey=key;
+            tiles.forEach(t=>t.classList.toggle('active', t.dataset.cat===key));
             title.textContent=c.name;
             cards.className='cat-cards card-grid '+(c.items.length>1?'cols-2':'single');
             cards.innerHTML=c.items.map(it=>'<a class="card" href="'+it.href+'"><span class="en">'+it.en+'</span><span class="ko">'+it.ko+'</span><span class="sub">'+it.sub+'</span></a>').join('');
-            grid.hidden=true; panel.hidden=false; };
-        const close=()=>{ panel.hidden=true; grid.hidden=false; };
-        grid.querySelectorAll('.cat-tile').forEach(t=>t.addEventListener('click',()=>open(t.dataset.cat)));
-        panel.querySelector('.cat-back').addEventListener('click',close);
+            panel.hidden=false;
+        };
+        tiles.forEach(t=>t.addEventListener('click',()=>open(t.dataset.cat)));
         drillClosers.push(close);
     });
     function closeCat(){ drillClosers.forEach(fn=>fn()); }
