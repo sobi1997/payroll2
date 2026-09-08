@@ -7,16 +7,16 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard','Malgun Gothic', sans-serif; }
-        body { background-color: #eef1f6; padding: 30px 20px; color: #333; }
+        body { background-color: #f5f7fb; padding: 40px 20px; color: #333; }
 
         /* 🖥️ 메인 컨테이너 */
         .container {
-            max-width: 1410px;   /* 두 뷰 간격 48px에서도 카드 폭을 기존(≈420px) 그대로 유지 */
+            max-width: 1410px;
             margin: 0 auto;
             background: #fff;
-            border: 1px solid #cfd8dc;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
-            border-radius: 8px;
+            border: 1px solid #eef2f8;
+            box-shadow: 0 20px 55px rgba(30,50,120,0.10);
+            border-radius: 20px;
             overflow: hidden;
         }
 
@@ -86,16 +86,17 @@
         }
 
         .launcher-body {
-            padding: 25px;
+            padding: 30px 30px 34px;
         }
 
         /* 📢 안내 및 상시 업무 요약 박스 */
         .portal-notice-box {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 16px 20px;
-            margin-bottom: 25px;
+            background-color: #f5f7fb;
+            border: 1px solid #eef2f8;
+            border-left: 4px solid #2b4d9e;
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin-bottom: 28px;
             font-size: 13px;
             color: #475569;
             line-height: 1.6;
@@ -136,7 +137,7 @@
         /* 📦 월별 카드 박스 기본 */
         .month-card {
             background: #ffffff;
-            border-radius: 8px;
+            border-radius: 14px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -149,9 +150,9 @@
 
         /* ▫️ [1] 나머지 9개 달 (비활성 기본) - 연하게 처리 */
         .month-card.other-month {
-            opacity: 0.45;
-            border: 1px solid #e2e8f0;
-            background-color: #fafafa;
+            opacity: 0.5;
+            border: 1px solid #eef2f8;
+            background-color: #fbfcfe;
         }
         .month-card.other-month .month-header {
             background-color: #f1f5f9;
@@ -319,10 +320,10 @@
             font-size: 11px;
             font-weight: bold;
             color: #475569;
-            background-color: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            padding: 1px 5px;
-            border-radius: 3px;
+            background-color: #eef2f8;
+            border: 1px solid #dfe5f0;
+            padding: 2px 7px;
+            border-radius: 8px;
             flex-shrink: 0;
             margin-top: 1px;
             transition: all 0.2s;
