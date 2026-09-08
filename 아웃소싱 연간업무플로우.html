@@ -7,12 +7,13 @@
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard','Malgun Gothic', sans-serif; }
-        body { background-color: #ffffff; padding: 34px 20px; color: #333; }
+        body { background-color: #ffffff; padding: 34px 20px; color: #333; min-height: 100vh; display: flex; flex-direction: column; }
 
         /* 🖥️ 메인 컨테이너 */
         .container {
             max-width: 1410px;
-            margin: 0 auto;
+            width: 100%;
+            margin: auto;
             background: transparent;
             border: none;
             box-shadow: none;
@@ -246,21 +247,21 @@
 
         /* 월 헤더 공통 */
         .month-header {
-            padding: 12px 16px;
-            font-size: 16px;
+            padding: 13px 16px;
+            font-size: 17px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         .month-header .month-num {
-            font-size: 17px;
+            font-size: 18px;
             letter-spacing: -0.5px;
         }
 
         /* 🏷️ 상태 알약 배지 */
         .status-badge {
-            font-size: 11px;
+            font-size: 12px;
             padding: 2px 8px;
             border-radius: 4px;
             font-weight: bold;
@@ -292,7 +293,7 @@
         }
 
         .sector-title {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             color: #475569;
             display: flex;
@@ -310,8 +311,8 @@
         }
 
         .task-item {
-            font-size: 13px;
-            line-height: 1.45;
+            font-size: 14px;
+            line-height: 1.5;
             letter-spacing: -0.4px;
             display: flex;
             align-items: flex-start;
@@ -320,7 +321,7 @@
 
         /* 단정한 날짜 태그 */
         .date-badge {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             color: #475569;
             background-color: #eef2f8;
@@ -345,7 +346,7 @@
 
         /* 🔢 급여 · 소싱 업무용 번호 표기 (배지 없이 ①②③) */
         .task-num {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
             color: #64748b;
             flex-shrink: 0;
@@ -489,7 +490,6 @@
         <div class="launcher-header">
             <a href="index.html" class="btn-back-portal">‹ 홈으로</a>
             <h1>아웃소싱 연간 업무 플로우</h1>
-            <p>월별 급여대행 · 4대보험 정기신고 · 세무연계 · 연간 노무행정 Schedule</p>
         </div>
 
         <div class="launcher-body">
