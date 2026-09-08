@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>노무법인 두웰 - 아웃소싱 연간 업무 플로우</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Malgun Gothic', sans-serif; }
-        body { background-color: #f4f6f9; padding: 30px 20px; color: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard','Malgun Gothic', sans-serif; }
+        body { background-color: #eef1f6; padding: 30px 20px; color: #333; }
 
         /* 🖥️ 메인 컨테이너 */
         .container {
@@ -21,14 +22,20 @@
 
         /* 🟦 헤더 영역 */
         .launcher-header {
-            background-color: #0d47a1;
+            background: linear-gradient(125deg,#3a4a8c 0%,#2e3c73 100%);
             color: #fff;
-            padding: 30px;
+            padding: 44px 30px 36px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            gap: 20px;
+            justify-content: center;
+            text-align: center;
+            gap: 8px;
+            position: relative;
         }
+        .cover-logo { height: 30px; width: auto; margin-bottom: 10px; }
+        .launcher-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+        .launcher-header p { font-size: 13px; color: #c3cae8; }
 
         .header-left {
             display: flex;
@@ -37,7 +44,7 @@
         }
 
         .header-icon {
-            fill: #90caf9;
+            fill: #b9c2e6;
             width: 44px;
             height: 44px;
             flex-shrink: 0;
@@ -54,16 +61,19 @@
 
         .header-text p {
             font-size: 13px;
-            color: #90caf9;
+            color: #b9c2e6;
         }
 
         /* 메인 포털 이동 버튼 */
         .btn-back-portal {
-            background-color: rgba(255, 255, 255, 0.15);
+            position: absolute;
+            left: 24px;
+            top: 22px;
+            background-color: rgba(255, 255, 255, 0.14);
             color: #fff;
             text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 7px 15px;
+            border-radius: 100px;
             font-size: 13px;
             font-weight: bold;
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -72,7 +82,7 @@
         }
         .btn-back-portal:hover {
             background-color: #fff;
-            color: #0d47a1;
+            color: #3a4a8c;
         }
 
         .launcher-body {
@@ -91,7 +101,7 @@
             line-height: 1.6;
         }
         .portal-notice-box strong {
-            color: #0d47a1;
+            color: #3a4a8c;
         }
         .routine-tasks {
             display: flex;
@@ -159,15 +169,15 @@
         /* ✨ [수정] 마우스 올리면 지난달/다음달 스타일(파란 톤 + 또렷한 글씨)로 선명해짐 */
         .month-card.other-month:hover {
             opacity: 1 !important;
-            border: 1.5px solid #60a5fa !important;
-            box-shadow: 0 4px 14px rgba(96, 165, 250, 0.22) !important;
+            border: 1.5px solid #a7b0dd !important;
+            box-shadow: 0 4px 14px rgba(140, 150, 205, 0.22) !important;
             background-color: #ffffff !important;
             transform: translateY(-2px);
         }
         .month-card.other-month:hover .month-header {
-            background-color: #dbeafe !important;
-            color: #1e40af !important;
-            border-bottom: 1px solid #bfdbfe;
+            background-color: #e6e9f6 !important;
+            color: #3a4a8c !important;
+            border-bottom: 1px solid #d6dbf0;
         }
         .month-card.other-month:hover .task-desc {
             color: #1e293b !important;
@@ -176,21 +186,21 @@
         .month-card.other-month:hover .date-badge {
             opacity: 1 !important;
             background-color: #ffffff;
-            border-color: #93c5fd;
-            color: #1d4ed8;
+            border-color: #c3cae8;
+            color: #3a4a8c;
         }
 
         /* 🟦 [2] 당월 (이번달) - 가장 진하고 선명한 메인 딥블루 (볼드체 완화) */
         .month-card.current-month {
             opacity: 1 !important;
-            border: 2px solid #0d47a1 !important;
-            box-shadow: 0 8px 24px rgba(13, 71, 161, 0.22) !important;
+            border: 2px solid #3a4a8c !important;
+            box-shadow: 0 8px 24px rgba(58, 74, 140, 0.22) !important;
             transform: translateY(-2px);
         }
         .month-card.current-month .month-header {
-            background-color: #0d47a1 !important;
+            background-color: #3a4a8c !important;
             color: #ffffff !important;
-            border-bottom: 1px solid #0a3880;
+            border-bottom: 1px solid #2e3c73;
         }
         /* 당월 글자 두께 자연스럽게 조정 */
         .month-card.current-month .task-desc {
@@ -201,13 +211,13 @@
         /* 🔷 [3] 지난달 - 소프트 파란색 톤 */
         .month-card.prev-month {
             opacity: 0.95 !important;
-            border: 1.5px solid #93c5fd !important;
-            box-shadow: 0 4px 12px rgba(147, 197, 253, 0.2) !important;
+            border: 1.5px solid #c3cae8 !important;
+            box-shadow: 0 4px 12px rgba(150, 160, 210, 0.2) !important;
         }
         .month-card.prev-month .month-header {
-            background-color: #eff6ff !important;
-            color: #1d4ed8 !important;
-            border-bottom: 1px solid #dbeafe;
+            background-color: #f2f4fb !important;
+            color: #3a4a8c !important;
+            border-bottom: 1px solid #e6e9f6;
         }
         .month-card.prev-month .task-desc {
             color: #334155 !important;
@@ -217,13 +227,13 @@
         /* 🔷 [4] 다음달 - 소프트 파란색 톤 */
         .month-card.next-month {
             opacity: 0.95 !important;
-            border: 1.5px solid #60a5fa !important;
-            box-shadow: 0 4px 12px rgba(96, 165, 250, 0.22) !important;
+            border: 1.5px solid #a7b0dd !important;
+            box-shadow: 0 4px 12px rgba(140, 150, 205, 0.22) !important;
         }
         .month-card.next-month .month-header {
-            background-color: #dbeafe !important;
-            color: #1e40af !important;
-            border-bottom: 1px solid #bfdbfe;
+            background-color: #e6e9f6 !important;
+            color: #3a4a8c !important;
+            border-bottom: 1px solid #d6dbf0;
         }
         .month-card.next-month .task-desc {
             color: #1e293b !important;
@@ -252,9 +262,9 @@
             font-weight: bold;
             letter-spacing: -0.3px;
         }
-        .badge-current { background-color: #ffffff; color: #0d47a1; border: 1px solid #90caf9; }
-        .badge-prev { background-color: #ffffff; color: #2563eb; border: 1px solid #bfdbfe; }
-        .badge-next { background-color: #ffffff; color: #1d4ed8; border: 1px solid #93c5fd; }
+        .badge-current { background-color: #ffffff; color: #3a4a8c; border: 1px solid #b9c2e6; }
+        .badge-prev { background-color: #ffffff; color: #4a5aa0; border: 1px solid #d6dbf0; }
+        .badge-next { background-color: #ffffff; color: #3a4a8c; border: 1px solid #c3cae8; }
 
         /* 🗂️ 카드 내부 깔끔한 섹터 구분 */
         .card-body {
@@ -325,8 +335,8 @@
         .month-card.current-month .date-badge,
         .month-card.next-month .date-badge {
             background-color: #ffffff;
-            border-color: #93c5fd;
-            color: #1d4ed8;
+            border-color: #c3cae8;
+            color: #3a4a8c;
         }
 
         /* 🔢 급여 · 소싱 업무용 번호 표기 (배지 없이 ①②③) */
@@ -375,7 +385,7 @@
             border: none;
             background: transparent;
             padding: 0;
-            color: #0d47a1;
+            color: #3a4a8c;
             font-size: 34px;
             line-height: 1;
             font-weight: 900;
@@ -390,7 +400,7 @@
         #navPrev { left: calc((100% - 96px) / 3 + 24px); }
         #navNext { left: calc((100% - 96px) / 3 * 2 + 72px); }
         .nav-arrow:hover {
-            color: #08306b;
+            color: #2a3568;
             transform: translate(-50%, -50%) scale(1.25);
         }
         /* 전체 보기 모드에선 화살표 숨김 */
@@ -415,7 +425,7 @@
             cursor: default;
         }
         .nav-arrow:disabled:hover {
-            color: #0d47a1;
+            color: #3a4a8c;
             transform: translate(-50%, -50%);
         }
 
@@ -428,15 +438,15 @@
             align-items: center;
             gap: 8px;
             background: #ffffff;
-            color: #0d47a1;
-            border: 1.5px solid #bfdbfe;
+            color: #3a4a8c;
+            border: 1.5px solid #d6dbf0;
             padding: 10px 26px;
             border-radius: 999px;
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             letter-spacing: -0.2px;
-            box-shadow: 0 2px 10px rgba(13, 71, 161, 0.10);
+            box-shadow: 0 2px 10px rgba(58, 74, 140, 0.10);
             transition: all 0.18s;
         }
         .view-toggle-btn::before {
@@ -449,10 +459,10 @@
             font-size: 20px;
         }
         .view-toggle-btn:hover {
-            background: #0d47a1;
+            background: #3a4a8c;
             color: #fff;
-            border-color: #0d47a1;
-            box-shadow: 0 8px 20px rgba(13, 71, 161, 0.28);
+            border-color: #3a4a8c;
+            box-shadow: 0 8px 20px rgba(58, 74, 140, 0.28);
             transform: translateY(-1px);
         }
 
@@ -471,17 +481,12 @@
 
     <div class="container">
 
-        <!-- 🟦 상단 헤더 -->
+        <!-- 🟦 상단 표지 배너 -->
         <div class="launcher-header">
-            <div class="header-left">
-                <svg class="header-icon" viewBox="0 0 24 24">
-                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/>
-                </svg>
-                <div class="header-text">
-                    <h1>노무법인 두웰 - 아웃소싱 연간 업무 플로우</h1>
-                    <p>월별 주요 급여대행 · 4대보험 정기신고 · 세무연계 · 연간 노무행정 Schedule</p>
-                </div>
-            </div>
+            <a href="index.html" class="btn-back-portal">‹ 홈으로</a>
+            <img src="logo_dowell_white.png" alt="Labor law Firm DOWELL" class="cover-logo">
+            <h1>아웃소싱 연간 업무 플로우</h1>
+            <p>월별 급여대행 · 4대보험 정기신고 · 세무연계 · 연간 노무행정 Schedule</p>
         </div>
 
         <div class="launcher-body">
