@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>노무법인 두웰 - 연간 일정</title>
+    <title>노무법인 두웰 - 월간 일정</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard','Malgun Gothic', sans-serif; }
@@ -501,8 +501,8 @@
         <!-- 🟦 상단 표지 배너 -->
         <div class="launcher-header">
             <a href="index.html" class="btn-back-portal">‹ 홈으로</a>
-            <span class="cover-eyebrow">Annual Schedule</span>
-            <h1>연간 일정</h1>
+            <span class="cover-eyebrow">Monthly Schedule</span>
+            <h1>월간 일정</h1>
         </div>
 
         <div class="launcher-body">
@@ -911,17 +911,25 @@
             }
 
             function render() {
+                const titleEl = document.querySelector('.launcher-header h1');
+                const eyebrowEl = document.querySelector('.cover-eyebrow');
                 if (viewMode === 'all') {
                     wrapper.classList.add('mode-all');
                     toggleBtn.textContent = '돌아가기';
                     toggleBtn.classList.add('mode-back');
                     grid.style.transition = '';
                     grid.style.transform = '';
+                    if (titleEl) titleEl.textContent = '연간 일정';
+                    if (eyebrowEl) eyebrowEl.textContent = 'Annual Schedule';
+                    document.title = '노무법인 두웰 - 연간 일정';
                     styleAll();
                 } else {
                     wrapper.classList.remove('mode-all');
                     toggleBtn.textContent = '전체 월';
                     toggleBtn.classList.remove('mode-back');
+                    if (titleEl) titleEl.textContent = '월간 일정';
+                    if (eyebrowEl) eyebrowEl.textContent = 'Monthly Schedule';
+                    document.title = '노무법인 두웰 - 월간 일정';
                     styleCompact();
                     updateRange();
                     positionTrack(false); // 초기/모드 전환 시엔 애니메이션 없이 위치만
