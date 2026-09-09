@@ -9,10 +9,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <style>
         :root {
-            --primary-color: #1e3a8a;
-            --primary-hover: #1d4ed8;
-            --bg-color: #f8fafc;
-            --border-color: #e2e8f0;
+            --primary-color: #2b4d9e;
+            --primary-hover: #203c7d;
+            --bg-color: #edf1f9;
+            --border-color: #e6ecf6;
             --text-color: #334155;
         }
 
@@ -30,6 +30,8 @@
         .container { display: flex; width: 100%; max-width: 1400px; gap: 24px; height: calc(100vh - 40px); }
         .panel { flex: 1; background: white; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .panel-header { padding: 18px 24px; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 16px; background: #fafafa; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; }
+        .hdr-home { font-size: 12.5px; font-weight: 600; color: var(--primary-color); text-decoration: none; padding: 5px 13px; border: 1px solid var(--border-color); border-radius: 100px; white-space: nowrap; transition: all .15s; }
+        .hdr-home:hover { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
         .panel-body { padding: 24px; overflow-y: auto; flex: 1; }
         /* 3단 탭 스타일 */
         .tab-container { display: flex; gap: 4px; padding: 12px 24px 0 24px; background: #fafafa; }
@@ -102,7 +104,7 @@
 <body>
 <div class="container">
     <div class="panel">
-        <div class="panel-header" style="border-bottom: none; padding-bottom: 6px;">소득/보수총액신고 세무요청 양식</div>
+        <div class="panel-header" style="border-bottom: none; padding-bottom: 6px;"><span>소득/보수총액신고 세무요청 양식</span><a href="index.html" class="hdr-home">‹ 홈으로</a></div>
 
         <div class="tab-container">
             <div id="tabInitial" class="tab-btn active" onclick="switchTab('initial')">5월(일반/성실)</div>
