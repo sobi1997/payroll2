@@ -47,7 +47,11 @@
         .eyebrow{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--blue); }
         .app-header h1{ font-size:clamp(23px,2.6vw,31px); font-weight:800; letter-spacing:-1px; margin:9px 0 6px; line-height:1.2; color:#2f6bff; }
         .app-header h1 .g{ color:#2f6bff; }
-        .app-header h1 .cat{ display:block; font-size:0.8em; font-weight:700; color:#5b6b86; letter-spacing:-0.2px; margin-bottom:5px; }
+        .app-header .h-top{ text-align:left; margin-bottom:8px; }
+        .app-header .h-top .back{ position:static; top:auto; left:auto; }
+        .app-header .ttl{ position:relative; }
+        .app-header .ttl h1{ margin:0; }
+        .app-header .ttl .cat{ position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:0.86em; font-weight:700; color:#5b6b86; letter-spacing:-0.2px; white-space:nowrap; }
         .app-header .sub{ color:var(--muted); font-size:14px; font-weight:500; margin:0; }
 
         /* ===== 2단 패널 ===== */
@@ -94,7 +98,7 @@
         .mail-card{ background:#fff; border:1px solid var(--card-bd); border-radius:16px; padding:20px; box-shadow:0 6px 18px rgba(30,70,150,0.06); margin-bottom:16px; }
         .mail-card:last-child{ margin-bottom:0; }
         .mail-card-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--card-bd); }
-        .mail-tag{ display:flex; align-items:center; gap:7px; font-weight:800; font-size:13px; color:var(--royal); }
+        .mail-tag{ display:flex; align-items:center; gap:7px; font-weight:800; font-size:13px; color:var(--blue); }
         .copy-btn{ background:#2f6bff; color:#fff; border:none; padding:8px 17px; border-radius:100px; font-size:12.5px; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(47,107,255,0.18); transition:transform .15s, box-shadow .15s, background .15s; white-space:nowrap; }
         .copy-btn:hover{ transform:translateY(-1px); background:#1b4dd1; box-shadow:0 8px 18px rgba(47,107,255,0.26); }
         .copy-btn.copied{ background:#10b981 !important; box-shadow:none !important; }
@@ -128,8 +132,8 @@
 <body>
 
     <header class="app-header">
-        <a href="index.html" class="back" onclick="if(history.length>1){history.back();return false;}">‹ 이전</a>
-        <h1><span class="cat">신규업체</span>기초요청자료</h1>
+        <div class="h-top"><a href="index.html" class="back" onclick="if(history.length>1){history.back();return false;}">‹ 이전</a></div>
+        <div class="ttl"><span class="cat">신규업체</span><h1>기초요청자료</h1></div>
     </header>
 
     <div class="container">
@@ -225,7 +229,7 @@
 
                 <div class="mail-card">
                     <div class="mail-card-top">
-                        <span class="mail-tag">✉️ 메일 제목</span>
+                        <span class="mail-tag">메일 제목</span>
                         <button class="copy-btn" onclick="copyText('mailSubject', this, '제목 복사')">제목 복사</button>
                     </div>
                     <div id="mailSubject" class="subject-text"></div>
@@ -233,7 +237,7 @@
 
                 <div class="mail-card">
                     <div class="mail-card-top">
-                        <span class="mail-tag">📄 메일 본문</span>
+                        <span class="mail-tag">메일 본문</span>
                         <button class="copy-btn" onclick="copyText('mailPreview', this, '본문 복사')">본문 복사</button>
                     </div>
                     <div id="mailPreview" class="mail-wrapper"></div>

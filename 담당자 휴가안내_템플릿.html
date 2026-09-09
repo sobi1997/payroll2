@@ -33,7 +33,11 @@
         .app-header .back:hover{ background:var(--primary-color); color:#fff; border-color:var(--primary-color); }
         .app-header h1{ font-size:clamp(22px,2.5vw,30px); font-weight:800; letter-spacing:-1px; margin:0; color:#2f6bff; }
         .app-header h1 .g{ color:#2f6bff; }
-        .app-header h1 .cat{ display:block; font-size:0.8em; font-weight:700; color:#5b6b86; letter-spacing:-0.2px; margin-bottom:5px; }
+        .app-header .h-top{ text-align:left; margin-bottom:8px; }
+        .app-header .h-top .back{ position:static; top:auto; left:auto; }
+        .app-header .ttl{ position:relative; }
+        .app-header .ttl h1{ margin:0; }
+        .app-header .ttl .cat{ position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:0.86em; font-weight:700; color:#5b6b86; letter-spacing:-0.2px; white-space:nowrap; }
         .p-label{ display:flex; align-items:center; gap:9px; color:#16223a; }
         .p-num{ width:24px; height:24px; border-radius:50%; background:#2f6bff; color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
         @media (max-width:860px){ body{height:auto;} .container{flex-direction:column; min-height:0;} .panel{min-height:70vh;} .app-header .back{position:static; margin-bottom:12px;} }
@@ -89,8 +93,8 @@
 </head>
 <body>
     <header class="app-header">
-        <a href="index.html" class="back" onclick="if(history.length>1){history.back();return false;}">‹ 이전</a>
-        <h1><span class="cat">기타</span>담당자 휴가 안내</h1>
+        <div class="h-top"><a href="index.html" class="back" onclick="if(history.length>1){history.back();return false;}">‹ 이전</a></div>
+        <div class="ttl"><span class="cat">기타</span><h1>담당자 휴가 안내</h1></div>
     </header>
 
     <div class="container">
