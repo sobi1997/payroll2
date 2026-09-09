@@ -424,7 +424,7 @@
 
     // 🔙 도구로 이동 직전 상태 저장 → "이전"(뒤로가기)으로 돌아오면 그 화면 복원
     document.addEventListener('click',function(e){
-        const a=e.target.closest('.cat-cards a.card');
+        const a=e.target.closest('a.card');
         if(a){ try{ sessionStorage.setItem('portalReturn', JSON.stringify({idx:idx, sec:curOpen.sec, key:curOpen.key})); }catch(_){} }
     });
     function restorePortalState(){
