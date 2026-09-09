@@ -167,7 +167,7 @@
         <a data-goto="1">통합노무관리</a>
         <a data-goto="2">계산기 · 양식</a>
         <a data-goto="3">메일 템플릿</a>
-        <a data-goto="4">상담일지 · 일정</a>
+        <a data-goto="4">기타</a>
     </div>
 </nav>
 
@@ -181,12 +181,12 @@
             <div class="inner">
                 <span class="eyebrow"><span class="dot"></span>Payroll Outsourcing</span>
                 <h1>급여 아웃소싱 실무를<br><span class="g">한 곳에서, 빠르고 정확하게</span></h1>
-                <p class="sub">노무법인 두웰 급여 아웃소싱 실무 포털 · 통합노무관리 · 계산기·양식 · 메일 템플릿 · 상담일지·일정을 한 곳에</p>
+                <p class="sub">노무법인 두웰 급여 아웃소싱 실무 포털 · 통합노무관리 · 계산기·양식 · 메일 템플릿 · 기타를 한 곳에</p>
                 <div class="cta" data-goto="1">실무 도구 보기 <span style="font-size:18px;">↓</span></div>
                 <div class="stats">
                     <div class="st"><b>5</b><span>실무 계산기</span></div>
                     <div class="st"><b>4</b><span>메일 템플릿</span></div>
-                    <div class="st"><b>3</b><span>상담일지 · 일정</span></div>
+                    <div class="st"><b>2</b><span>기타</span></div>
                 </div>
             </div>
             <div class="scroll-cue" data-goto="1">SCROLL<span class="chev"></span></div>
@@ -292,13 +292,13 @@
         <section class="section" id="form">
             <div class="blob blob-a" style="bottom:-220px;left:-160px;opacity:.38;"></div>
             <div class="section-head">
-                <span class="en">Consultation · Schedule</span>
-                <div class="ko">상담일지 · 일정</div>
-                <p class="desc">상담일지 작성양식과 월간·연간 일정을 한 곳에.</p>
+                <span class="en">Others</span>
+                <div class="ko">기타</div>
+                <p class="desc">월간·연간 일정과 상담일지 등 기타 실무 자료.</p>
             </div>
             <div class="card-grid cols-2">
-                <a class="card" href="상담일지.html"><span class="en">Consultation Log</span><span class="ko">상담일지 양식</span><span class="sub">고객사 인바운드 상담 내역 기록·캡처·공유용 (노무법인 표준)</span></a>
                 <a class="card" href="연간일정.html"><span class="en">Monthly · Annual</span><span class="ko">월간 · 연간 일정</span><span class="sub">3개월 보기(월간) · 전체 펼치면 12개월(연간) 일정 정리</span></a>
+                <a class="card" href="상담일지.html"><span class="en">Consultation Log</span><span class="ko">상담일지 양식</span><span class="sub">고객사 인바운드 상담 내역 기록·캡처·공유용 (노무법인 표준)</span></a>
             </div>
             <div class="credit">노무법인 두웰 · 급여 아웃소싱 실무 포털 &nbsp;|&nbsp; made by 전형섭</div>
         </section>
@@ -314,7 +314,7 @@
     const nav=document.getElementById('nav');
     const links=Array.from(document.querySelectorAll('.nav-links a'));
     const sections=Array.from(document.querySelectorAll('.section'));
-    const labels=['홈','통합노무관리','계산기 · 양식','메일 템플릿','상담일지 · 일정'];
+    const labels=['홈','통합노무관리','계산기 · 양식','메일 템플릿','기타'];
     let idx=0, locking=false;
     const isDesktop=()=>window.matchMedia('(min-width:901px)').matches;
 
