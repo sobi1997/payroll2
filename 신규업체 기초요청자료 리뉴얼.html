@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>노무법인 두웰 · 신규업체 기초요청자료</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- 이메일 미리보기 전용 폰트(실제 발송 메일과 동일) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- UI 전용 폰트(포털과 동일) -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <style>
+        :root{
+            --ink:#16223a; --muted:#5b6b86;
+            --blue:#2f6bff; --blue-deep:#1b4dd1; --royal:#2b4d9e; --mint:#12c2a0;
+            --grad:linear-gradient(120deg,#2f6bff 0%,#12c2a0 100%);
+            --card:#ffffff; --card-bd:#e6eef8; --sh:0 12px 34px rgba(30,70,150,0.10);
+            --ui:'Pretendard',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+        }
+        *{box-sizing:border-box;}
+        html,body{margin:0;}
+        /* UI는 Pretendard, 이메일 미리보기 내부만 Noto Sans KR 유지 */
+        body,input,button,select,textarea{ font-family:var(--ui); }
+        body{
+            color:var(--ink);
+            background:
+                radial-gradient(1100px 460px at 82% -8%, #e2ebff 0%, transparent 62%),
+                radial-gradient(900px 420px at -5% 108%, #dcf5ec 0%, transparent 60%),
+                linear-gradient(180deg,#eef3fb 0%,#f5f8fd 100%);
+            background-attachment: fixed;
+            min-height:100vh; padding:24px; letter-spacing:-0.3px;
+            -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+            display:flex; flex-direction:column;
+        }
+
+        /* ===== 상단 브랜드 헤더 ===== */
+        .app-header{ position:relative; width:100%; max-width:1360px; margin:2px auto 20px; text-align:center; padding:4px 8px 0; }
+        .app-header .back{
+            position:absolute; left:0; top:0; display:inline-flex; align-items:center; gap:4px;
+            background:#fff; color:var(--royal); text-decoration:none; font-size:13px; font-weight:700;
+            padding:8px 15px; border-radius:100px; border:1px solid var(--card-bd);
+            box-shadow:0 4px 14px rgba(30,70,150,0.08); transition:all .18s;
+        }
+        .app-header .back:hover{ background:var(--royal); color:#fff; border-color:var(--royal); }
+        .eyebrow{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--blue); }
+        .app-header h1{ font-size:clamp(23px,2.6vw,31px); font-weight:800; letter-spacing:-1px; margin:9px 0 6px; line-height:1.2; }
+        .app-header h1 .g{ background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+        .app-header .sub{ color:var(--muted); font-size:14px; font-weight:500; margin:0; }
+
+        /* ===== 2단 패널 ===== */
+        .container{ display:flex; gap:22px; width:100%; max-width:1360px; margin:0 auto; flex:1; min-height:0; }
+        .panel{ flex:1; background:var(--card); border:1px solid var(--card-bd); border-radius:20px; box-shadow:var(--sh); display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+        .panel-top{ padding:16px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid var(--card-bd); }
+        .p-label{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:15px; color:var(--ink); }
+        .p-num{ width:25px; height:25px; border-radius:50%; background:var(--grad); color:#fff; font-size:12.5px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .p-hint{ font-size:12px; color:var(--muted); font-weight:500; }
+        .panel-body{ padding:22px; overflow-y:auto; flex:1; }
+        .preview-body{ background:#eef2f9; }
+
+        /* ===== 입력 필드 ===== */
+        .field{ margin-bottom:18px; }
+        .field > label{ display:block; font-weight:700; font-size:13.5px; color:var(--ink); margin-bottom:7px; }
+        .req{ color:#ef4444; font-weight:800; margin-left:3px; }
+        .input-text{ width:100%; padding:12px 14px; border:1.5px solid var(--card-bd); border-radius:12px; font-size:14px; color:var(--ink); background:#fff; transition:border-color .15s, box-shadow .15s; }
+        .input-text::placeholder{ color:#aab6cc; }
+        .input-text:focus{ outline:none; border-color:var(--blue); box-shadow:0 0 0 4px rgba(47,107,255,0.12); }
+        .input-warn-msg{ display:none !important; }
+
+        /* ===== 체크리스트 섹션 ===== */
+        .section-box{ border:1px solid var(--card-bd); border-radius:16px; padding:18px; margin-bottom:18px; background:#f7faff; }
+        .section-box:last-child{ margin-bottom:0; }
+        .section-title{ display:flex; align-items:center; gap:9px; font-weight:800; font-size:14px; color:var(--royal); margin-bottom:14px; }
+        .section-title .chip{ width:22px; height:22px; border-radius:7px; background:rgba(43,77,158,0.10); color:var(--royal); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .sortable-list{ display:flex; flex-direction:column; gap:8px; }
+        .sort-item{ display:flex; align-items:center; gap:9px; background:#fff; border:1px solid var(--card-bd); padding:9px 12px; border-radius:12px; cursor:grab; transition:border-color .15s, box-shadow .15s; }
+        .sort-item:hover{ border-color:#cdd9f0; box-shadow:0 4px 12px rgba(30,70,150,0.06); }
+        .sort-item:active{ cursor:grabbing; }
+        .drag-handle{ color:#b3c0d8; font-size:15px; user-select:none; }
+        .sort-item input[type="checkbox"]{ width:17px; height:17px; accent-color:var(--blue); cursor:pointer; flex-shrink:0; }
+        .item-input{ flex:1; border:none; background:transparent; font-family:var(--ui); font-size:14px; color:var(--ink); outline:none; letter-spacing:-0.3px; padding:2px 4px; }
+        .item-input:focus{ background:#eef4ff; border-radius:6px; }
+        .del-btn{ background:none; border:none; color:#c3ccdb; cursor:pointer; font-size:17px; line-height:1; padding:0 2px; transition:color .15s; }
+        .del-btn:hover{ color:#ef4444; }
+        .add-input-box{ display:flex; gap:8px; margin-top:12px; }
+        .add-input{ flex:1; padding:10px 12px; border:1.5px solid var(--card-bd); border-radius:10px; font-size:13px; color:var(--ink); background:#fff; }
+        .add-input:focus{ outline:none; border-color:var(--blue); }
+        .add-submit-btn{ background:var(--royal); color:#fff; border:none; padding:0 18px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:background .15s; }
+        .add-submit-btn:hover{ background:var(--blue-deep); }
+
+        /* ===== 메일 카드 (미리보기) ===== */
+        .mail-card{ background:#fff; border:1px solid var(--card-bd); border-radius:16px; padding:20px; box-shadow:0 6px 18px rgba(30,70,150,0.06); margin-bottom:16px; }
+        .mail-card:last-child{ margin-bottom:0; }
+        .mail-card-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--card-bd); }
+        .mail-tag{ display:flex; align-items:center; gap:7px; font-weight:800; font-size:13px; color:var(--royal); }
+        .copy-btn{ background:var(--grad); color:#fff; border:none; padding:8px 17px; border-radius:100px; font-size:12.5px; font-weight:700; cursor:pointer; box-shadow:0 6px 16px rgba(47,107,255,0.25); transition:transform .15s, box-shadow .15s; white-space:nowrap; }
+        .copy-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(47,107,255,0.32); }
+        .copy-btn.copied{ background:#10b981 !important; box-shadow:none !important; }
+
+        /* 이메일 콘텐츠 폰트 = Noto Sans KR (실제 발송 메일과 동일하게 유지) */
+        .subject-text{ font-family:'Noto Sans KR', sans-serif !important; font-size:14px !important; font-weight:600; color:#1e293b; letter-spacing:-0.3px; word-break:break-all; padding:2px 0; }
+        .mail-wrapper{ font-family:'Noto Sans KR', sans-serif !important; font-size:14px !important; line-height:1.6 !important; }
+        .mail-wrapper *{ font-family:'Noto Sans KR', sans-serif !important; font-size:14px !important; letter-spacing:-0.3px !important; }
+
+        /* ===== 복사 차단 모달 ===== */
+        .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); align-items:center; justify-content:center; z-index:1000; }
+        .modal-overlay.show{ display:flex; }
+        .modal-card{ background:#fff; border-radius:18px; padding:30px 28px 24px; width:330px; text-align:center; box-shadow:0 24px 55px rgba(15,23,42,0.30); }
+        .modal-icon{ font-size:34px; margin-bottom:10px; line-height:1; }
+        .modal-title{ font-weight:800; font-size:17px; color:var(--ink); margin-bottom:6px; }
+        .modal-desc{ font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.5; }
+        .modal-list{ list-style:none; padding:0; margin:0 0 22px; text-align:left; }
+        .modal-list li{ font-size:13.5px; color:#ef4444; font-weight:700; padding:4px 0; }
+        .modal-list li::before{ content:"• "; }
+        .modal-close-btn{ background:var(--grad); color:#fff; border:none; padding:11px 28px; border-radius:100px; font-weight:700; font-size:14px; cursor:pointer; box-shadow:0 8px 20px rgba(47,107,255,0.28); }
+
+        /* ===== 반응형(좁을 때 세로 스택) ===== */
+        @media (max-width:860px){
+            body{ height:auto; }
+            .container{ flex-direction:column; min-height:0; }
+            .panel{ min-height:70vh; }
+            .app-header .back{ position:static; margin-bottom:14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <a href="index.html" class="back">‹ 홈으로</a>
+        <span class="eyebrow">New Client · 기초요청</span>
+        <h1>신규업체 <span class="g">기초요청자료</span></h1>
+        <p class="sub">사업장 정보만 입력하면 대행약정·기초정보 요청 메일이 완성됩니다.</p>
+    </header>
+
+    <div class="container">
+        <!-- 좌: 입력 -->
+        <div class="panel">
+            <div class="panel-top">
+                <span class="p-label"><span class="p-num">1</span>정보 입력</span>
+                <span class="p-hint">항목은 드래그로 순서 변경 · 체크 해제 시 제외</span>
+            </div>
+            <div class="panel-body">
+
+                <div class="field">
+                    <label>사업장명 <span class="req">*</span></label>
+                    <input type="text" id="companyName" class="input-text" placeholder="노무법인 두웰" oninput="renderMail()">
+                    <div id="companyWarn" class="input-warn-msg">⚠️ 사업장명을 기입해주세요.</div>
+                </div>
+                <div class="field">
+                    <label>담당자 연락처 <span class="req">*</span></label>
+                    <input type="text" id="contactInfo" class="input-text" placeholder="053-0000-0000" oninput="handleContactInput(this)">
+                    <div id="contactWarn" class="input-warn-msg">⚠️ 연락처를 기입해주세요.</div>
+                </div>
+
+                <div class="section-box">
+                    <div class="section-title"><span class="chip">1</span>첨부 양식에 내용 기재</div>
+                    <div id="formList" class="sortable-list">
+                        <div class="sort-item">
+                            <span class="drag-handle">☰</span>
+                            <input type="checkbox" checked onchange="renderMail()">
+                            <input type="text" class="item-input" value="대행약정서 : 자문료 지급일자 및 위임인 서명" oninput="renderMail()">
+                            <button class="del-btn" onclick="deleteItem(this)">×</button>
+                        </div>
+                        <div class="sort-item">
+                            <span class="drag-handle">☰</span>
+                            <input type="checkbox" checked onchange="renderMail()">
+                            <input type="text" class="item-input" value="기초정보 요청서식 : 사업장 정보 및 근로자 정보 등 기재" oninput="renderMail()">
+                            <button class="del-btn" onclick="deleteItem(this)">×</button>
+                        </div>
+                        <div class="sort-item">
+                            <span class="drag-handle">☰</span>
+                            <input type="checkbox" checked onchange="renderMail()">
+                            <input type="text" class="item-input" value="자동이체신청동의서 : 자동이체 원하실 경우 작성" oninput="renderMail()">
+                            <button class="del-btn" onclick="deleteItem(this)">×</button>
+                        </div>
+                        <div class="sort-item">
+                            <span class="drag-handle">☰</span>
+                            <input type="checkbox" checked onchange="renderMail()">
+                            <input type="text" class="item-input" value="EDI 업무대행신청서 : 아래의 서명란에 직인 날인" oninput="renderMail()">
+                            <button class="del-btn" onclick="deleteItem(this)">×</button>
+                        </div>
+                    </div>
+                    <div class="add-input-box">
+                        <input type="text" id="newFormText" class="add-input" placeholder="새로운 첨부양식 항목 추가...">
+                        <button class="add-submit-btn" onclick="addNewItem('formList', 'newFormText')">추가</button>
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <div class="section-title"><span class="chip">2</span>사내 보유 자료 제출</div>
+                    <div id="docList" class="sortable-list">
+                        <div class="sort-item">
+                            <span class="drag-handle">☰</span>
+                            <input type="checkbox" checked onchange="renderMail()">
+                            <input type="text" class="item-input" value="기존자료 (취업규칙, 전직원 근로계약서, 3개월 임금대장)" oninput="renderMail()">
+                            <button class="del-btn" onclick="deleteItem(this)">×</button>
+                        </div>
+                        <div class="sort-item">
+                            <span class="drag-handle">☰</span>
+                            <input type="checkbox" checked onchange="renderMail()">
+                            <input type="text" class="item-input" value="사업자등록증 사본" oninput="renderMail()">
+                            <button class="del-btn" onclick="deleteItem(this)">×</button>
+                        </div>
+                        <div class="sort-item">
+                            <span class="drag-handle">☰</span>
+                            <input type="checkbox" checked onchange="renderMail()">
+                            <input type="text" class="item-input" value="통장 사본" oninput="renderMail()">
+                            <button class="del-btn" onclick="deleteItem(this)">×</button>
+                        </div>
+                    </div>
+                    <div class="add-input-box">
+                        <input type="text" id="newDocText" class="add-input" placeholder="새로운 사내보유자료 항목 추가...">
+                        <button class="add-submit-btn" onclick="addNewItem('docList', 'newDocText')">추가</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 우: 미리보기 -->
+        <div class="panel">
+            <div class="panel-top">
+                <span class="p-label"><span class="p-num">2</span>완성된 메일</span>
+                <span class="p-hint">그대로 복사해 발송하세요</span>
+            </div>
+            <div class="panel-body preview-body">
+
+                <div class="mail-card">
+                    <div class="mail-card-top">
+                        <span class="mail-tag">✉️ 메일 제목</span>
+                        <button class="copy-btn" onclick="copyText('mailSubject', this, '제목 복사')">제목 복사</button>
+                    </div>
+                    <div id="mailSubject" class="subject-text"></div>
+                </div>
+
+                <div class="mail-card">
+                    <div class="mail-card-top">
+                        <span class="mail-tag">📄 메일 본문</span>
+                        <button class="copy-btn" onclick="copyText('mailPreview', this, '본문 복사')">본문 복사</button>
+                    </div>
+                    <div id="mailPreview" class="mail-wrapper"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="copyGuardOverlay" class="modal-overlay" onclick="if (event.target === this) closeCopyGuardModal()">
+        <div class="modal-card">
+            <div class="modal-icon">⚠️</div>
+            <div class="modal-title">복사하기 전에 확인해주세요</div>
+            <div class="modal-desc">아래 항목을 먼저 입력해야 제목/본문을 복사할 수 있습니다.</div>
+            <ul id="copyGuardList" class="modal-list"></ul>
+            <button class="modal-close-btn" onclick="closeCopyGuardModal()">확인</button>
+        </div>
+    </div>
+
+    <script>
+        const circleNums = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫', '⑬', '⑭', '⑮', '⑯', '⑰', '⑱', '⑲', '⑳'];
+
+        new Sortable(document.getElementById('formList'), { handle: '.drag-handle', animation: 150, onEnd: renderMail });
+        new Sortable(document.getElementById('docList'), { handle: '.drag-handle', animation: 150, onEnd: renderMail });
+
+        function handleContactInput(el) {
+            let val = el.value.replace(/[^0-9]/g, '');
+            let formatted = '';
+
+            if (val.startsWith('02')) {
+                if (val.length <= 2) { formatted = val; }
+                else if (val.length <= 5) { formatted = val.substring(0, 2) + '-' + val.substring(2); }
+                else if (val.length <= 9) { formatted = val.substring(0, 2) + '-' + val.substring(2, val.length - 4) + '-' + val.substring(val.length - 4); }
+                else { formatted = val.substring(0, 2) + '-' + val.substring(2, 6) + '-' + val.substring(6, 10); }
+            } else {
+                if (val.length <= 3) { formatted = val; }
+                else if (val.length <= 6) { formatted = val.substring(0, 3) + '-' + val.substring(3); }
+                else if (val.length <= 10) { formatted = val.substring(0, 3) + '-' + val.substring(3, val.length - 4) + '-' + val.substring(val.length - 4); }
+                else { formatted = val.substring(0, 3) + '-' + val.substring(3, 7) + '-' + val.substring(7, 11); }
+            }
+
+            el.value = formatted;
+            renderMail();
+        }
+
+        function addNewItem(listId, inputId) {
+            const inputElement = document.getElementById(inputId);
+            const text = inputElement.value.trim();
+            if (!text) return;
+
+            const container = document.getElementById(listId);
+            const div = document.createElement('div');
+            div.className = 'sort-item';
+            div.innerHTML = `
+                <span class="drag-handle">☰</span>
+                <input type="checkbox" checked onchange="renderMail()">
+                <input type="text" class="item-input" value="${text}" oninput="renderMail()">
+                <button class="del-btn" onclick="deleteItem(this)">×</button>
+            `;
+
+            container.appendChild(div);
+            inputElement.value = '';
+            renderMail();
+        }
+
+        function deleteItem(btn) {
+            btn.parentElement.remove();
+            renderMail();
+        }
+
+        function renderMail() {
+            const companyRaw = document.getElementById('companyName').value.trim();
+            const contactRaw = document.getElementById('contactInfo').value.trim();
+
+            document.getElementById('companyWarn').style.display = companyRaw ? 'none' : 'block';
+            document.getElementById('contactWarn').style.display = contactRaw ? 'none' : 'block';
+
+            const companyText = companyRaw || '';
+            const contactText = contactRaw || '';
+
+            document.getElementById('mailSubject').innerText = `[노무법인 두웰] ${companyText} 급여아웃소싱 대행약정서 및 기초정보자료 송부드립니다.`;
+
+            let currentNumIdx = 0;
+
+            const formItems = document.querySelectorAll('#formList .sort-item');
+            let formHTML = '';
+            formItems.forEach(item => {
+                const isChecked = item.querySelector('input[type="checkbox"]').checked;
+                const val = item.querySelector('.item-input').value.trim();
+                if (isChecked && val) {
+                    formHTML += `<div style="margin-bottom: 4px; padding-left: 10px; font-family: 'Noto Sans KR', sans-serif; color: #333333;">${circleNums[currentNumIdx++]} ${val}</div>`;
+                }
+            });
+
+            const docItems = document.querySelectorAll('#docList .sort-item');
+            let docHTML = '';
+            docItems.forEach(item => {
+                const isChecked = item.querySelector('input[type="checkbox"]').checked;
+                const val = item.querySelector('.item-input').value.trim();
+                if (isChecked && val) {
+                    docHTML += `<div style="margin-bottom: 4px; padding-left: 10px; font-family: 'Noto Sans KR', sans-serif; color: #333333;">${circleNums[currentNumIdx++]} ${val}</div>`;
+                }
+            });
+
+            const emailTemplate = `
+                <div style="max-width: 600px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; line-height: 1.6; color: #333333;">
+                    <p style="margin: 0 0 16px 0; font-family: 'Noto Sans KR', sans-serif; color: #333333;">안녕하십니까,<br>노무법인 두웰입니다.</p>
+
+                    <p style="margin: 0 0 24px 0; font-family: 'Noto Sans KR', sans-serif; color: #333333;"><span style="color: #2b4d9e; font-weight: bold; font-family: 'Noto Sans KR', sans-serif;">${companyText}</span> 급여 아웃소싱 진행에 앞서 필요한 정보를 요청 드리오니,<br>
+                    첨부파일 내 양식 작성과 함께 제출 구비서류를 준비하여 전달해 주시기 바랍니다.</p>
+
+                    <div style="margin-bottom: 20px; font-family: 'Noto Sans KR', sans-serif;">
+                        <div style="font-weight: bold; color: #2b4d9e; margin-bottom: 8px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif;">1. 첨부 양식에 내용 기재</div>
+                        ${formHTML ? formHTML : '<div style="color:#999; font-style:italic; padding-left:10px; font-family: sans-serif;">선택되거나 입력된 양식이 없습니다.</div>'}
+                    </div>
+
+                    <div style="margin-bottom: 24px; font-family: 'Noto Sans KR', sans-serif;">
+                        <div style="font-weight: bold; color: #2b4d9e; margin-bottom: 8px; font-size: 15px; font-family: 'Noto Sans KR', sans-serif;">2. 사내 보유 자료 제출</div>
+                        ${docHTML ? docHTML : '<div style="color:#999; font-style:italic; padding-left:10px; font-family: sans-serif;">선택되거나 입력된 제출 자료가 없습니다.</div>'}
+                    </div>
+
+                    <div style="background-color: #f8fafc; border-left: 4px solid #2b4d9e; padding: 12px 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0; font-family: 'Noto Sans KR', sans-serif; color: #333333;">
+                        작성 중 문의사항이 있으신 경우 아래 번호로 연락 부탁드립니다.<br>
+                        <span style="font-weight: bold; color: #2b4d9e; font-family: 'Noto Sans KR', sans-serif;">연락처 : ${contactText}</span>
+                    </div>
+
+                    <p style="margin: 0; font-family: 'Noto Sans KR', sans-serif; color: #333333;">감사합니다.</p>
+                </div>
+            `;
+
+            document.getElementById('mailPreview').innerHTML = emailTemplate;
+        }
+
+        // 사업장명 / 담당자 연락처가 모두 입력되어야 복사를 허용
+        function getMissingRequiredFields() {
+            const missing = [];
+            if (!document.getElementById('companyName').value.trim()) missing.push('사업장명');
+            if (!document.getElementById('contactInfo').value.trim()) missing.push('담당자 연락처');
+            return missing;
+        }
+
+        function showCopyGuardModal(missingFields) {
+            document.getElementById('copyGuardList').innerHTML = missingFields.map(f => `<li>${f}</li>`).join('');
+            document.getElementById('copyGuardOverlay').classList.add('show');
+        }
+
+        function closeCopyGuardModal() {
+            document.getElementById('copyGuardOverlay').classList.remove('show');
+        }
+
+        function copyText(elementId, btnElement, originalText) {
+            const missing = getMissingRequiredFields();
+            if (missing.length > 0) {
+                renderMail();
+                showCopyGuardModal(missing);
+                return;
+            }
+
+            const container = document.getElementById(elementId);
+
+            let targetNode = container;
+            if (elementId === 'mailSubject') {
+                const tempDiv = document.createElement('div');
+                tempDiv.style.fontFamily = "'Noto Sans KR', sans-serif";
+                tempDiv.style.fontSize = "14px";
+                tempDiv.style.fontWeight = "600";
+                tempDiv.innerText = container.innerText;
+                document.body.appendChild(tempDiv);
+                targetNode = tempDiv;
+            }
+
+            const range = document.createRange();
+            range.selectNode(targetNode);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+
+            try {
+                document.execCommand('copy');
+                btnElement.classList.add('copied');
+                btnElement.innerText = '복사 완료!';
+
+                setTimeout(() => {
+                    btnElement.classList.remove('copied');
+                    btnElement.innerText = originalText;
+                }, 1000);
+
+            } catch (err) {
+                console.error('복사 실패', err);
+            }
+
+            window.getSelection().removeAllRanges();
+            if (elementId === 'mailSubject') {
+                targetNode.remove();
+            }
+        }
+
+        renderMail();
+    </script>
+
+</body>
+</html>
