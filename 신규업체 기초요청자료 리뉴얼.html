@@ -36,7 +36,7 @@
         }
 
         /* ===== 상단 브랜드 헤더 ===== */
-        .app-header{ position:relative; width:100%; max-width:1360px; margin:2px auto 20px; text-align:center; padding:4px 8px 0; }
+        .app-header{ position:relative; width:100%; max-width:1360px; margin:2px auto 20px; text-align:center; padding:12px 8px; }
         .app-header .back{
             position:absolute; left:0; top:0; display:inline-flex; align-items:center; gap:4px;
             background:#fff; color:var(--royal); text-decoration:none; font-size:13px; font-weight:700;
@@ -47,8 +47,7 @@
         .eyebrow{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--blue); }
         .app-header h1{ font-size:clamp(23px,2.6vw,31px); font-weight:800; letter-spacing:-1px; margin:9px 0 6px; line-height:1.2; color:#2f6bff; }
         .app-header h1 .g{ color:#2f6bff; }
-        .app-header .h-top{ text-align:left; margin-bottom:8px; }
-        .app-header .h-top .back{ position:static; top:auto; left:auto; }
+        .app-header .back{ top:50%; transform:translateY(-50%); }
         .app-header .ttl{ position:relative; text-align:center; }
         .app-header .ttl h1{ display:inline-block; position:relative; margin:0; }
         .app-header .ttl h1 .crumb{ position:absolute; top:50%; right:calc(100% + 8px); transform:translateY(-50%); white-space:nowrap; font-size:0.8em; font-weight:700; color:#5b6b86; letter-spacing:-0.2px; }
@@ -132,7 +131,7 @@
 <body>
 
     <header class="app-header">
-        <div class="h-top"><a href="index.html" class="back" onclick="if(history.length>1){history.back();return false;}">‹ 이전</a></div>
+        <a href="index.html" class="back" onclick="if(history.length>1){history.back();return false;}">‹ 이전</a>
         <div class="ttl"><h1><span class="crumb">신규업체 ›</span>기초요청자료</h1></div>
     </header>
 
