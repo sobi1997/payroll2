@@ -398,17 +398,19 @@
       }
     };
     const drillClosers=[];
+    const drillOpeners={};
+    let curOpen={sec:null,key:null};
     document.querySelectorAll('.section').forEach(sec=>{
         const grid=sec.querySelector('.cat-grid'), panel=sec.querySelector('.cat-panel'), data=DRILL[sec.id];
         if(!grid||!panel||!data) return;
         const cards=panel.querySelector('.cat-cards'), title=panel.querySelector('.cat-title');
         const tiles=grid.querySelectorAll('.cat-tile');
         let activeKey=null;
-        const close=()=>{ activeKey=null; tiles.forEach(t=>t.classList.remove('active')); panel.hidden=true; };
+        const close=()=>{ activeKey=null; tiles.forEach(t=>t.classList.remove('active')); panel.hidden=true; if(curOpen.sec===sec.id) curOpen={sec:null,key:null}; };
         const open=(key)=>{
             if(activeKey===key){ close(); return; }              // 같은 타일 재클릭 → 접기
             const c=data[key]; if(!c) return;
-            activeKey=key;
+            activeKey=key; curOpen={sec:sec.id,key:key};
             tiles.forEach(t=>t.classList.toggle('active', t.dataset.cat===key));
             title.textContent=c.name;
             cards.className='cat-cards card-grid '+(c.items.length>1?'cols-2':'single');
@@ -416,12 +418,32 @@
             panel.hidden=false;
         };
         tiles.forEach(t=>t.addEventListener('click',()=>open(t.dataset.cat)));
-        drillClosers.push(close);
+        drillClosers.push(close); drillOpeners[sec.id]=open;
     });
     function closeCat(){ drillClosers.forEach(fn=>fn()); }
 
+    // 🔙 도구로 이동 직전 상태 저장 → "이전"(뒤로가기)으로 돌아오면 그 화면 복원
+    document.addEventListener('click',function(e){
+        const a=e.target.closest('.cat-cards a.card');
+        if(a){ try{ sessionStorage.setItem('portalReturn', JSON.stringify({idx:idx, sec:curOpen.sec, key:curOpen.key})); }catch(_){} }
+    });
+    function restorePortalState(){
+        try{
+            const raw=sessionStorage.getItem('portalReturn'); if(!raw) return;
+            sessionStorage.removeItem('portalReturn');
+            const r=JSON.parse(raw);
+            if(typeof r.idx==='number' && r.idx>0){
+                const prev=track.style.transition; track.style.transition='none';
+                idx=Math.max(0,Math.min(sections.length-1,r.idx)); render();
+                void track.offsetWidth; track.style.transition=prev||'';
+            }
+            if(r.sec && r.key && drillOpeners[r.sec]) drillOpeners[r.sec](r.key);
+        }catch(_){}
+    }
+
     window.addEventListener('resize',render);
     render();
+    restorePortalState();
 </script>
 </body>
 </html>
