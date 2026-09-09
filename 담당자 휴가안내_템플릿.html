@@ -31,7 +31,7 @@
         .app-header{ position:relative; width:100%; max-width:1360px; margin:2px auto 18px; text-align:center; padding:4px 8px 0; }
         .app-header .back{ position:absolute; left:0; top:0; display:inline-flex; align-items:center; gap:4px; background:#fff; color:var(--primary-color); text-decoration:none; font-size:13px; font-weight:700; padding:8px 15px; border-radius:100px; border:1px solid var(--border-color); box-shadow:0 4px 14px rgba(30,70,150,0.08); transition:all .18s; }
         .app-header .back:hover{ background:var(--primary-color); color:#fff; border-color:var(--primary-color); }
-        .app-header h1{ font-size:clamp(22px,2.5vw,30px); font-weight:800; letter-spacing:-1px; margin:0; color:#16223a; }
+        .app-header h1{ font-size:clamp(22px,2.5vw,30px); font-weight:800; letter-spacing:-1px; margin:0; color:#2f6bff; }
         .app-header h1 .g{ color:#2f6bff; }
         .p-label{ display:flex; align-items:center; gap:9px; color:#16223a; }
         .p-num{ width:24px; height:24px; border-radius:50%; background:#2f6bff; color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
@@ -88,7 +88,7 @@
 </head>
 <body>
     <header class="app-header">
-        <a href="index.html" class="back">‹ 홈으로</a>
+        <a href="index.html" class="back" onclick="if(history.length>1){history.back();return false;}">‹ 이전</a>
         <h1>담당자 <span class="g">휴가 안내</span></h1>
     </header>
 

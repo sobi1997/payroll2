@@ -45,7 +45,7 @@
         }
         .app-header .back:hover{ background:var(--royal); color:#fff; border-color:var(--royal); }
         .eyebrow{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--blue); }
-        .app-header h1{ font-size:clamp(23px,2.6vw,31px); font-weight:800; letter-spacing:-1px; margin:9px 0 6px; line-height:1.2; }
+        .app-header h1{ font-size:clamp(23px,2.6vw,31px); font-weight:800; letter-spacing:-1px; margin:9px 0 6px; line-height:1.2; color:#2f6bff; }
         .app-header h1 .g{ color:#2f6bff; }
         .app-header .sub{ color:var(--muted); font-size:14px; font-weight:500; margin:0; }
 
@@ -127,7 +127,7 @@
 <body>
 
     <header class="app-header">
-        <a href="index.html" class="back">‹ 홈으로</a>
+        <a href="index.html" class="back" onclick="if(history.length>1){history.back();return false;}">‹ 이전</a>
         <h1>신규업체 <span class="g">기초요청자료</span></h1>
     </header>
 
