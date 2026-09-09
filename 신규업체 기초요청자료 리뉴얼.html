@@ -46,7 +46,7 @@
         .app-header .back:hover{ background:var(--royal); color:#fff; border-color:var(--royal); }
         .eyebrow{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--blue); }
         .app-header h1{ font-size:clamp(23px,2.6vw,31px); font-weight:800; letter-spacing:-1px; margin:9px 0 6px; line-height:1.2; }
-        .app-header h1 .g{ background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+        .app-header h1 .g{ color:#2f6bff; }
         .app-header .sub{ color:var(--muted); font-size:14px; font-weight:500; margin:0; }
 
         /* ===== 2단 패널 ===== */
@@ -54,7 +54,7 @@
         .panel{ flex:1; background:var(--card); border:1px solid var(--card-bd); border-radius:20px; box-shadow:var(--sh); display:flex; flex-direction:column; min-height:0; overflow:hidden; }
         .panel-top{ padding:16px 22px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid var(--card-bd); }
         .p-label{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:15px; color:var(--ink); }
-        .p-num{ width:25px; height:25px; border-radius:50%; background:var(--grad); color:#fff; font-size:12.5px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .p-num{ width:25px; height:25px; border-radius:50%; background:#2f6bff; color:#fff; font-size:12.5px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
         .p-hint{ font-size:12px; color:var(--muted); font-weight:500; }
         .panel-body{ padding:22px; overflow-y:auto; flex:1; }
         .preview-body{ background:#eef2f9; }
@@ -86,7 +86,7 @@
         .add-input-box{ display:flex; gap:8px; margin-top:12px; }
         .add-input{ flex:1; padding:10px 12px; border:1.5px solid var(--card-bd); border-radius:10px; font-size:13px; color:var(--ink); background:#fff; }
         .add-input:focus{ outline:none; border-color:var(--blue); }
-        .add-submit-btn{ background:var(--royal); color:#fff; border:none; padding:0 18px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:background .15s; }
+        .add-submit-btn{ background:#2f6bff; color:#fff; border:none; padding:0 18px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:background .15s; }
         .add-submit-btn:hover{ background:var(--blue-deep); }
 
         /* ===== 메일 카드 (미리보기) ===== */
@@ -94,8 +94,8 @@
         .mail-card:last-child{ margin-bottom:0; }
         .mail-card-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--card-bd); }
         .mail-tag{ display:flex; align-items:center; gap:7px; font-weight:800; font-size:13px; color:var(--royal); }
-        .copy-btn{ background:var(--grad); color:#fff; border:none; padding:8px 17px; border-radius:100px; font-size:12.5px; font-weight:700; cursor:pointer; box-shadow:0 6px 16px rgba(47,107,255,0.25); transition:transform .15s, box-shadow .15s; white-space:nowrap; }
-        .copy-btn:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(47,107,255,0.32); }
+        .copy-btn{ background:#2f6bff; color:#fff; border:none; padding:8px 17px; border-radius:100px; font-size:12.5px; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(47,107,255,0.18); transition:transform .15s, box-shadow .15s, background .15s; white-space:nowrap; }
+        .copy-btn:hover{ transform:translateY(-1px); background:#1b4dd1; box-shadow:0 8px 18px rgba(47,107,255,0.26); }
         .copy-btn.copied{ background:#10b981 !important; box-shadow:none !important; }
 
         /* 이메일 콘텐츠 폰트 = Noto Sans KR (실제 발송 메일과 동일하게 유지) */
@@ -113,7 +113,7 @@
         .modal-list{ list-style:none; padding:0; margin:0 0 22px; text-align:left; }
         .modal-list li{ font-size:13.5px; color:#ef4444; font-weight:700; padding:4px 0; }
         .modal-list li::before{ content:"• "; }
-        .modal-close-btn{ background:var(--grad); color:#fff; border:none; padding:11px 28px; border-radius:100px; font-weight:700; font-size:14px; cursor:pointer; box-shadow:0 8px 20px rgba(47,107,255,0.28); }
+        .modal-close-btn{ background:#2f6bff; color:#fff; border:none; padding:11px 28px; border-radius:100px; font-weight:700; font-size:14px; cursor:pointer; box-shadow:0 6px 16px rgba(47,107,255,0.22); }
 
         /* ===== 반응형(좁을 때 세로 스택) ===== */
         @media (max-width:860px){
@@ -130,7 +130,6 @@
         <a href="index.html" class="back">‹ 홈으로</a>
         <span class="eyebrow">New Client · 기초요청</span>
         <h1>신규업체 <span class="g">기초요청자료</span></h1>
-        <p class="sub">사업장 정보만 입력하면 대행약정·기초정보 요청 메일이 완성됩니다.</p>
     </header>
 
     <div class="container">
@@ -138,7 +137,6 @@
         <div class="panel">
             <div class="panel-top">
                 <span class="p-label"><span class="p-num">1</span>정보 입력</span>
-                <span class="p-hint">항목은 드래그로 순서 변경 · 체크 해제 시 제외</span>
             </div>
             <div class="panel-body">
 
