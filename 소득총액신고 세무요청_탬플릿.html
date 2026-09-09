@@ -43,7 +43,8 @@
         .input-text, .input-select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; color: #334155; background-color: white; font-family: 'Noto Sans KR', sans-serif; }
         .input-text:focus, .input-select:focus { outline: 2px solid var(--primary-color); border-color: transparent; }
         .input-text[type="date"] { cursor: pointer; }
-        .input-warn-msg { color: #ef4444; font-size: 12px; margin-top: 4px; display: none; font-weight: 500; }
+        .input-warn-msg { color: #ef4444; font-size: 12px; margin-top: 4px; display: none !important; font-weight: 500; }
+        .req { color: #ef4444; font-weight: 700; margin-left: 3px; }
 
         .section-box { border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 22px; background: #fbfcfe; }
         .section-title { font-weight: 600; font-size: 15px; margin-bottom: 12px; color: var(--primary-color); }
@@ -114,13 +115,13 @@
         <div class="panel-body" style="border-top: 1px solid var(--border-color);">
 
             <div class="input-group">
-                <label>사업장명</label>
+                <label>사업장명 <span class="req">*</span></label>
                 <input type="text" id="companyName" class="input-text" placeholder="노무법인 두웰" oninput="renderMail()">
                 <div id="companyWarn" class="input-warn-msg">⚠️ 사업장명을 기입해주세요.</div>
             </div>
 
             <div class="input-group">
-                <label>담당자 직통번호</label>
+                <label>담당자 직통번호 <span class="req">*</span></label>
                 <input type="text" id="contactInfo" class="input-text" placeholder="053-0000-0000" oninput="handleContactInput(this)">
                 <div id="contactWarn" class="input-warn-msg">⚠️ 연락처를 기입해주세요.</div>
             </div>
@@ -135,13 +136,13 @@
                 </select>
             </div>
             <div class="input-group">
-                <label id="labelDateNormal">일반 사업장 회신기한</label>
+                <label id="labelDateNormal">일반 사업장 회신기한 <span class="req">*</span></label>
                 <input type="date" id="dueDateNormal" class="input-text" onchange="renderMail()">
                 <div id="normalWarn" class="input-warn-msg">⚠️ 회신기한을 선택해주세요.</div>
             </div>
 
             <div class="input-group" id="groupSpecialDate">
-                <label id="labelDateSpecial">성실신고 사업장 회신기한</label>
+                <label id="labelDateSpecial">성실신고 사업장 회신기한 <span class="req">*</span></label>
                 <input type="date" id="dueDateSpecial" class="input-text" onchange="renderMail()">
                 <div id="specialWarn" class="input-warn-msg">⚠️ 성실신고 회신기한을 선택해주세요.</div>
             </div>

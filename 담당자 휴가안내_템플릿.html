@@ -39,7 +39,8 @@
         .input-text { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; color: #334155; background-color: white; font-family: 'Noto Sans KR', sans-serif; }
         .input-text:focus { outline: 2px solid var(--primary-color); border-color: transparent; }
         .input-text[type="date"] { cursor: pointer; }
-        .input-warn-msg { color: #ef4444; font-size: 12px; margin-top: 4px; display: none; font-weight: 500; }
+        .input-warn-msg { color: #ef4444; font-size: 12px; margin-top: 4px; display: none !important; font-weight: 500; }
+        .req { color: #ef4444; font-weight: 700; margin-left: 3px; }
 
         /* 좌우 2칸 배열 */
         .field-row { display: flex; gap: 12px; margin-bottom: 16px; }
@@ -84,19 +85,19 @@
 
             <div class="field-row">
                 <div class="input-group">
-                    <label>담당자 이름</label>
+                    <label>담당자 이름 <span class="req">*</span></label>
                     <input type="text" id="empName" class="input-text" placeholder="홍길동" oninput="renderMail()">
                     <div id="nameWarn" class="input-warn-msg">⚠️ 이름을 기입해주세요.</div>
                 </div>
                 <div class="input-group">
-                    <label>직급</label>
+                    <label>직급 <span class="req">*</span></label>
                     <input type="text" id="empTitle" class="input-text" placeholder="노무사 / 대리 등" oninput="renderMail()">
                     <div id="titleWarn" class="input-warn-msg">⚠️ 직급을 기입해주세요.</div>
                 </div>
             </div>
 
             <div class="input-group">
-                <label>사유</label>
+                <label>사유 <span class="req">*</span></label>
                 <input type="text" id="reason" class="input-text" placeholder="연차 휴가 / 개인 사정 등" oninput="renderMail()">
                 <div id="reasonWarn" class="input-warn-msg">⚠️ 사유를 기입해주세요.</div>
             </div>
@@ -105,11 +106,11 @@
                 <div class="section-title">휴가 기간</div>
                 <div class="field-row" style="margin-bottom: 0;">
                     <div class="input-group">
-                        <label>시작일</label>
+                        <label>시작일 <span class="req">*</span></label>
                         <input type="date" id="startDate" class="input-text" onchange="renderMail()">
                     </div>
                     <div class="input-group">
-                        <label>종료일</label>
+                        <label>종료일 <span class="req">*</span></label>
                         <input type="date" id="endDate" class="input-text" onchange="renderMail()">
                     </div>
                 </div>
