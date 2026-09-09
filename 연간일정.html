@@ -73,7 +73,7 @@
             left: 24px;
             top: 24px;
             background-color: #ffffff;
-            color: #2b4d9e;
+            color: #2f6bff;
             text-decoration: none;
             padding: 7px 15px;
             border-radius: 100px;
@@ -84,9 +84,9 @@
             white-space: nowrap;
         }
         .btn-back-portal:hover {
-            background-color: #2b4d9e;
+            background-color: #2f6bff;
             color: #fff;
-            border-color: #2b4d9e;
+            border-color: #2f6bff;
         }
 
         .launcher-body {
@@ -500,7 +500,7 @@
 
         <!-- 🟦 상단 표지 배너 -->
         <div class="launcher-header">
-            <a href="index.html" class="btn-back-portal">‹ 홈으로</a>
+            <a href="index.html" class="btn-back-portal" onclick="if(history.length>1){history.back();return false;}">‹ 이전</a>
             <span class="cover-eyebrow">Monthly Schedule</span>
             <h1>월간 일정</h1>
         </div>
